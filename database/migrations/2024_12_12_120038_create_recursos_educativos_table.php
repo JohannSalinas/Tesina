@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('titulo');
             $table->text('descripcion')->nullable();
-            $table->enum('tipo', ['video', 'documento', 'presentacion', 'libro']);
+            $table->enum('tipo', ['PDF', 'DOCX', 'PPTX', 'Enlace Web']);
             $table->string('url')->nullable(); // URL externa del recurso
             $table->string('archivo_path')->nullable(); // Ruta del archivo subido
             $table->foreignId('user_id')

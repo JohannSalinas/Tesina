@@ -72,10 +72,8 @@ Route::prefix('noticias')->name('noticias.')->group(function () {
 
 
 
+// Rutas para Encuestas
 Route::prefix('encuestas')->name('encuestas.')->group(function () {
-
-    $encuestas = \App\Models\Encuesta::all(); // Puedes agregar filtros o paginación aquí
-        return Inertia::render('GestionEncuestas',['encuestas' => $encuestas]);
     Route::get('/', [EncuestaController::class, 'index'])->name('index');
     Route::get('/crear', [EncuestaController::class, 'create'])->name('create');
     Route::post('/', [EncuestaController::class, 'store'])->name('store');
@@ -83,6 +81,9 @@ Route::prefix('encuestas')->name('encuestas.')->group(function () {
     Route::put('/{id}', [EncuestaController::class, 'update'])->name('update');
     Route::delete('/{id}', [EncuestaController::class, 'destroy'])->name('destroy');
 });
+
+
+
 
 
 

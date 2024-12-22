@@ -1,64 +1,75 @@
 <?php
-// app/Http/Controllers/EncuestaController.php
 
 namespace App\Http\Controllers;
 
 use App\Models\Encuesta;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 
 class EncuestaController extends Controller
 {
-    // Mostrar todas las encuestas
+    // Mostrar la lista de encuestas
     public function index()
     {
-        $encuestas = Encuesta::all(); // Aquí puedes agregar paginación o filtros
-        return view('encuestas.index', compact('encuestas')); // Cambia la vista según tu estructura
+        $encuestas = Encuesta::all(); // Obtener todas las encuestas
+        return Inertia::render('GestionEncuestas', [
+            'encuestas' => $encuestas,
+        ]);
     }
 
-    // Mostrar el formulario para crear una nueva encuesta
+    // Mostrar el formulario de creación de encuesta
     public function create()
     {
-        return view('encuestas.create'); // Cambia la vista según tu estructura
+        return Inertia::render('CrearEncuesta');
     }
 
-    // Almacenar una nueva encuesta
+    // Almacenar la encuesta en la base de datos
     public function store(Request $request)
     {
-        $validatedData = $request->validate([
+        $request->validate([
             'titulo' => 'required|string|max:255',
             'descripcion' => 'nullable|string',
-            'preguntas' => 'required|string', // Aquí puedes agregar validación según el formato de preguntas
-            'user_id' => 'required|exists:users,id', // Validamos que el id_usuario exista en la tabla users
+            'preguntas' => 'nullable|string',
         ]);
 
-        // Crear la nueva encuesta
-        Encuesta::create($validatedData);
+        // Crear una nueva encuesta
+        Encuesta::create([
+            'titulo' => $request->titulo,
+            'descripcion' => $request->descripcion,
+            'preguntas' => $request->preguntas,
+            'user_id' => auth()->id(), // El ID del usuario autenticado
+        ]);
 
-        // Redirigir a la lista de encuestas con un mensaje de éxito
-        return redirect()->route('encuestas.index')->with('success', 'Encuesta creada con éxito.');
+        return redirect()->route('encuestas.index');
     }
 
-    // Mostrar el formulario para editar una encuesta
+    // Mostrar el formulario para editar la encuesta
     public function edit($id)
     {
         $encuesta = Encuesta::findOrFail($id);
-        return view('encuestas.edit', compact('encuesta')); // Cambia la vista según tu estructura
+        return Inertia::render('EditarEncuesta', [
+            'encuesta' => $encuesta,
+        ]);
     }
 
     // Actualizar una encuesta existente
     public function update(Request $request, $id)
     {
-        $validatedData = $request->validate([
+        $encuesta = Encuesta::findOrFail($id);
+
+        $request->validate([
             'titulo' => 'required|string|max:255',
             'descripcion' => 'nullable|string',
-            'preguntas' => 'required|string',
-            'user_id' => 'required|exists:users,id',
+            'preguntas' => 'nullable|string',
         ]);
 
-        $encuesta = Encuesta::findOrFail($id);
-        $encuesta->update($validatedData);
+        $encuesta->update([
+            'titulo' => $request->titulo,
+            'descripcion' => $request->descripcion,
+            'preguntas' => $request->preguntas,
+        ]);
 
-        return redirect()->route('encuestas.index')->with('success', 'Encuesta actualizada con éxito.');
+        return redirect()->route('encuestas.index');
     }
 
     // Eliminar una encuesta
@@ -67,6 +78,6 @@ class EncuestaController extends Controller
         $encuesta = Encuesta::findOrFail($id);
         $encuesta->delete();
 
-        return redirect()->route('encuestas.index')->with('success', 'Encuesta eliminada con éxito.');
+        return redirect()->route('encuestas.index');
     }
 }
