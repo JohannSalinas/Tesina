@@ -25,10 +25,15 @@ class User extends Authenticatable
      * @var list<string>
      */
     protected $fillable = [
-        'name',
+        'nombre',
         'email',
         'password',
         'user_type', // Agregado para permitir asignación masiva
+        'genero',
+        'apellidos',
+        'gradoAcademico',
+        'fechaNacimiento',
+        'foto',
     ];
 
     /**

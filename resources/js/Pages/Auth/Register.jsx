@@ -7,11 +7,16 @@ import { Head, Link, useForm } from '@inertiajs/react';
 
 export default function Register() {
     const { data, setData, post, processing, errors, reset } = useForm({
-        name: '',
+        nombre: '',
+        apellidos: '',
         email: '',
         password: '',
         password_confirmation: '',
         user_type: 'profesor', // Valor predeterminado
+        genero: 'otro', // Valor predeterminado
+        gradoAcademico: 'licenciatura', // Valor predeterminado
+        fechaNacimiento: '',
+        foto: null,
     });
 
     const submit = (e) => {
@@ -22,31 +27,51 @@ export default function Register() {
         });
     };
 
+    const handleInputChange = (e) => {
+        const { name, value, type, files } = e.target;
+        if (type === 'file') {
+            setData(name, files[0]);
+        } else {
+            setData(name, value);
+        }
+    };
+
     return (
         <GuestLayout>
             <Head title="Register" />
 
             <form onSubmit={submit}>
                 <div>
-                    <InputLabel htmlFor="name" value="Name" />
-
+                    <InputLabel htmlFor="nombre" value="Nombre" />
                     <TextInput
-                        id="name"
-                        name="name"
-                        value={data.name}
+                        id="nombre"
+                        name="nombre"
+                        value={data.nombre}
                         className="mt-1 block w-full"
-                        autoComplete="name"
+                        autoComplete="nombre"
                         isFocused={true}
-                        onChange={(e) => setData('name', e.target.value)}
+                        onChange={handleInputChange}
                         required
                     />
+                    <InputError message={errors.nombre} className="mt-2" />
+                </div>
 
-                    <InputError message={errors.name} className="mt-2" />
+                <div className="mt-4">
+                    <InputLabel htmlFor="apellidos" value="Apellidos" />
+                    <TextInput
+                        id="apellidos"
+                        name="apellidos"
+                        value={data.apellidos}
+                        className="mt-1 block w-full"
+                        autoComplete="apellidos"
+                        onChange={handleInputChange}
+                        required
+                    />
+                    <InputError message={errors.apellidos} className="mt-2" />
                 </div>
 
                 <div className="mt-4">
                     <InputLabel htmlFor="email" value="Email" />
-
                     <TextInput
                         id="email"
                         type="email"
@@ -54,16 +79,14 @@ export default function Register() {
                         value={data.email}
                         className="mt-1 block w-full"
                         autoComplete="username"
-                        onChange={(e) => setData('email', e.target.value)}
+                        onChange={handleInputChange}
                         required
                     />
-
                     <InputError message={errors.email} className="mt-2" />
                 </div>
 
                 <div className="mt-4">
                     <InputLabel htmlFor="password" value="Password" />
-
                     <TextInput
                         id="password"
                         type="password"
@@ -71,19 +94,14 @@ export default function Register() {
                         value={data.password}
                         className="mt-1 block w-full"
                         autoComplete="new-password"
-                        onChange={(e) => setData('password', e.target.value)}
+                        onChange={handleInputChange}
                         required
                     />
-
                     <InputError message={errors.password} className="mt-2" />
                 </div>
 
                 <div className="mt-4">
-                    <InputLabel
-                        htmlFor="password_confirmation"
-                        value="Confirm Password"
-                    />
-
+                    <InputLabel htmlFor="password_confirmation" value="Confirm Password" />
                     <TextInput
                         id="password_confirmation"
                         type="password"
@@ -91,34 +109,87 @@ export default function Register() {
                         value={data.password_confirmation}
                         className="mt-1 block w-full"
                         autoComplete="new-password"
-                        onChange={(e) =>
-                            setData('password_confirmation', e.target.value)
-                        }
+                        onChange={handleInputChange}
                         required
                     />
-
-                    <InputError
-                        message={errors.password_confirmation}
-                        className="mt-2"
-                    />
+                    <InputError message={errors.password_confirmation} className="mt-2" />
                 </div>
 
                 <div className="mt-4">
                     <InputLabel htmlFor="user_type" value="User Type" />
-
                     <select
                         id="user_type"
                         name="user_type"
                         value={data.user_type}
                         className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-                        onChange={(e) => setData('user_type', e.target.value)}
+                        onChange={handleInputChange}
                         required
                     >
                         <option value="profesor">Profesor</option>
                         <option value="coordinador">Coordinador</option>
                     </select>
-
                     <InputError message={errors.user_type} className="mt-2" />
+                </div>
+
+                <div className="mt-4">
+                    <InputLabel htmlFor="genero" value="Género" />
+                    <select
+                        id="genero"
+                        name="genero"
+                        value={data.genero}
+                        className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                        onChange={handleInputChange}
+                        required
+                    >
+                        <option value="masculino">Masculino</option>
+                        <option value="femenino">Femenino</option>
+                        <option value="otro">Otro</option>
+                    </select>
+                    <InputError message={errors.genero} className="mt-2" />
+                </div>
+
+                <div className="mt-4">
+                    <InputLabel htmlFor="gradoAcademico" value="Grado Académico" />
+                    <select
+                        id="gradoAcademico"
+                        name="gradoAcademico"
+                        value={data.gradoAcademico}
+                        className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                        onChange={handleInputChange}
+                        required
+                    >
+                        <option value="licenciatura">Licenciatura</option>
+                        <option value="maestria">Maestría</option>
+                        <option value="doctorado">Doctorado</option>
+                    </select>
+                    <InputError message={errors.gradoAcademico} className="mt-2" />
+                </div>
+
+                <div className="mt-4">
+                    <InputLabel htmlFor="fechaNacimiento" value="Fecha de Nacimiento" />
+                    <TextInput
+                        id="fechaNacimiento"
+                        type="date"
+                        name="fechaNacimiento"
+                        value={data.fechaNacimiento}
+                        className="mt-1 block w-full"
+                        autoComplete="bday"
+                        onChange={handleInputChange}
+                        required
+                    />
+                    <InputError message={errors.fechaNacimiento} className="mt-2" />
+                </div>
+
+                <div className="mt-4">
+                    <InputLabel htmlFor="foto" value="Foto" />
+                    <input
+                        id="foto"
+                        type="file"
+                        name="foto"
+                        className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                        onChange={handleInputChange}
+                    />
+                    <InputError message={errors.foto} className="mt-2" />
                 </div>
 
                 <div className="mt-4 flex items-center justify-end">

@@ -31,17 +31,33 @@ class RegisteredUserController extends Controller
     public function store(Request $request): RedirectResponse
     {
         $request->validate([
-            'name' => 'required|string|max:255',
+            'nombre' => 'required|string|max:255',
+            'apellidos' => 'nullable|string|max:255',
             'email' => 'required|string|lowercase|email|max:255|unique:'.User::class,
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
-            'user_type' => 'required|in:profesor,coordinador'
+            'user_type' => 'required|in:profesor,coordinador',
+            'genero' => 'required|in:masculino,femenino,otro',
+            'gradoAcademico' => 'required|in:licenciatura,maestria,doctorado',
+            'fechaNacimiento' => 'nullable|date',
+            'foto' => 'nullable|image|max:10240',  // Validación de la imagen
         ]);
 
+        // Handle the image upload
+        $fotoPath = null;
+        if ($request->hasFile('foto')) {
+            $fotoPath = $request->file('foto')->store('fotos', 'public');
+        }
+
         $user = User::create([
-            'name' => $request->name,
+            'nombre' => $request->nombre,
+            'apellidos' => $request->apellidos,
             'email' => $request->email,
             'password' => Hash::make($request->password),
             'user_type' => $request->user_type,
+            'genero' => $request->genero,
+            'gradoAcademico' => $request->gradoAcademico,
+            'fechaNacimiento' => $request->fechaNacimiento,
+            'foto' => $fotoPath,
         ]);
 
         event(new Registered($user));
