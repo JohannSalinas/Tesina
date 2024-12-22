@@ -8,6 +8,8 @@ use Inertia\Inertia;
 use App\Models\User;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\NoticiasController;
+use App\Http\Controllers\EncuestaController;
+
 
 Route::get('/', function () {
     return Inertia::render('Welcome', [
@@ -67,6 +69,23 @@ Route::prefix('noticias')->name('noticias.')->group(function () {
     Route::get('/{id}/editar', [NoticiasController::class, 'edit'])->name('edit');
     Route::put('/{id}', [NoticiasController::class, 'update'])->name('update');
 });
+
+
+
+Route::prefix('encuestas')->name('encuestas.')->group(function () {
+
+    $encuestas = \App\Models\Encuesta::all(); // Puedes agregar filtros o paginación aquí
+        return Inertia::render('GestionEncuestas',['encuestas' => $encuestas]);
+    Route::get('/', [EncuestaController::class, 'index'])->name('index');
+    Route::get('/crear', [EncuestaController::class, 'create'])->name('create');
+    Route::post('/', [EncuestaController::class, 'store'])->name('store');
+    Route::get('/{id}/editar', [EncuestaController::class, 'edit'])->name('edit');
+    Route::put('/{id}', [EncuestaController::class, 'update'])->name('update');
+    Route::delete('/{id}', [EncuestaController::class, 'destroy'])->name('destroy');
+});
+
+
+
 });
 
 require __DIR__.'/auth.php';

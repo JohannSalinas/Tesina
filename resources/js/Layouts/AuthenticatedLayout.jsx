@@ -50,6 +50,12 @@ export default function AuthenticatedLayout({ header, children }) {
                                         >
                                             Gestion Noticias
                                         </NavLink>
+                                        <NavLink
+                                            href={route('encuestas.index')} // Enlace a la gestión de encuestas
+                                            active={route().current('encuestas.index')}
+                                        >
+                                            Gestion Encuestas
+                                        </NavLink>
                                     </>
                                 )}
                             </div>
