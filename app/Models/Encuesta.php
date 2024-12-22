@@ -9,15 +9,16 @@ class Encuesta extends Model
 {
     use HasFactory;
 
-    // Definir los campos que se pueden asignar de forma masiva
-    protected $fillable = [
-        'titulo',
-        'descripcion',
-        'preguntas',
-        'user_id',
-    ];
+    // Tabla asociada
+    protected $table = 'encuestas';
 
-    // Relación: Una encuesta pertenece a un usuario (user)
+    // No timestamps por defecto
+    public $timestamps = false;
+
+    // Asignación masiva permitida
+    protected $fillable = ['titulo', 'descripcion', 'preguntas', 'user_id', 'fecha_creacion'];
+
+    // Relación con el modelo User
     public function user()
     {
         return $this->belongsTo(User::class);
