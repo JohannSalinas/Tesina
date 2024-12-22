@@ -1,5 +1,5 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { Head, usePage, router } from '@inertiajs/react';
+import { Head, usePage, router, Link } from '@inertiajs/react';
 import { useState } from 'react';
 
 export default function GestionEncuestas() {
@@ -97,7 +97,7 @@ export default function GestionEncuestas() {
                                         className="w-full p-2 mt-1 border rounded"
                                     ></textarea>
                                 </div>
-                                <button className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600" type="submit">
+                                <button className="w-full bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600" type="submit">
                                     Crear Encuesta
                                 </button>
                             </form>
@@ -125,6 +125,12 @@ export default function GestionEncuestas() {
                                                 >
                                                     Eliminar
                                                 </button>
+                                                <Link
+                                                    href={`/encuestas/${encuesta.id}/editar`}
+                                                    className="px-3 py-1 text-white bg-blue-500 rounded hover:bg-blue-600"
+                                                >
+                                                    Modificar
+                                                </Link>
                                             </td>
                                         </tr>
                                     ))}

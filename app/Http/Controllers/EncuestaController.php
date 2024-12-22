@@ -48,4 +48,29 @@ class EncuestaController extends Controller
 
         return redirect()->back()->with('success', 'Encuesta eliminada correctamente.');
     }
+
+    public function edit($id)
+{
+    $encuesta = Encuesta::findOrFail($id);
+    return inertia('EditarEncuesta', ['encuesta' => $encuesta]);
+}
+
+/**
+ * Actualiza la encuesta.
+ */
+public function update(Request $request, $id)
+{
+    $request->validate([
+        'titulo' => 'required|string|max:255',
+        'descripcion' => 'nullable|string',
+        'preguntas' => 'nullable|string',
+    ]);
+
+    $encuesta = Encuesta::findOrFail($id);
+    $encuesta->update($request->all());
+
+    return redirect()->route('encuestas.index')->with('success', 'Encuesta actualizada correctamente.');
+}
+
+
 }
