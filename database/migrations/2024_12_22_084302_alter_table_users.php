@@ -18,7 +18,6 @@ return new class extends Migration
             $table->enum('gradoAcademico',['licenciatura','maestria','doctorado']);
             $table->date('fechaNacimiento')->nullable();
             $table->string('foto')->nullable();
-
         });
     }
 

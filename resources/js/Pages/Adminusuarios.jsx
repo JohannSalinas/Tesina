@@ -25,38 +25,62 @@ export default function Adminusuarios() {
 
             <div className="py-12">
                 <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
-                    <div className="overflow-hidden bg-white shadow-sm sm:rounded-lg dark:bg-gray-800">
+                    <div className="overflow-x-auto bg-white shadow-sm sm:rounded-lg dark:bg-gray-800">
                         <div className="p-6 text-gray-900 dark:text-gray-100">
                             <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                                 <thead className="bg-gray-50 dark:bg-gray-700">
-                                    <tr>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-300">
-                                            ID
-                                        </th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-300">
-                                            Nombre
-                                        </th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-300">
-                                            Email
-                                        </th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-300">
-                                            Tipo de Usuario
-                                        </th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-300">
-                                            Acciones
-                                        </th>
-                                    </tr>
+                                <tr>
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-300">
+                                        ID
+                                    </th>
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-300">
+                                        Nombre
+                                    </th>
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-300">
+                                        Apellidos
+                                    </th>
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-300">
+                                        Género
+                                    </th>
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-300">
+                                        Email
+                                    </th>
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-300">
+                                        Grado Académico
+                                    </th>
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-300">
+                                        fecha de Nacimiento
+                                    </th>
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-300">
+                                        Foto
+                                    </th>
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-300">
+                                        Tipo de Usuario
+                                    </th>
+                                    <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-300">
+                                        Acciones
+                                    </th>
+                                </tr>
                                 </thead>
-                                <tbody className="bg-white divide-y divide-gray-200 dark:bg-gray-800 dark:divide-gray-700">
-                                    {users.map((user) => (
-                                        <tr key={user.id}>
-                                            <td className="px-6 py-4 text-sm text-gray-900 dark:text-gray-100">{user.id}</td>
-                                            <td className="px-6 py-4 text-sm text-gray-900 dark:text-gray-100">{user.name}</td>
-                                            <td className="px-6 py-4 text-sm text-gray-900 dark:text-gray-100">{user.email}</td>
-                                            <td className="px-6 py-4 text-sm text-gray-900 dark:text-gray-100">{user.user_type}</td>
-                                            <td className="px-6 py-4 text-sm text-gray-900 dark:text-gray-100">
+                                <tbody
+                                    className="bg-white divide-y divide-gray-200 dark:bg-gray-800 dark:divide-gray-700">
+                                {users.map((user) => (
+                                    <tr key={user.id}>
+                                        <td className="px-6 py-4 text-sm text-gray-900 dark:text-gray-100">{user.id}</td>
+                                        <td className="px-6 py-4 text-sm text-gray-900 dark:text-gray-100">{user.nombre}</td>
+                                        <td className="px-6 py-4 text-sm text-gray-900 dark:text-gray-100">{user.apellidos}</td>
+                                        <td className="px-6 py-4 text-sm text-gray-900 dark:text-gray-100">{user.genero}</td>
+                                        <td className="px-6 py-4 text-sm text-gray-900 dark:text-gray-100">{user.email}</td>
+                                        <td className="px-6 py-4 text-sm text-gray-900 dark:text-gray-100">{user.gradoAcademico}</td>
+                                        <td className="px-6 py-4 text-sm text-gray-900 dark:text-gray-100">{user.fechaNacimiento}</td>
+                                        <td className="px-6 py-4 text-sm text-gray-900 dark:text-gray-100">
+                                            {user.foto && <img src={`/storage/${user.foto}`} alt="Foto de usuario" className="w-10 h-10 rounded-full" />}
+                                        </td>
+                                        <td className="px-6 py-4 text-sm text-gray-900 dark:text-gray-100">{user.user_type}</td>
+                                        <td className="px-6 py-4 text-sm text-gray-900 dark:text-gray-100">
+                                            <div className="flex space-x-2">
                                                 <button
-                                                    className="px-3 py-1 mr-2 text-white bg-red-500 rounded hover:bg-red-600"
+                                                    className="px-3 py-1 text-white bg-red-500 rounded hover:bg-red-600"
                                                     onClick={() => handleDelete(user.id)}
                                                 >
                                                     Eliminar
@@ -67,9 +91,10 @@ export default function Adminusuarios() {
                                                 >
                                                     Modificar
                                                 </Link>
-                                            </td>
-                                        </tr>
-                                    ))}
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ))}
                                 </tbody>
                             </table>
                         </div>

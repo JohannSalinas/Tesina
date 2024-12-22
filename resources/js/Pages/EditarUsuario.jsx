@@ -1,113 +1,204 @@
-import { useForm } from '@inertiajs/react';
+import InputError from '@/Components/InputError';
+import InputLabel from '@/Components/InputLabel';
+import PrimaryButton from '@/Components/PrimaryButton';
+import TextInput from '@/Components/TextInput';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { Head } from '@inertiajs/react';
-import { useState } from 'react';
+import { Head, useForm } from '@inertiajs/react';
 
 export default function EditarUsuario({ user }) {
-    const { data, setData, put, processing, errors } = useForm({
-        name: user.name,
+    const { data, setData, put, processing, errors, reset } = useForm({
+        nombre: user.nombre,
+        apellidos: user.apellidos,
         email: user.email,
-        user_type: user.user_type,
         password: '',
         password_confirmation: '',
+        user_type: user.user_type,
+        genero: user.genero,
+        gradoAcademico: user.gradoAcademico,
+        fechaNacimiento: user.fechaNacimiento,
+        foto: null,
     });
 
-    const handleSubmit = (e) => {
+    const submit = (e) => {
         e.preventDefault();
+        put(route('usuarios.update', user.id), {
+            onFinish: () => {reset('password', 'password_confirmation')},
+            onSuccess: () => {alert('Usuario actualizado correctamente.')},
+            onError: () => {alert('Ocurrió un error al actualizar el usuario.'), console.log(errors)},
 
-        // Envía los datos al servidor
-        put(`/usuarios/${user.id}`, {
-            preserveScroll: true, // Opcional, para evitar scroll al enviar
         });
+    };
+
+    const handleInputChange = (e) => {
+        const { name, value, type, files } = e.target;
+        if (type === 'file') {
+            setData(name, files[0]);
+        } else {
+            setData(name, value);
+        }
     };
 
     return (
         <AuthenticatedLayout
-            header={
-                <h2 className="text-xl font-semibold leading-tight text-gray-800 dark:text-gray-200">
-                    Editar Usuario
-                </h2>
-            }
+            header={<h2 className="text-xl font-semibold leading-tight text-gray-800 dark:text-gray-200">Editar Usuario</h2>}
         >
             <Head title="Editar Usuario" />
 
             <div className="py-12">
-                <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
-                    <div className="overflow-hidden bg-white shadow-sm sm:rounded-lg dark:bg-gray-800">
+                <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
+                    <div className="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
                         <div className="p-6 text-gray-900 dark:text-gray-100">
-                            <form onSubmit={handleSubmit}>
+                            <form onSubmit={submit} encType="multipart/form-data">
                                 <div>
-                                    <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Nombre</label>
-                                    <input
-                                        type="text"
-                                        id="name"
-                                        value={data.name}
-                                        onChange={(e) => setData('name', e.target.value)}
-                                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50"
+                                    <InputLabel htmlFor="nombre" value="Nombre" />
+                                    <TextInput
+                                        id="nombre"
+                                        name="nombre"
+                                        value={data.nombre}
+                                        className="mt-1 block w-full"
+                                        autoComplete="nombre"
+                                        onChange={handleInputChange}
+                                        required
                                     />
-                                    {errors.name && <p className="text-sm text-red-600">{errors.name}</p>}
+                                    <InputError message={errors.nombre} className="mt-2" />
                                 </div>
 
                                 <div className="mt-4">
-                                    <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Email</label>
-                                    <input
-                                        type="email"
+                                    <InputLabel htmlFor="apellidos" value="Apellidos" />
+                                    <TextInput
+                                        id="apellidos"
+                                        name="apellidos"
+                                        value={data.apellidos}
+                                        className="mt-1 block w-full"
+                                        autoComplete="apellidos"
+                                        onChange={handleInputChange}
+                                    />
+                                    <InputError message={errors.apellidos} className="mt-2" />
+                                </div>
+
+                                <div className="mt-4">
+                                    <InputLabel htmlFor="email" value="Email" />
+                                    <TextInput
                                         id="email"
+                                        type="email"
+                                        name="email"
                                         value={data.email}
-                                        onChange={(e) => setData('email', e.target.value)}
-                                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50"
+                                        className="mt-1 block w-full"
+                                        autoComplete="username"
+                                        onChange={handleInputChange}
+                                        required
                                     />
-                                    {errors.email && <p className="text-sm text-red-600">{errors.email}</p>}
+                                    <InputError message={errors.email} className="mt-2" />
                                 </div>
 
                                 <div className="mt-4">
-                                    <label htmlFor="user_type" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Tipo de Usuario</label>
+                                    <InputLabel htmlFor="user_type" value="Tipo de Usuario" />
                                     <select
                                         id="user_type"
+                                        name="user_type"
                                         value={data.user_type}
-                                        onChange={(e) => setData('user_type', e.target.value)}
-                                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50"
+                                        className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                                        onChange={handleInputChange}
+                                        required
                                     >
+                                        <option value="admin">Administrador</option>
                                         <option value="profesor">Profesor</option>
                                         <option value="coordinador">Coordinador</option>
-                                        <option value="admin">Admin</option>
                                     </select>
-                                    {errors.user_type && <p className="text-sm text-red-600">{errors.user_type}</p>}
+                                    <InputError message={errors.user_type} className="mt-2" />
                                 </div>
 
                                 <div className="mt-4">
-                                    <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Contraseña</label>
-                                    <input
-                                        type="password"
+                                    <InputLabel htmlFor="password" value="Contraseña (dejar en blanco para mantener actual)" />
+                                    <TextInput
                                         id="password"
+                                        type="password"
+                                        name="password"
                                         value={data.password}
-                                        onChange={(e) => setData('password', e.target.value)}
-                                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50"
+                                        className="mt-1 block w-full"
+                                        autoComplete="new-password"
+                                        onChange={handleInputChange}
                                     />
-                                    <p className="text-sm text-gray-500 mt-1">Deja este campo vacío si no deseas cambiar la contraseña.</p>
-                                    {errors.password && <p className="text-sm text-red-600">{errors.password}</p>}
+                                    <InputError message={errors.password} className="mt-2" />
                                 </div>
 
                                 <div className="mt-4">
-                                    <label htmlFor="password_confirmation" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Confirmar Contraseña</label>
-                                    <input
-                                        type="password"
+                                    <InputLabel htmlFor="password_confirmation" value="Confirmar Contraseña" />
+                                    <TextInput
                                         id="password_confirmation"
+                                        type="password"
+                                        name="password_confirmation"
                                         value={data.password_confirmation}
-                                        onChange={(e) => setData('password_confirmation', e.target.value)}
-                                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50"
+                                        className="mt-1 block w-full"
+                                        autoComplete="new-password"
+                                        onChange={handleInputChange}
                                     />
-                                    {errors.password_confirmation && <p className="text-sm text-red-600">{errors.password_confirmation}</p>}
+                                </div>
+
+                                <div className="mt-4">
+                                    <InputLabel htmlFor="genero" value="Género" />
+                                    <select
+                                        id="genero"
+                                        name="genero"
+                                        value={data.genero}
+                                        className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                                        onChange={handleInputChange}
+                                        required
+                                    >
+                                        <option value="masculino">Masculino</option>
+                                        <option value="femenino">Femenino</option>
+                                        <option value="otro">Otro</option>
+                                    </select>
+                                    <InputError message={errors.genero} className="mt-2" />
+                                </div>
+
+                                <div className="mt-4">
+                                    <InputLabel htmlFor="gradoAcademico" value="Grado Académico" />
+                                    <select
+                                        id="gradoAcademico"
+                                        name="gradoAcademico"
+                                        value={data.gradoAcademico}
+                                        className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                                        onChange={handleInputChange}
+                                        required
+                                    >
+                                        <option value="licenciatura">Licenciatura</option>
+                                        <option value="maestria">Maestría</option>
+                                        <option value="doctorado">Doctorado</option>
+                                    </select>
+                                    <InputError message={errors.gradoAcademico} className="mt-2" />
+                                </div>
+
+                                <div className="mt-4">
+                                    <InputLabel htmlFor="fechaNacimiento" value="Fecha de Nacimiento" />
+                                    <TextInput
+                                        id="fechaNacimiento"
+                                        type="date"
+                                        name="fechaNacimiento"
+                                        value={data.fechaNacimiento}
+                                        className="mt-1 block w-full"
+                                        onChange={handleInputChange}
+                                    />
+                                    <InputError message={errors.fechaNacimiento} className="mt-2" />
+                                </div>
+
+                                <div className="mt-4">
+                                    <InputLabel htmlFor="foto" value="Foto de Perfil" />
+                                    <input
+                                        id="foto"
+                                        type="file"
+                                        name="foto"
+                                        className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                                        onChange={handleInputChange}
+                                        accept="image/*"
+                                    />
+                                    <InputError message={errors.foto} className="mt-2" />
                                 </div>
 
                                 <div className="mt-6 flex justify-end">
-                                    <button
-                                        type="submit"
-                                        className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-                                        disabled={processing}
-                                    >
-                                        {processing ? 'Guardando...' : 'Guardar Cambios'}
-                                    </button>
+                                    <PrimaryButton className="ms-4" disabled={processing}>
+                                        Actualizar Usuario
+                                    </PrimaryButton>
                                 </div>
                             </form>
                         </div>
