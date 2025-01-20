@@ -38,7 +38,7 @@ Route::middleware('auth')->group(function () {
         })->name('index');
         Route::delete('/{id}', [UserController::class, 'destroy'])->name('destroy');
         Route::get('/{id}/editar', [UserController::class, 'edit'])->name('edit');
-        Route::put('/{id}', [UserController::class, 'update'])->name('update');
+        Route::match(['post', 'put'], '/{id}', [UserController::class, 'update'])->name('update');
     });
 
     // Rutas para Recursos Educativos
@@ -82,6 +82,15 @@ Route::prefix('encuestas')->name('encuestas.')->group(function () {
     Route::delete('/{id}', [EncuestaController::class, 'destroy'])->name('destroy');
 });
 
+// Rutas para Colaboradores
+Route::prefix('colaboradores')->name('colaboradores.')->group(function () {
+    Route::get('/', [ColaboradoresController::class, 'index'])->name('index'); // Listado de colaboradores
+    Route::get('/crear', [ColaboradoresController::class, 'create'])->name('create'); // Formulario para crear un colaborador
+    Route::post('/', [ColaboradoresController::class, 'store'])->name('store'); // Almacenar colaborador
+    Route::get('/{id}/editar', [ColaboradoresController::class, 'edit'])->name('edit'); // Formulario para editar colaborador
+    Route::put('/{id}', [ColaboradoresController::class, 'update'])->name('update'); // Actualizar colaborador
+    Route::delete('/{id}', [ColaboradoresController::class, 'destroy'])->name('destroy'); // Eliminar colaborador
+});
 
 
 

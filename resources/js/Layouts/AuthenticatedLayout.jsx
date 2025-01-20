@@ -56,6 +56,12 @@ export default function AuthenticatedLayout({ header, children }) {
                                         >
                                             Gestion Encuestas
                                         </NavLink>
+                                        <NavLink
+                                            href={route('colaboradores.index')} // Asegúrate de definir esta ruta
+                                            active={route().current('colaboradores.index')}
+                                        >
+                                            Gestión Grupos de Colaboradores
+                                        </NavLink>
                                     </>
                                 )}
                             </div>

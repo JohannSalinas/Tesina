@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Noticia;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Inertia\Inertia;
+
 
 class NoticiasController extends Controller
 {
@@ -44,11 +46,10 @@ class NoticiasController extends Controller
         return redirect(route('noticias.index'))->with('success', 'Noticia creada exitosamente.');
     }
 
-    // Mostrar el formulario de edición de una noticia
     public function edit($id)
     {
         $noticia = Noticia::findOrFail($id);
-        return inertia('EditarNoticia', ['noticia' => $noticia]);
+        return Inertia::render('EditarNoticia', ['noticia' => $noticia]);
     }
 
  // Actualizar una noticia

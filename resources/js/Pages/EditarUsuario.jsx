@@ -6,7 +6,7 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, useForm } from '@inertiajs/react';
 
 export default function EditarUsuario({ user }) {
-    const { data, setData, put, processing, errors, reset } = useForm({
+    const { data, setData, post, processing, errors, reset } = useForm({
         nombre: user.nombre,
         apellidos: user.apellidos,
         email: user.email,
@@ -17,17 +17,8 @@ export default function EditarUsuario({ user }) {
         gradoAcademico: user.gradoAcademico,
         fechaNacimiento: user.fechaNacimiento,
         foto: null,
+        _method: 'PUT',
     });
-
-    const submit = (e) => {
-        e.preventDefault();
-        put(route('usuarios.update', user.id), {
-            onFinish: () => {reset('password', 'password_confirmation')},
-            onSuccess: () => {alert('Usuario actualizado correctamente.')},
-            onError: () => {alert('Ocurrió un error al actualizar el usuario.'), console.log(errors)},
-
-        });
-    };
 
     const handleInputChange = (e) => {
         const { name, value, type, files } = e.target;
@@ -36,6 +27,29 @@ export default function EditarUsuario({ user }) {
         } else {
             setData(name, value);
         }
+    };
+
+    const submit = (e) => {
+        e.preventDefault();
+        
+        const formData = new FormData();
+        formData.append('_method', 'PUT');
+        
+        Object.keys(data).forEach(key => {
+            if (key === 'foto' && data[key]) {
+                formData.append(key, data[key]);
+            } else if (key !== 'foto' && data[key] !== null) {
+                formData.append(key, data[key]);
+            }
+        });
+
+        post(route('usuarios.update', user.id), formData, {
+            forceFormData: true,
+            preserveState: true,
+            onFinish: () => reset('password', 'password_confirmation'),
+            onSuccess: () => alert('Usuario actualizado correctamente.'),
+            onError: (errors) => console.log(errors),
+        });
     };
 
     return (
@@ -49,6 +63,7 @@ export default function EditarUsuario({ user }) {
                     <div className="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
                         <div className="p-6 text-gray-900 dark:text-gray-100">
                             <form onSubmit={submit} encType="multipart/form-data">
+                                <input type="hidden" name="_method" value="PUT" />
                                 <div>
                                     <InputLabel htmlFor="nombre" value="Nombre" />
                                     <TextInput

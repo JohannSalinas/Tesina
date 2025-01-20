@@ -3,7 +3,7 @@ import { usePage, router } from '@inertiajs/react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 
 export default function EditarRecursoEducativo() {
-    const { recurso } = usePage().props;  // Recibe el recurso pasado desde el controlador
+    const { recurso } = usePage().props; // Recibe el recurso desde el backend
     const [formData, setFormData] = useState({
         titulo: recurso.titulo,
         descripcion: recurso.descripcion,
@@ -16,48 +16,42 @@ export default function EditarRecursoEducativo() {
             titulo: recurso.titulo,
             descripcion: recurso.descripcion,
             tipo: recurso.tipo,
-            archivo: null, // Si no se desea actualizar el archivo, lo dejamos null
+            archivo: null, // El archivo es opcional y solo se selecciona si el usuario lo modifica
         });
     }, [recurso]);
 
     const handleInputChange = (e) => {
         const { name, value, type, files } = e.target;
         if (type === 'file') {
-            setFormData({ ...formData, [name]: files[0] });  // Asegúrate de que el archivo se agregue correctamente
+            setFormData({ ...formData, [name]: files[0] });
         } else {
             setFormData({ ...formData, [name]: value });
         }
     };
-    
 
     const handleSubmit = (e) => {
         e.preventDefault();
-    
-        // Crear el FormData para enviar
+
+        // Crear el objeto FormData
         const form = new FormData();
         form.append('titulo', formData.titulo);
         form.append('descripcion', formData.descripcion);
         form.append('tipo', formData.tipo);
-    
-        // Solo agregamos el archivo si se ha seleccionado uno
+
+        // Agregar el archivo solo si se seleccionó uno
         if (formData.archivo) {
             form.append('archivo', formData.archivo);
         }
-    
-        // Asegurarse de que los datos se estén enviando correctamente
-        console.log('Datos enviados al controlador:', {
-            titulo: formData.titulo,
-            descripcion: formData.descripcion,
-            tipo: formData.tipo,
-            archivo: formData.archivo ? formData.archivo.name : null,
-        });
-    
-        router.put(`/recursos/${recurso.id}`, form, {
+
+        // Agregar el campo oculto `_method` para indicar que es un PUT
+        form.append('_method', 'PUT');
+
+        // Enviar los datos como POST
+        router.post(`/recursos/${recurso.id}`, form, {
             onSuccess: () => alert('Recurso actualizado correctamente.'),
             onError: () => alert('Ocurrió un error al actualizar el recurso.'),
         });
     };
-    
 
     return (
         <AuthenticatedLayout>
@@ -69,9 +63,6 @@ export default function EditarRecursoEducativo() {
                                 Editar Recurso Educativo
                             </h3>
                             <form onSubmit={handleSubmit} className="space-y-4" encType="multipart/form-data">
-                                {/* Agregar campo oculto para método PUT */}
-                                <input type="hidden" name="_method" value="PUT" />
-
                                 <div>
                                     <label htmlFor="titulo" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                                         Título
@@ -90,7 +81,6 @@ export default function EditarRecursoEducativo() {
                                         Descripción
                                     </label>
                                     <textarea
-                                        type="text"
                                         id="descripcion"
                                         name="descripcion"
                                         value={formData.descripcion}
