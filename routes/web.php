@@ -9,6 +9,7 @@ use App\Models\User;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\NoticiasController;
 use App\Http\Controllers\EncuestaController;
+use App\Http\Controllers\GrupoColaboradorController;
 
 
 Route::get('/', function () {
@@ -82,17 +83,22 @@ Route::prefix('encuestas')->name('encuestas.')->group(function () {
     Route::delete('/{id}', [EncuestaController::class, 'destroy'])->name('destroy');
 });
 
-// Rutas para Colaboradores
-Route::prefix('colaboradores')->name('colaboradores.')->group(function () {
-    Route::get('/', [ColaboradoresController::class, 'index'])->name('index'); // Listado de colaboradores
-    Route::get('/crear', [ColaboradoresController::class, 'create'])->name('create'); // Formulario para crear un colaborador
-    Route::post('/', [ColaboradoresController::class, 'store'])->name('store'); // Almacenar colaborador
-    Route::get('/{id}/editar', [ColaboradoresController::class, 'edit'])->name('edit'); // Formulario para editar colaborador
-    Route::put('/{id}', [ColaboradoresController::class, 'update'])->name('update'); // Actualizar colaborador
-    Route::delete('/{id}', [ColaboradoresController::class, 'destroy'])->name('destroy'); // Eliminar colaborador
+
+Route::prefix('grupos-colaboradores')->name('grupos-colaboradores.')->group(function () {
+    Route::get('/', [GrupoColaboradorController::class, 'index'])->name('index'); // Listado de grupos de colaboradores
+    Route::get('/crear', [GrupoColaboradorController::class, 'create'])->name('create'); // Formulario para crear un grupo de colaboradores
+    Route::post('/', [GrupoColaboradorController::class, 'store'])->name('store'); // Almacenar grupo de colaboradores
+    Route::get('/{id}/editar', [GrupoColaboradorController::class, 'edit'])->name('edit'); // Formulario para editar un grupo de colaboradores
+    Route::put('/{id}', [GrupoColaboradorController::class, 'update'])->name('update'); // Actualizar grupo de colaboradores
+    Route::delete('/{id}', [GrupoColaboradorController::class, 'destroy'])->name('destroy'); // Eliminar grupo de colaboradores
 });
 
 
+
+Route::prefix('grupo-usuario')->name('grupo_usuario.')->group(function () {
+    Route::post('/', [GrupoUsuarioController::class, 'store'])->name('store'); // Asociar usuario al grupo
+    Route::delete('/', [GrupoUsuarioController::class, 'destroy'])->name('destroy'); // Desasociar usuario del grupo
+});
 
 
 
