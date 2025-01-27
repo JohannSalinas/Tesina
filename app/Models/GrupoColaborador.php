@@ -21,10 +21,8 @@ class GrupoColaborador extends Model
         'numero_inscritos',
     ];
 
-    // Si estás usando una relación con usuarios a través de la tabla pivote 'grupo_usuario',
-    // puedes agregar una relación aquí, por ejemplo:
-    public function usuarios()
+    public function grupoUsuarios()
     {
-        return $this->belongsToMany(User::class, 'grupo_usuario', 'grupo_id', 'usuario_id');
+        return $this->hasMany(GrupoUsuario::class, 'grupo_id');
     }
 }

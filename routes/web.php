@@ -97,7 +97,7 @@ Route::prefix('grupos-colaboradores')->name('grupos-colaboradores.')->group(func
 
 
 
-Route::get('/grupo-usuarios/{grupo_id}', [GrupoUsuarioController::class, 'index'])->name('grupo-usuarios.index');
+Route::get('/grupo-usuarios', [GrupoUsuarioController::class, 'index'])->name('grupo-usuarios.index');
 
 });
 

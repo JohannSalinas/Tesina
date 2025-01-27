@@ -4,15 +4,48 @@ namespace App\Http\Controllers;
 
 use App\Models\GrupoUsuario;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 
 class GrupoUsuarioController extends Controller
 {
     // Mostrar todos los usuarios en un grupo específico
-    public function index($grupo_id)
-{
-    $grupoUsuarios = GrupoUsuario::where('grupo_id', $grupo_id)->with('usuario')->get();
-    return response()->json($grupoUsuarios);
-}
+    public function index()
+    {
+        try {
+            $gruposUsuarios = GrupoUsuario::with(['grupoColaborador', 'usuario'])
+                ->get()
+                ->map(function ($grupoUsuario) {
+                    return [
+                        'id' => $grupoUsuario->grupoColaborador->id,
+                        'nombre' => $grupoUsuario->grupoColaborador->nombre,
+                        'usuarios' => [
+                            [
+                                'id' => $grupoUsuario->usuario->id,
+                                'nombre' => $grupoUsuario->usuario->nombre,
+                                'email' => $grupoUsuario->usuario->email,
+                            ]
+                        ]
+                    ];
+                })
+                ->groupBy('id')
+                ->map(function ($grupo) {
+                    return [
+                        'id' => $grupo[0]['id'],
+                        'nombre' => $grupo[0]['nombre'],
+                        'usuarios' => collect($grupo)->pluck('usuarios')->flatten(1)->values()
+                    ];
+                })
+                ->values();
+
+            return Inertia::render('GrupoUsuario', [
+                'gruposColaboradores' => $gruposUsuarios
+            ]);
+        } catch (\Exception $e) {
+            return Inertia::render('GrupoUsuario', [
+                'gruposColaboradores' => []
+            ]);
+        }
+    }
 
     // Vincular un usuario a un grupo
     public function store(Request $request, $grupo_id)

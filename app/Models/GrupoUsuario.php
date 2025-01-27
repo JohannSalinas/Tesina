@@ -16,6 +16,11 @@ class GrupoUsuario extends Model
         'usuario_id',
     ];
 
+    public function grupoColaborador()
+    {
+        return $this->belongsTo(GrupoColaborador::class, 'grupo_id');
+    }
+
     public function usuario()
     {
         return $this->belongsTo(User::class, 'usuario_id');

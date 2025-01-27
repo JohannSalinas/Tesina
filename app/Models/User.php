@@ -89,6 +89,10 @@ class User extends Authenticatable
         return $this->user_type === self::TYPE_PROFESOR;
     }
 
+    public function grupoUsuarios()
+    {
+        return $this->hasMany(GrupoUsuario::class, 'usuario_id');
+    }
 
-    
+
 }
