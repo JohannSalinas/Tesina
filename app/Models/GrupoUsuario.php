@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class GrupoUsuario extends Model
@@ -15,17 +16,6 @@ class GrupoUsuario extends Model
         'usuario_id',
     ];
 
-    /**
-     * Relación inversa con GrupoColaborador.
-     */
-    public function grupo()
-    {
-        return $this->belongsTo(GrupoColaborador::class, 'grupo_id');
-    }
-
-    /**
-     * Relación inversa con User.
-     */
     public function usuario()
     {
         return $this->belongsTo(User::class, 'usuario_id');

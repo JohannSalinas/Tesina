@@ -62,6 +62,12 @@ export default function AuthenticatedLayout({ header, children }) {
                                         >
                                             Gestión Grupos de Colaboradores
                                         </NavLink>
+                                        <NavLink
+                                            href={route('grupo-usuarios.index', { grupo_id: grupo.id })}
+                                            active={route().current('grupo-usuarios.index')}
+                                        >
+                                            Grupo Usuarios
+                                        </NavLink>
                                     </>
                                 )}
                             </div>

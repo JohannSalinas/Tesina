@@ -52,8 +52,9 @@ class UserController extends Controller
         'genero',
         'gradoAcademico',
         'fechaNacimiento',
-        'foto'
+        'foto' => $user->foto
     ]));
+
 
     return redirect()->route('usuarios.index');
 }

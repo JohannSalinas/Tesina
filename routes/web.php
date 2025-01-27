@@ -10,6 +10,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\NoticiasController;
 use App\Http\Controllers\EncuestaController;
 use App\Http\Controllers\GrupoColaboradorController;
+use App\Http\Controllers\GrupoUsuarioController;
 
 
 Route::get('/', function () {
@@ -95,12 +96,8 @@ Route::prefix('grupos-colaboradores')->name('grupos-colaboradores.')->group(func
 
 
 
-Route::prefix('grupo-usuario')->name('grupo_usuario.')->group(function () {
-    Route::post('/', [GrupoUsuarioController::class, 'store'])->name('store'); // Asociar usuario al grupo
-    Route::delete('/', [GrupoUsuarioController::class, 'destroy'])->name('destroy'); // Desasociar usuario del grupo
-});
 
-
+Route::get('/grupo-usuarios/{grupo_id}', [GrupoUsuarioController::class, 'index'])->name('grupo-usuarios.index');
 
 });
 
