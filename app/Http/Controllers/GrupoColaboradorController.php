@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\GrupoColaborador;
+use App\Models\GrupoUsuario;
 use Inertia\Inertia;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 
 class GrupoColaboradorController extends Controller
@@ -29,7 +31,17 @@ class GrupoColaboradorController extends Controller
             'temas_abordados' => 'nullable|string',
         ]);
 
-        GrupoColaborador::create($request->all());
+        // Crear el grupo
+        $grupo = GrupoColaborador::create($request->all());
+
+        // Obtener el usuario autenticado
+        $user = Auth::user();
+
+        // Agregar al usuario como miembro del grupo
+        GrupoUsuario::create([
+            'grupo_id' => $grupo->id,
+            'usuario_id' => $user->id,
+        ]);
 
         return redirect()->route('grupos-colaboradores.index');
     }
@@ -78,6 +90,17 @@ public function update(Request $request, $id)
 
     // Redirigir con mensaje flash
     return redirect()->route('grupos-colaboradores.index')->with('success', 'Grupo de colaboradores actualizado correctamente');
+}
+
+
+public function indexProfesor()
+{
+    // Filtra los grupos que son visibles para los profesores, si es necesario
+    $grupos = GrupoColaborador::all(); // o puedes agregar más lógica si es necesario
+
+    return Inertia::render('Profesor/ListaGrupos', [
+        'grupos' => $grupos
+    ]);
 }
 
 }

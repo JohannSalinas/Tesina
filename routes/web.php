@@ -94,11 +94,12 @@ Route::prefix('grupos-colaboradores')->name('grupos-colaboradores.')->group(func
     Route::delete('/{id}', [GrupoColaboradorController::class, 'destroy'])->name('destroy'); // Eliminar grupo de colaboradores
 });
 
-
-
-
 Route::get('/grupo-usuarios', [GrupoUsuarioController::class, 'index'])->name('grupo-usuarios.index');
 
+
+Route::get('/profesor/grupos', [GrupoColaboradorController::class, 'indexProfesor'])->name('grupos-colaboradores.profesor');
+
 });
+
 
 require __DIR__.'/auth.php';
