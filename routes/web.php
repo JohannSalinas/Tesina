@@ -47,17 +47,12 @@ Route::middleware('auth')->group(function () {
 
     // Rutas para Recursos Educativos
     // Rutas protegidas para la gestión de Recursos Educativos
-Route::prefix('recursos')->name('recursos.')->group(function () {
-    // Listar todos los recursos educativos
-    Route::get('/', function () {
-        $recursos = \App\Models\RecursoEducativo::all(); // Puedes agregar filtros o paginación aquí
-        return Inertia::render('RecursosEducativos', ['recursos' => $recursos]);
-    })->name('index');
-    Route::delete('/{id}', [RecursosEducativosController::class, 'destroy'])->name('destroy');
-    Route::get('/crear', [RecursosEducativosController::class, 'create'])->name('create');
-    Route::post('/', [RecursosEducativosController::class, 'store'])->name('store');
-    Route::get('/{id}/editar', [RecursosEducativosController::class, 'edit'])->name('edit');
-    Route::put('/{id}', [RecursosEducativosController::class, 'update'])->name('update');
+        Route::prefix('recursos')->name('recursos.')->group(function () {
+            Route::get('/', [RecursosEducativosController::class, 'index'])->name('index');
+            Route::post('/crear', [RecursosEducativosController::class, 'store'])->name('store');
+            Route::delete('/{id}', [RecursosEducativosController::class, 'destroy'])->name('destroy');
+            Route::get('/{id}/editar', [RecursosEducativosController::class, 'edit'])->name('edit');
+            Route::put('/{id}', [RecursosEducativosController::class, 'update'])->name('update');
 });
 
 // Rutas para Gestión de Noticias

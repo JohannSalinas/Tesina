@@ -14,25 +14,26 @@ class RecursoEducativo extends Model
 
     // Campos asignables masivamente
     protected $fillable = [
-        'titulo', 
-        'descripcion', 
-        'tipo', 
-        'url', 
-        'user_id' // Si decides centralizar todo en `url`, elimina archivo_path
+        'titulo',
+        'descripcion',
+        'tipo',
+        'archivo_path',
+        'grupo_colaborador_id',
+        'user_id'
     ];
 
     // Relación con el usuario
     public function user()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class, 'user_id');
     }
 
     // Accesor para la URL del archivo o recurso
     public function getArchivoUrlAttribute()
     {
         // Si 'url' contiene un archivo, retorna su ruta completa
-        return $this->url && \Storage::exists($this->url) 
-            ? \Storage::url($this->url) 
+        return $this->url && \Storage::exists($this->url)
+            ? \Storage::url($this->url)
             : $this->url; // Retorna la URL como está si no es un archivo
     }
 

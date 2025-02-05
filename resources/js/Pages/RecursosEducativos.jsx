@@ -39,7 +39,7 @@ export default function RecursosEducativos() {
         form.append('archivo', formData.archivo);
         form.append('grupo_id', formData.grupo_id); // Asegúrate de agregar este campo
 
-        router.post('/recursos', form, {
+        router.post('/recursos/crear', form, {
             onSuccess: () => {
                 alert('Recurso creado correctamente.');
                 setFormData({ titulo: '', descripcion: '', tipo: '', archivo: null, grupo_id: '' }); // Limpiar formulario
@@ -122,24 +122,24 @@ export default function RecursosEducativos() {
                                         <option value="Enlace Web">Enlace Web</option>
                                     </select>
                                 </div>
-                                 
+
                                  <div>
-    <label htmlFor="grupo_id" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-        Selecciona el Grupo
-    </label>
-    <select name="grupo_id" id="grupo_id" value={formData.grupo_id} onChange={handleInputChange}>
-        <option value="">Selecciona un grupo</option>
-        {grupos.length > 0 ? (
-            grupos.map((grupo) => (
-                <option key={grupo.id} value={grupo.id}>
-                    {grupo.nombre}
-                </option>
-            ))
-        ) : (
-            <option disabled>No hay grupos disponibles</option>
-        )}
-    </select>
-</div>
+                                    <label htmlFor="grupo_id" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                                        Selecciona el Grupo
+                                    </label>
+                                     <select name="grupo_id" id="grupo_id" value={formData.grupo_id} onChange={handleInputChange}>
+                                         <option value="">Selecciona un grupo</option>
+                                         {grupos.length > 0 ? (
+                                             grupos.map((grupo) => (
+                                                 <option key={grupo.id} value={grupo.id}>
+                                                     {grupo.nombre}
+                                                 </option>
+                                             ))
+                                         ) : (
+                                             <option disabled>No hay grupos disponibles</option>
+                                         )}
+                                     </select>
+                                 </div>
                                 <div>
                                     <label htmlFor="archivo" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                                         Archivo
@@ -187,7 +187,7 @@ export default function RecursosEducativos() {
                                             <td className="px-6 py-4 text-sm text-gray-900 dark:text-gray-100">{recurso.id}</td>
                                             <td className="px-6 py-4 text-sm text-gray-900 dark:text-gray-100">{recurso.titulo}</td>
                                             <td className="px-6 py-4 text-sm text-gray-900 dark:text-gray-100">{recurso.tipo}</td>
-                                            <td className="px-6 py-4 text-sm text-gray-900 dark:text-gray-100">{recurso.usuario?.name || 'Desconocido'}</td>
+                                            <td className="px-6 py-4 text-sm text-gray-900 dark:text-gray-100">{recurso.user.nombre || 'Desconocido'}</td>
                                             <td className="px-6 py-4 text-sm text-gray-900 dark:text-gray-100">
                                                 <button
                                                     className="px-3 py-1 mr-2 text-white bg-red-500 rounded hover:bg-red-600"
