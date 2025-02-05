@@ -4,45 +4,123 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
-use Symfony\Component\HttpFoundation\BinaryFileResponse;
-use Inertia\Inertia; // Agrega esta línea para importar Inertia
+use Symfony\Component\Process\Process;
+use Symfony\Component\Process\Exception\ProcessFailedException;
+use Inertia\Inertia;
+use Illuminate\Support\Facades\Log;
 
 class BackupController extends Controller
 {
     public function index()
     {
-        return Inertia::render('BackupRestore'); // Asegúrate de que esté el archivo BackupRestore.jsx en Pages
+        return Inertia::render('BackupRestore');
     }
 
-    // Acción para realizar el respaldo
+    // ✅ Acción para realizar el respaldo de la base de datos
     public function backup()
     {
-        $filename = 'backup_' . now()->format('Ymd_His') . '.sql';
+        try {
+            if (!Storage::exists('public/backups')) {
+                Storage::makeDirectory('public/backups');
+            }
 
-        // Comando para hacer el respaldo
-        $command = 'mysqldump --opt --user=' . env('DB_USERNAME') . ' --password=' . env('DB_PASSWORD') . ' --host=' . env('DB_HOST') . ' ' . env('DB_DATABASE') . ' > ' . storage_path('app/public/' . $filename);
-        exec($command);
+            $fileName = 'backup_' . now()->format('Ymd_His') . '.sql';
+            $backupPath = storage_path("app/public/backups/{$fileName}");
 
-        return response()->json([
-            'message' => 'Respaldo realizado con éxito',
-            'file' => $filename
-        ]);
+            // Configuración de la base de datos
+            $dbHost = config('database.connections.mysql.host', '127.0.0.1');
+            $dbUser = config('database.connections.mysql.username');
+            $dbPass = config('database.connections.mysql.password');
+            $dbName = config('database.connections.mysql.database');
+
+            // Construir el comando como string en lugar de array
+            $command = sprintf(
+                '"%s" --host=%s --user=%s --password=%s %s > "%s"',
+                'C:\\xampp\\mysql\\bin\\mysqldump.exe',
+                escapeshellarg($dbHost),
+                escapeshellarg($dbUser),
+                escapeshellarg($dbPass),
+                escapeshellarg($dbName),
+                $backupPath
+            );
+
+            // Ejecutar el comando usando exec
+            $output = null;
+            $resultCode = null;
+            exec($command, $output, $resultCode);
+
+            // Verificar si el archivo se creó y tiene contenido
+            if ($resultCode !== 0 || !file_exists($backupPath) || filesize($backupPath) === 0) {
+                Log::error('Error en backup: Código ' . $resultCode . ', Output: ' . implode("\n", $output));
+                throw new \Exception('El archivo de respaldo está vacío o no se pudo crear.');
+            }
+
+            // Log para debugging
+            Log::info('Backup creado: ' . $backupPath . ' - Tamaño: ' . filesize($backupPath) . ' bytes');
+
+            return back()->with([
+                'success' => true,
+                'message' => 'Respaldo realizado exitosamente.'
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('Error en backup: ' . $e->getMessage());
+            
+            return back()->with([
+                'error' => 'Error al realizar el respaldo: ' . $e->getMessage()
+            ]);
+        }
     }
 
-    // Acción para restaurar la base de datos
     public function restore(Request $request)
     {
-        $request->validate([
-            'backup_file' => 'required|file|mimes:sql,gz|max:10240',
-        ]);
+        try {
+            $request->validate([
+                'backup_file' => 'required|file|mimes:sql,gz',
+            ]);
 
-        $path = $request->file('backup_file')->storeAs('backups', $request->file('backup_file')->getClientOriginalName(), 'public');
+            $uploadedFile = $request->file('backup_file');
+            $filePath = $uploadedFile->getRealPath();
 
-        $command = 'mysql --user=' . env('DB_USERNAME') . ' --password=' . env('DB_PASSWORD') . ' --host=' . env('DB_HOST') . ' ' . env('DB_DATABASE') . ' < ' . storage_path('app/public/' . $path);
-        exec($command);
+            // Configuración de la base de datos
+            $dbHost = config('database.connections.mysql.host', '127.0.0.1');
+            $dbUser = config('database.connections.mysql.username');
+            $dbPass = config('database.connections.mysql.password');
+            $dbName = config('database.connections.mysql.database');
 
-        return response()->json([
-            'message' => 'Restauración realizada con éxito',
-        ]);
+            // Construir el comando como string
+            $command = sprintf(
+                '"%s" --host=%s --user=%s --password=%s %s < "%s"',
+                'C:\\xampp\\mysql\\bin\\mysql.exe',
+                escapeshellarg($dbHost),
+                escapeshellarg($dbUser),
+                escapeshellarg($dbPass),
+                escapeshellarg($dbName),
+                $filePath
+            );
+
+            // Ejecutar el comando
+            $output = null;
+            $resultCode = null;
+            exec($command, $output, $resultCode);
+
+            if ($resultCode !== 0) {
+                Log::error('Error en restore: Código ' . $resultCode . ', Output: ' . implode("\n", $output));
+                throw new \Exception('Error al restaurar la base de datos.');
+            }
+
+            return back()->with([
+                'success' => true,
+                'message' => 'Base de datos restaurada exitosamente.'
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('Error en restore: ' . $e->getMessage());
+            
+            return back()->with([
+                'error' => 'Error al restaurar la base de datos: ' . $e->getMessage()
+            ]);
+        }
     }
+
 }
