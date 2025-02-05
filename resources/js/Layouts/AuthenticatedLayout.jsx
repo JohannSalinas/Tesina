@@ -68,14 +68,25 @@ export default function AuthenticatedLayout({ header, children }) {
                                         >
                                             Grupo Usuarios
                                         </NavLink>
+                                        <NavLink
+                                            href={route('backup-restore.index')}
+                                            active={route().current('backup-restore.index')}
+                                        >
+                                            Respaldo y Restauración BD
+                                        </NavLink>
                                     </>
                                 )}
 
                                 {/* Botón exclusivo para profesores */}
                                 {user.user_type === 'profesor' && (
+                                <>    
                                     <NavLink href={route('grupos-colaboradores.profesor')} active={route().current('grupos-colaboradores.profesor')}>
                                         Grupos de Colaboradores
                                     </NavLink>
+                                    <NavLink href={route('recursos.index.profesor')} active={route().current('recursos.index.profesor')}>
+                                        Ver Recursos Educativos
+                                    </NavLink>
+                                </>    
                                 )}
 
                             </div>

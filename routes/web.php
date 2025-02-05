@@ -11,6 +11,8 @@ use App\Http\Controllers\NoticiasController;
 use App\Http\Controllers\EncuestaController;
 use App\Http\Controllers\GrupoColaboradorController;
 use App\Http\Controllers\GrupoUsuarioController;
+use App\Http\Controllers\BackupController;
+
 
 
 Route::get('/', function () {
@@ -96,8 +98,13 @@ Route::prefix('grupos-colaboradores')->name('grupos-colaboradores.')->group(func
 
 Route::get('/grupo-usuarios', [GrupoUsuarioController::class, 'index'])->name('grupo-usuarios.index');
 
+Route::get('/backup-restore', [BackupController::class, 'index'])->name('backup-restore.index'); // Vista React
+Route::post('/backup-restore/backup', [BackupController::class, 'backup'])->name('backup-restore.backup'); // Respaldo
+Route::post('/backup-restore/restore', [BackupController::class, 'restore'])->name('backup-restore.restore'); // Restauración
+
 
 Route::get('/profesor/grupos', [GrupoColaboradorController::class, 'indexProfesor'])->name('grupos-colaboradores.profesor');
+Route::get('/recursos/para-profesor', [RecursosEducativosController::class, 'indexProfesor'])->name('recursos.index.profesor');
 
 });
 

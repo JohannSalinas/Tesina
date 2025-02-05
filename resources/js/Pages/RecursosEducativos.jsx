@@ -3,7 +3,7 @@ import { Head, usePage, router, Link } from '@inertiajs/react';
 import { useState } from 'react';
 
 export default function RecursosEducativos() {
-    const { recursos } = usePage().props; // Obtenemos los recursos educativos desde las props pasadas por Inertia
+    const { recursos = [], grupos = [] } = usePage().props; // Obtenemos los recursos educativos desde las props pasadas por Inertia
 
     // Estado para el formulario de creación de recurso
     const [formData, setFormData] = useState({
@@ -11,6 +11,7 @@ export default function RecursosEducativos() {
         descripcion: '',
         tipo: '',
         archivo: null,
+        grupo_id: '', // Asegúrate de agregar este campo
     });
 
     const handleInputChange = (e) => {
@@ -36,11 +37,12 @@ export default function RecursosEducativos() {
         form.append('descripcion', formData.descripcion);
         form.append('tipo', formData.tipo);
         form.append('archivo', formData.archivo);
+        form.append('grupo_id', formData.grupo_id); // Asegúrate de agregar este campo
 
         router.post('/recursos', form, {
             onSuccess: () => {
                 alert('Recurso creado correctamente.');
-                setFormData({ titulo: '', descripcion: '', tipo: '', archivo: null }); // Limpiar formulario
+                setFormData({ titulo: '', descripcion: '', tipo: '', archivo: null, grupo_id: '' }); // Limpiar formulario
             },
             onError: (error) => {
                 alert('Ocurrió un error al crear el recurso.');
@@ -120,6 +122,24 @@ export default function RecursosEducativos() {
                                         <option value="Enlace Web">Enlace Web</option>
                                     </select>
                                 </div>
+                                 
+                                 <div>
+    <label htmlFor="grupo_id" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+        Selecciona el Grupo
+    </label>
+    <select name="grupo_id" id="grupo_id" value={formData.grupo_id} onChange={handleInputChange}>
+        <option value="">Selecciona un grupo</option>
+        {grupos.length > 0 ? (
+            grupos.map((grupo) => (
+                <option key={grupo.id} value={grupo.id}>
+                    {grupo.nombre}
+                </option>
+            ))
+        ) : (
+            <option disabled>No hay grupos disponibles</option>
+        )}
+    </select>
+</div>
                                 <div>
                                     <label htmlFor="archivo" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                                         Archivo

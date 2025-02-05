@@ -7,20 +7,48 @@ use Inertia\Inertia;
 use App\Models\RecursoEducativo;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Storage;
+use App\Models\GrupoUsuario; // Para obtener los grupos del usuario
+use App\Models\GrupoColaborador; // Si se necesita el grupo completo
 
 class RecursosEducativosController extends Controller
 {
     public function index()
-    {
-        $recursos = RecursoEducativo::all();
-        return Inertia::render('RecursosEducativos/Index', [
-            'recursos' => $recursos
-        ]);
-    }
+{
+    $userId = auth()->id(); // Obtener el ID del usuario autenticado
+
+    // Obtener los grupos del usuario autenticado
+    $grupos = GrupoUsuario::where('user_id', $userId)
+    ->join('grupos', 'grupousuario.grupo_id', '=', 'grupos.id')
+    ->select('grupos.id', 'grupos.nombre')
+    ->get();
+
+    // Agregar más depuración si es necesario
+    dd($grupos->toArray()); // Muestra los grupos para asegurarte de que están siendo obtenidos correctamente
+
+    $recursos = RecursoEducativo::all(); // Obtener los recursos educativos
+
+    return Inertia::render('RecursosEducativos/Index', [
+        'recursos' => $recursos,
+        'grupos' => $grupos, // Pasar los grupos al frontend
+    ]);
+}
 
     public function create()
     {
-        return Inertia::render('RecursosEducativos/Create');
+        $usuario = auth()->user();
+        // Obtener los grupos en los que el usuario está inscrito a través de la tabla 'grupousuario'
+        $grupos = DB::table('grupousuario')
+        ->join('grupos', 'grupousuario.grupo_id', '=', 'grupos.id')
+        ->where('grupousuario.user_id', $usuario->id)
+        ->select('grupos.id', 'grupos.nombre')
+        ->get();
+    
+    // Verificación de los datos
+    dd($grupos->toArray());
+    
+        return Inertia::render('RecursosEducativos/Create', [
+            'grupos' => $grupos
+        ]);
     }
 
     public function store(Request $request)
@@ -29,28 +57,39 @@ class RecursosEducativosController extends Controller
             'titulo' => 'required|max:255',
             'descripcion' => 'nullable|max:1000',
             'tipo' => 'required|in:PDF,DOCX,PPTX,Enlace Web',
+            'grupo_colaborador_id' => [
+    'required',
+    Rule::exists('grupos_colaboradores', 'id')->where(function ($query) {
+        $userId = auth()->id();  // Obtener el ID del usuario autenticado
+        $query->whereIn('id', DB::table('grupousuario')
+            ->where('user_id', $userId)  // Obtener solo los grupos del usuario autenticado
+            ->pluck('grupo_id')  // Obtener los IDs de los grupos
+        );
+    })
+],
             'url' => 'nullable|url',
             'archivo' => 'nullable|file|max:10240'
         ]);
-
+    
         if ($validator->fails()) {
             return back()->withErrors($validator)->withInput();
         }
-
+    
         $archivoPath = null;
         if ($request->hasFile('archivo')) {
             $archivoPath = $request->file('archivo')->store('recursos', 'public');
         }
-
-        // Crear el recurso educativo, asignando el user_id
+    
+        // Crear el recurso educativo, asignando el user_id y el grupo correspondiente
         RecursoEducativo::create([
             'titulo' => $request->titulo,
             'descripcion' => $request->descripcion,
             'tipo' => $request->tipo,
-            'url' => $archivoPath ?? $request->url,  // Se usa el archivo si existe, sino usa la URL
-            'user_id' => auth()->id()  // Asignar el user_id del usuario autenticado
+            'url' => $archivoPath ?? $request->url,
+            'grupo_colaborador_id' => $request->grupo_colaborador_id,
+            'user_id' => auth()->id()
         ]);
-
+    
         return redirect()->route('recursos.index')->with('message', 'Recurso educativo creado exitosamente.');
     }
 
@@ -118,4 +157,19 @@ class RecursosEducativosController extends Controller
             Storage::disk('public')->delete($filePath);
         }
     }
+
+    public function indexProfesor()
+    {
+        $usuario = auth()->user();
+        $gruposIds = $usuario->gruposColaboradores->pluck('id');
+    
+        $recursos = RecursoEducativo::whereIn('grupo_colaborador_id', $gruposIds)->get();
+    
+        return Inertia::render('Profesor/ListaRecursos', [
+            'recursos' => $recursos
+        ]);
+    }
+
+
+
 }

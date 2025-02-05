@@ -5,6 +5,9 @@ namespace App\Http\Controllers;
 use App\Models\GrupoColaborador;
 use App\Models\GrupoUsuario;
 use Inertia\Inertia;
+use App\Models\User;
+use App\Notifications\SolicitudUnirseGrupo;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -102,5 +105,21 @@ public function indexProfesor()
         'grupos' => $grupos
     ]);
 }
+/*
+public function solicitarUnirse($grupoId)
+{
+    // Obtener el grupo y el primer usuario
+    $grupo = GrupoColaborador::findOrFail($grupoId);
+    $primerUsuario = GrupoUsuario::where('grupo_id', $grupo->id)->first()->usuario;
+
+    // Obtener el usuario autenticado (el que solicita unirse)
+    $usuarioSolicitante = auth()->user();
+
+    // Enviar la notificación al primer usuario del grupo
+    Notification::send($primerUsuario, new SolicitudUnirseGrupo($grupo, $usuarioSolicitante));
+
+    return back()->with('success', 'Solicitud enviada correctamente.');
+}*/
+
 
 }

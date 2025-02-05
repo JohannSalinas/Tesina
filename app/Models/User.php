@@ -93,6 +93,6 @@ class User extends Authenticatable
     {
         return $this->hasMany(GrupoUsuario::class, 'usuario_id');
     }
-
+   
 
 }
