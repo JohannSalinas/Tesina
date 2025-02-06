@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useForm } from '@inertiajs/inertia-react';
-import { Inertia } from '@inertiajs/inertia';
+import { route } from 'ziggy-js';
 import { Link } from '@inertiajs/inertia-react';
 
 
@@ -8,21 +8,19 @@ const BackupRestore = () => {
     const [backupStatus, setBackupStatus] = useState(null);
     const [isRestoring, setIsRestoring] = useState(false);
 
-    // Para el respaldo
-    const { post: backupPost, processing: isBackingUp } = useForm();
+    const { post: backupPost, processing: isBackingUp } = useForm({});
+    const { post: restorePost, processing: isRestoringData } = useForm({});
 
-    // Para la restauración
-    const { post: restorePost, processing: isRestoringData } = useForm();
 
     const handleBackup = () => {
-        setBackupStatus(null);
-        backupPost(route('backup-restore.backup'), {
-            onSuccess: () => setBackupStatus({ type: 'success', message: 'Respaldo realizado exitosamente.' }),
-            onError: (errors) => {
-                console.error("Error en el respaldo:", errors);
-                setBackupStatus({ type: 'error', message: errors.error || 'Hubo un error al realizar el respaldo.' });
-            }
-        });
+            backupPost(route('backup-restore.backup'), {
+                onSuccess: () => {
+                    setBackupStatus({ type: 'success', message: 'Respaldo realizado exitosamente.' });
+                },
+                onError: () => {
+                    setBackupStatus({ type: 'error', message: 'Hubo un error durante el respaldo.' });
+                }
+            });
     };
 
     const handleRestore = (e) => {

@@ -133,7 +133,7 @@ class RecursosEducativosController extends Controller
         $grupos = GrupoColaborador::whereHas('usuarios', function ($query) use ($userId) {
             $query->where('usuario_id', $userId);
         })->with('recursos')->get();
-    
+
         return Inertia::render('Profesor/ListaRecursos', [
             'grupos' => $grupos
         ]);

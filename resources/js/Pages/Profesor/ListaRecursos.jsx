@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from '@inertiajs/inertia-react';
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import DocViewer, { DocViewerRenderers } from "@cyntler/react-doc-viewer";
+import "@cyntler/react-doc-viewer/dist/index.css";
 
 const ListaRecursos = ({ grupos }) => {
     const [calificacion, setCalificacion] = useState({});
@@ -8,13 +9,11 @@ const ListaRecursos = ({ grupos }) => {
     // Función para manejar la calificación
     const handleCalificar = async (recursoId, nuevaCalificacion) => {
         try {
-            // Actualizar la calificación en el estado local
             setCalificacion((prev) => ({
                 ...prev,
                 [recursoId]: nuevaCalificacion,
             }));
 
-            // Enviar la calificación al backend
             await axios.post(route('recursos.calificar', recursoId), {
                 calificacion: nuevaCalificacion,
             });
@@ -23,27 +22,12 @@ const ListaRecursos = ({ grupos }) => {
         }
     };
 
-    const renderFilePreview = (archivo) => {
-        const fileExtension = archivo.split('.').pop().toLowerCase();
-
-        if (['jpg', 'jpeg', 'png', 'gif'].includes(fileExtension)) {
-            return <img src={archivo} alt="Vista previa" className="w-full h-auto rounded-lg" />;
-        }
-
-        if (fileExtension === 'pdf') {
-            return (
-                <iframe
-                    src={archivo}
-                    width="100%"
-                    height="300"
-                    title="Vista previa del archivo PDF"
-                    className="border border-gray-300 rounded-lg"
-                ></iframe>
-            );
-        }
-
-        return <p className="text-gray-500">No se puede mostrar una vista previa de este archivo.</p>;
+    // Generar documentos compatibles con DocViewer
+    const getFileDocs = (recurso) => {
+        if (!recurso || !recurso.archivo_path) return [];
+        return [{ uri: `/storage/${recurso.archivo_path}` }];
     };
+
 
     return (
         <div className="min-h-screen bg-gray-100 py-10 px-6">
@@ -57,7 +41,7 @@ const ListaRecursos = ({ grupos }) => {
                         <div key={grupo.id} className="bg-gray-50 p-4 rounded-lg shadow-md mb-4">
                             <h2 className="text-lg font-semibold text-gray-800">{grupo.nombre}</h2>
                             <p className="text-gray-600">{grupo.descripcion}</p>
-                            
+
                             {grupo.recursos.length > 0 ? (
                                 <ul className="mt-3 space-y-4">
                                     {grupo.recursos.map((recurso) => (
@@ -68,26 +52,33 @@ const ListaRecursos = ({ grupos }) => {
 
                                             <p className="text-gray-600 mb-2">{recurso.descripcion}</p>
 
-                                            {/* Vista previa del archivo */}
-                                            {recurso.archivo && renderFilePreview(recurso.archivo)}
+                                            {/* Vista previa del archivo con react-doc-viewer */}
+                                            {recurso.archivo_path && (
+                                                <DocViewer
+                                                    pluginRenderers={DocViewerRenderers}
+                                                    documents={getFileDocs(recurso)}
+                                                    style={{ width: "100%", height: "300px" }}
+                                                />
+                                            )}
 
                                             {/* Calificación */}
                                             <div className="flex items-center mt-3">
                                                 <span className="font-semibold">Calificación: </span>
                                                 <div className="ml-2 flex items-center">
-                                                    {[...Array(5)].map((_, index) => (
-                                                        <button
-                                                            key={index}
-                                                            onClick={() => handleCalificar(recurso.id, index + 1)}
-                                                            className={`${
-                                                                calificacion[recurso.id] >= index + 1
-                                                                    ? 'text-yellow-500'
-                                                                    : 'text-gray-300'
-                                                            } text-xl`}
-                                                        >
-                                                            ★
-                                                        </button>
-                                                    ))}
+                                                    {[...Array(5)].map((_, index) => {
+                                                        const rating = calificacion[recurso.id] ?? recurso.calificacion;
+                                                        return (
+                                                            <button
+                                                                key={index}
+                                                                onClick={() => handleCalificar(recurso.id, index + 1)}
+                                                                className={`${
+                                                                    rating >= index + 1 ? 'text-yellow-500' : 'text-gray-300'
+                                                                } text-xl`}
+                                                            >
+                                                                ★
+                                                            </button>
+                                                        );
+                                                    })}
                                                 </div>
                                             </div>
                                         </li>

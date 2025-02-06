@@ -20,9 +20,9 @@ class BackupController extends Controller
     public function backup()
     {
         try {
-            if (!Storage::exists('public/backups')) {
-                Storage::makeDirectory('public/backups');
-            }
+           if (!Storage::exists('public/backups')) {
+               Storage::makeDirectory('backups');
+           }
 
             $fileName = 'backup_' . now()->format('Ymd_His') . '.sql';
             $backupPath = storage_path("app/public/backups/{$fileName}");
@@ -36,7 +36,7 @@ class BackupController extends Controller
             // Construir el comando como string en lugar de array
             $command = sprintf(
                 '"%s" --host=%s --user=%s --password=%s %s > "%s"',
-                'C:\\xampp\\mysql\\bin\\mysqldump.exe',
+                'C:\\Program Files\\MySQL\\MySQL Server 8.4\\bin\\mysqldump.exe',
                 escapeshellarg($dbHost),
                 escapeshellarg($dbUser),
                 escapeshellarg($dbPass),
@@ -65,7 +65,7 @@ class BackupController extends Controller
 
         } catch (\Exception $e) {
             Log::error('Error en backup: ' . $e->getMessage());
-            
+
             return back()->with([
                 'error' => 'Error al realizar el respaldo: ' . $e->getMessage()
             ]);
@@ -82,7 +82,7 @@ class BackupController extends Controller
             // Guardar el archivo temporalmente
             $uploadedFile = $request->file('backup_file');
             $tempPath = storage_path('app/temp');
-            
+
             if (!file_exists($tempPath)) {
                 mkdir($tempPath, 0755, true);
             }
@@ -134,7 +134,7 @@ class BackupController extends Controller
 
         } catch (\Exception $e) {
             Log::error('Error en restore: ' . $e->getMessage());
-            
+
             // Limpiar archivo temporal si existe
             if (isset($filePath) && file_exists($filePath)) {
                 unlink($filePath);
