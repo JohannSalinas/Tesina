@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Storage;
 use App\Models\GrupoUsuario; // Para obtener los grupos del usuario
 use App\Models\GrupoColaborador; // Si se necesita el grupo completo
+use Illuminate\Support\Facades\Auth;
 
 class RecursosEducativosController extends Controller
 {
@@ -124,18 +125,31 @@ class RecursosEducativosController extends Controller
         }
     }
 
-    public function indexProfesor()
+    public function recursosProfesor()
     {
-        $usuario = auth()->user();
-        $gruposIds = $usuario->gruposColaboradores->pluck('id');
+        $userId = Auth::id();
 
-        $recursos = RecursoEducativo::whereIn('grupo_colaborador_id', $gruposIds)->get();
-
+        // Obtener los grupos en los que el profesor está inscrito con sus recursos
+        $grupos = GrupoColaborador::whereHas('usuarios', function ($query) use ($userId) {
+            $query->where('usuario_id', $userId);
+        })->with('recursos')->get();
+    
         return Inertia::render('Profesor/ListaRecursos', [
-            'recursos' => $recursos
+            'grupos' => $grupos
         ]);
     }
 
+    public function calificar(Request $request, RecursoEducativo $recurso)
+{
+    $request->validate([
+        'calificacion' => 'required|numeric|min:0|max:5',
+    ]);
 
+    // Actualizar la calificación del recurso
+    $recurso->calificacion = $request->calificacion;
+    $recurso->save();
+
+    return response()->json(['message' => 'Calificación actualizada con éxito']);
+}
 
 }

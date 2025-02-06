@@ -34,11 +34,20 @@ class GrupoColaboradorController extends Controller
             'temas_abordados' => 'nullable|string',
         ]);
 
-        // Crear el grupo
-        $grupo = GrupoColaborador::create($request->all());
+        
 
         // Obtener el usuario autenticado
         $user = Auth::user();
+
+         // Crear el grupo y asignar el usuario como creador
+         $grupo = GrupoColaborador::create([
+            'nombre' => $request->nombre,
+            'tipo' => $request->tipo,
+            'descripcion' => $request->descripcion,
+            'temas_abordados' => $request->temas_abordados,
+            'creador_id' => $user->id, // ✅ Se asigna el usuario que crea el grupo
+            'numero_inscritos' => 1,   // ✅ Se inicia con 1 inscrito (el creador)
+        ]);
 
         // Agregar al usuario como miembro del grupo
         GrupoUsuario::create([

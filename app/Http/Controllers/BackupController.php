@@ -76,11 +76,19 @@ class BackupController extends Controller
     {
         try {
             $request->validate([
-                'backup_file' => 'required|file|mimes:sql,gz',
+                'backup_file' => 'required|file|mimes:sql',
             ]);
 
+            // Guardar el archivo temporalmente
             $uploadedFile = $request->file('backup_file');
-            $filePath = $uploadedFile->getRealPath();
+            $tempPath = storage_path('app/temp');
+            
+            if (!file_exists($tempPath)) {
+                mkdir($tempPath, 0755, true);
+            }
+
+            $filePath = $tempPath . '/' . $uploadedFile->getClientOriginalName();
+            move_uploaded_file($uploadedFile->getRealPath(), $filePath);
 
             // Configuración de la base de datos
             $dbHost = config('database.connections.mysql.host', '127.0.0.1');
@@ -88,35 +96,50 @@ class BackupController extends Controller
             $dbPass = config('database.connections.mysql.password');
             $dbName = config('database.connections.mysql.database');
 
-            // Construir el comando como string
+            // Primero intentamos con mysql.exe
             $command = sprintf(
-                '"%s" --host=%s --user=%s --password=%s %s < "%s"',
-                'C:\\xampp\\mysql\\bin\\mysql.exe',
-                escapeshellarg($dbHost),
-                escapeshellarg($dbUser),
-                escapeshellarg($dbPass),
-                escapeshellarg($dbName),
+                '"C:\\xampp\\mysql\\bin\\mysql.exe" -h%s -u%s -p%s %s < "%s"',
+                $dbHost,
+                $dbUser,
+                $dbPass,
+                $dbName,
                 $filePath
             );
 
+            // Log del comando para debugging (omitiendo la contraseña)
+            Log::info('Ejecutando comando de restauración (contraseña omitida)');
+
             // Ejecutar el comando
-            $output = null;
-            $resultCode = null;
-            exec($command, $output, $resultCode);
+            $output = [];
+            $resultCode = 0;
+            exec($command . " 2>&1", $output, $resultCode);
+
+            // Log de la salida para debugging
+            Log::info('Código de resultado: ' . $resultCode);
+            Log::info('Salida del comando: ' . implode("\n", $output));
+
+            // Limpiar archivo temporal
+            if (file_exists($filePath)) {
+                unlink($filePath);
+            }
 
             if ($resultCode !== 0) {
-                Log::error('Error en restore: Código ' . $resultCode . ', Output: ' . implode("\n", $output));
-                throw new \Exception('Error al restaurar la base de datos.');
+                throw new \Exception('Error en la restauración: ' . implode("\n", $output));
             }
 
             return back()->with([
                 'success' => true,
-                'message' => 'Base de datos restaurada exitosamente.'
+                'message' => 'Base de datos restaurada exitosamente'
             ]);
 
         } catch (\Exception $e) {
             Log::error('Error en restore: ' . $e->getMessage());
             
+            // Limpiar archivo temporal si existe
+            if (isset($filePath) && file_exists($filePath)) {
+                unlink($filePath);
+            }
+
             return back()->with([
                 'error' => 'Error al restaurar la base de datos: ' . $e->getMessage()
             ]);

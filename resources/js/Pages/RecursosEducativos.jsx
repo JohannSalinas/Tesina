@@ -119,7 +119,7 @@ export default function RecursosEducativos() {
                                         <option value="PDF">PDF</option>
                                         <option value="DOCX">DOCX</option>
                                         <option value="PPTX">PPTX</option>
-                                        <option value="Enlace Web">Enlace Web</option>
+                                        
                                     </select>
                                 </div>
 

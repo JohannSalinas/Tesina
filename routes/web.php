@@ -99,7 +99,8 @@ Route::post('/backup-restore/restore', [BackupController::class, 'restore'])->na
 
 
 Route::get('/profesor/grupos', [GrupoColaboradorController::class, 'indexProfesor'])->name('grupos-colaboradores.profesor');
-Route::get('/recursos/para-profesor', [RecursosEducativosController::class, 'indexProfesor'])->name('recursos.index.profesor');
+Route::get('/profesor/mis-recursos', [RecursosEducativosController::class, 'recursosProfesor'])->name('recursos.profesor');
+Route::post('recursos/{recurso}/calificar', [RecursosEducativosController::class, 'calificar'])->name('recursos.calificar');
 
 });
 

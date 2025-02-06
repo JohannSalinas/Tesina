@@ -1,24 +1,115 @@
-// pages/Profesor/ListaRecursos.jsx
+import React, { useState } from 'react';
+import { Link } from '@inertiajs/inertia-react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { useEffect, useState } from 'react';
 
-export default function ListaRecursos({ recursos }) {
+const ListaRecursos = ({ grupos }) => {
+    const [calificacion, setCalificacion] = useState({});
+
+    // Función para manejar la calificación
+    const handleCalificar = async (recursoId, nuevaCalificacion) => {
+        try {
+            // Actualizar la calificación en el estado local
+            setCalificacion((prev) => ({
+                ...prev,
+                [recursoId]: nuevaCalificacion,
+            }));
+
+            // Enviar la calificación al backend
+            await axios.post(route('recursos.calificar', recursoId), {
+                calificacion: nuevaCalificacion,
+            });
+        } catch (error) {
+            console.error('Error al calificar el recurso:', error);
+        }
+    };
+
+    const renderFilePreview = (archivo) => {
+        const fileExtension = archivo.split('.').pop().toLowerCase();
+
+        if (['jpg', 'jpeg', 'png', 'gif'].includes(fileExtension)) {
+            return <img src={archivo} alt="Vista previa" className="w-full h-auto rounded-lg" />;
+        }
+
+        if (fileExtension === 'pdf') {
+            return (
+                <iframe
+                    src={archivo}
+                    width="100%"
+                    height="300"
+                    title="Vista previa del archivo PDF"
+                    className="border border-gray-300 rounded-lg"
+                ></iframe>
+            );
+        }
+
+        return <p className="text-gray-500">No se puede mostrar una vista previa de este archivo.</p>;
+    };
+
     return (
-        <div className="container mx-auto p-6">
-            <h1 className="text-2xl font-bold text-gray-800 dark:text-white mb-6">Recursos Educativos</h1>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                {recursos.length > 0 ? (
-                    recursos.map((recurso) => (
-                        <div key={recurso.id} className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg">
-                            <h2 className="text-xl font-semibold text-gray-900 dark:text-white">{recurso.titulo}</h2>
-                            <p className="text-gray-600 dark:text-gray-400 mt-2">{recurso.descripcion}</p>
-                            <a href={recurso.url} className="text-blue-600 dark:text-blue-400 mt-2">Ver Recurso</a>
+        <div className="min-h-screen bg-gray-100 py-10 px-6">
+            <div className="max-w-5xl mx-auto bg-white p-6 rounded-lg shadow-lg">
+                <h1 className="text-2xl font-bold text-gray-700 mb-4 text-center">
+                    Recursos Educativos de Mis Grupos
+                </h1>
+
+                {grupos.length > 0 ? (
+                    grupos.map((grupo) => (
+                        <div key={grupo.id} className="bg-gray-50 p-4 rounded-lg shadow-md mb-4">
+                            <h2 className="text-lg font-semibold text-gray-800">{grupo.nombre}</h2>
+                            <p className="text-gray-600">{grupo.descripcion}</p>
+                            
+                            {grupo.recursos.length > 0 ? (
+                                <ul className="mt-3 space-y-4">
+                                    {grupo.recursos.map((recurso) => (
+                                        <li key={recurso.id} className="p-4 bg-white rounded-lg shadow-sm border border-gray-200">
+                                            <div className="mb-2">
+                                                <span className="font-semibold text-lg">{recurso.titulo}</span>
+                                            </div>
+
+                                            <p className="text-gray-600 mb-2">{recurso.descripcion}</p>
+
+                                            {/* Vista previa del archivo */}
+                                            {recurso.archivo && renderFilePreview(recurso.archivo)}
+
+                                            {/* Calificación */}
+                                            <div className="flex items-center mt-3">
+                                                <span className="font-semibold">Calificación: </span>
+                                                <div className="ml-2 flex items-center">
+                                                    {[...Array(5)].map((_, index) => (
+                                                        <button
+                                                            key={index}
+                                                            onClick={() => handleCalificar(recurso.id, index + 1)}
+                                                            className={`${
+                                                                calificacion[recurso.id] >= index + 1
+                                                                    ? 'text-yellow-500'
+                                                                    : 'text-gray-300'
+                                                            } text-xl`}
+                                                        >
+                                                            ★
+                                                        </button>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        </li>
+                                    ))}
+                                </ul>
+                            ) : (
+                                <p className="text-gray-500 mt-2">No hay recursos en este grupo.</p>
+                            )}
                         </div>
                     ))
                 ) : (
-                    <p className="text-gray-600 dark:text-gray-400">No hay recursos disponibles para tu grupo.</p>
+                    <p className="text-gray-500 text-center">No estás inscrito en ningún grupo.</p>
                 )}
+
+                <div className="text-center mt-6">
+                    <Link href={route('dashboard')} className="text-blue-600 hover:underline">
+                        &larr; Volver al Dashboard
+                    </Link>
+                </div>
             </div>
         </div>
     );
-}
+};
+
+export default ListaRecursos;
