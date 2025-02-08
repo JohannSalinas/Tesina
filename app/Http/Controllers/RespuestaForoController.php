@@ -16,24 +16,25 @@ class RespuestaForoController extends Controller
         'respuesta' => 'required|string',
     ]);
 
-    $pregunta = PreguntaForo::findOrFail($request->pregunta_id);
-
-    // Contar las respuestas actuales
-    if ($pregunta->respuestas()->count() >= $pregunta->max_respuestas) {
-        return response()->json(['error' => 'Se ha alcanzado el límite de respuestas para esta pregunta.'], 403);
-    }
-
     // Crear la respuesta
-    RespuestaForo::create([
+    $respuesta = RespuestaForo::create([
         'pregunta_id' => $request->pregunta_id,
         'usuario_id' => auth()->id(),
         'respuesta' => $request->respuesta,
     ]);
 
-    // Incrementar el contador de respuestas en la pregunta
+    // Incrementar el contador de respuestas
+    $pregunta = PreguntaForo::findOrFail($request->pregunta_id);
     $pregunta->increment('numero_respuestas');
 
-    return redirect()->route('preguntas.show', $pregunta->id)->with('success', 'Respuesta enviada.');
+    // Cargar las relaciones necesarias
+    $respuesta->load('usuario');
+
+    // Retornar una respuesta JSON en lugar de redireccionar
+    return response()->json([
+        'message' => 'Respuesta enviada exitosamente',
+        'respuesta' => $respuesta
+    ]);
 }
 
 // Eliminar una respuesta

@@ -106,6 +106,8 @@ Route::post('recursos/{recurso}/calificar', [RecursosEducativosController::class
 // Rutas para las preguntas del foro
 Route::get('/preguntas', [PreguntaForoController::class, 'index'])->name('preguntas.index');
 Route::post('/preguntas', [PreguntaForoController::class, 'store'])->name('preguntas.store');
+Route::post('/respuestas', [RespuestaForoController::class, 'store'])->name('respuestas.store');
+
 });
 
 
