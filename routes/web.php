@@ -12,7 +12,8 @@ use App\Http\Controllers\EncuestaController;
 use App\Http\Controllers\GrupoColaboradorController;
 use App\Http\Controllers\GrupoUsuarioController;
 use App\Http\Controllers\BackupController;
-
+use App\Http\Controllers\PreguntaForoController;
+use App\Http\Controllers\RespuestaForoController;
 
 
 Route::get('/', function () {
@@ -102,6 +103,9 @@ Route::get('/profesor/grupos', [GrupoColaboradorController::class, 'indexProfeso
 Route::get('/profesor/mis-recursos', [RecursosEducativosController::class, 'recursosProfesor'])->name('recursos.profesor');
 Route::post('recursos/{recurso}/calificar', [RecursosEducativosController::class, 'calificar'])->name('recursos.calificar');
 
+// Rutas para las preguntas del foro
+Route::get('/preguntas', [PreguntaForoController::class, 'index'])->name('preguntas.index');
+Route::post('/preguntas', [PreguntaForoController::class, 'store'])->name('preguntas.store');
 });
 
 

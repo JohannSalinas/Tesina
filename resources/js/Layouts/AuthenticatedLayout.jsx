@@ -74,6 +74,12 @@ export default function AuthenticatedLayout({ header, children }) {
                                         >
                                             Respaldo y Restauración BD
                                         </NavLink>
+                                        <NavLink
+                                            href={route('preguntas.index')}
+                                            active={route().current('preguntas.index')}
+                                        >
+                                            Foro de Preguntas
+                                        </NavLink>
                                     </>
                                 )}
 

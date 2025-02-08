@@ -36,7 +36,7 @@ class BackupController extends Controller
             // Construir el comando como string en lugar de array
             $command = sprintf(
                 '"%s" --host=%s --user=%s --password=%s %s > "%s"',
-                'C:\\Program Files\\MySQL\\MySQL Server 8.4\\bin\\mysqldump.exe',
+                'C:\\xampp\\mysql\\bin\\mysqldump.exe',
                 escapeshellarg($dbHost),
                 escapeshellarg($dbUser),
                 escapeshellarg($dbPass),
