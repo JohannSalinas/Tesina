@@ -2,6 +2,7 @@ import { useForm } from '@inertiajs/react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head } from '@inertiajs/react';
 import { useState } from 'react';
+import Notification from "@/Components/Notifications";
 
 const ListaPreguntas = ({ preguntas }) => {
     // Formulario para preguntas
@@ -17,43 +18,63 @@ const ListaPreguntas = ({ preguntas }) => {
     // Manejar el envío de una nueva pregunta
     const handleSubmit = (e) => {
         e.preventDefault();
-        preguntaForm.post(route('preguntas.store'));
+        preguntaForm.post(route('preguntas.store'), {
+            onSuccess: () => preguntaForm.reset()
+        });
     };
 
     // Manejar el envío de una nueva respuesta
+    const [mensaje, setMensaje] = useState(null);
+    const [tipoMensaje, setTipoMensaje] = useState(null);
+
     const handleRespuestaSubmit = (e, preguntaId) => {
         e.preventDefault();
-    
+
         if (!nuevaRespuesta[preguntaId]) {
             return;
         }
-    
+
         setProcessingRespuesta(prev => ({
             ...prev,
             [preguntaId]: true
         }));
-    
-        // Usar axios directamente
+
         axios.post(route('respuestas.store'), {
             pregunta_id: preguntaId,
             respuesta: nuevaRespuesta[preguntaId]
         })
-        .then(() => {
-            setNuevaRespuesta(prev => ({
-                ...prev,
-                [preguntaId]: ''
-            }));
-        })
-        .catch(error => {
-            console.error('Error al enviar respuesta:', error);
-        })
-        .finally(() => {
-            setProcessingRespuesta(prev => ({
-                ...prev,
-                [preguntaId]: false
-            }));
-        });
+            .then(() => {
+                setNuevaRespuesta(prev => ({
+                    ...prev,
+                    [preguntaId]: ''
+                }));
+
+                setMensaje("Respuesta agregada correctamente.");
+                setTipoMensaje("success");
+
+                setTimeout(() => {
+                    window.location.reload();
+                }, 2000);
+            })
+            .catch(error => {
+                console.error('Error al enviar respuesta:', error);
+
+                setMensaje("Limite de respuestas por pregunta alcanzado.");
+                setTipoMensaje("error");
+            })
+            .finally(() => {
+                setProcessingRespuesta(prev => ({
+                    ...prev,
+                    [preguntaId]: false
+                }));
+
+                setTimeout(() => {
+                    setMensaje(null);
+                    setTipoMensaje(null);
+                }, 3000);
+            });
     };
+
 
     return (
         <AuthenticatedLayout>
@@ -117,6 +138,12 @@ const ListaPreguntas = ({ preguntas }) => {
                             {/* Formulario de respuesta */}
                             <div className="mt-4 p-4 border-t border-gray-200">
                                 <form onSubmit={(e) => handleRespuestaSubmit(e, pregunta.id)}>
+                                    {/* Notificación */}
+                                    <Notification
+                                        message={mensaje}
+                                        type={tipoMensaje}
+                                        onClose={() => setMensaje(null)}
+                                    />
                                     <input
                                         type="text"
                                         name="respuesta"
@@ -128,10 +155,10 @@ const ListaPreguntas = ({ preguntas }) => {
                                         placeholder="Escribe tu respuesta..."
                                         className="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                     />
-                                    <input 
-                                        type="hidden" 
-                                        name="pregunta_id" 
-                                        value={pregunta.id} 
+                                    <input
+                                        type="hidden"
+                                        name="pregunta_id"
+                                        value={pregunta.id}
                                     />
                                     <button
                                         type="submit"

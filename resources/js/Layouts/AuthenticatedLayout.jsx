@@ -85,14 +85,14 @@ export default function AuthenticatedLayout({ header, children }) {
 
                                 {/* Botón exclusivo para profesores */}
                                 {user.user_type === 'profesor' && (
-                                <>    
+                                <>
                                     <NavLink href={route('grupos-colaboradores.profesor')} active={route().current('grupos-colaboradores.profesor')}>
                                         Grupos de Colaboradores
                                     </NavLink>
                                     <NavLink href={route('recursos.profesor')} active={route().current('recursos.profesor')}>
                                         Ver Recursos Educativos
                                     </NavLink>
-                                </>    
+                                </>
                                 )}
 
                             </div>
@@ -130,6 +130,11 @@ export default function AuthenticatedLayout({ header, children }) {
                                             href={route('profile.edit')}
                                         >
                                             Profile
+                                        </Dropdown.Link>
+                                        <Dropdown.Link
+                                            href={route('notifications.show')}
+                                        >
+                                            Notifications
                                         </Dropdown.Link>
                                         <Dropdown.Link
                                             href={route('logout')}
@@ -214,6 +219,9 @@ export default function AuthenticatedLayout({ header, children }) {
                         <div className="mt-3 space-y-1">
                             <ResponsiveNavLink href={route('profile.edit')}>
                                 Profile
+                            </ResponsiveNavLink>
+                            <ResponsiveNavLink href={route('notifications.show')}>
+                                Notifications
                             </ResponsiveNavLink>
                             <ResponsiveNavLink
                                 method="post"

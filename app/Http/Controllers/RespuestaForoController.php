@@ -16,16 +16,23 @@ class RespuestaForoController extends Controller
         'respuesta' => 'required|string',
     ]);
 
+    // Incrementar el contador de respuestas
+    $pregunta = PreguntaForo::findOrFail($request->pregunta_id);
+
+    if ($pregunta->numero_respuestas >= 5) {
+        return (response()->json([
+            'message' => 'No puedes responder a esta pregunta porque ya tiene 5 respuestas.'
+        ], 403));
+    }
+
+    $pregunta->increment('numero_respuestas');
+
     // Crear la respuesta
     $respuesta = RespuestaForo::create([
         'pregunta_id' => $request->pregunta_id,
         'usuario_id' => auth()->id(),
         'respuesta' => $request->respuesta,
     ]);
-
-    // Incrementar el contador de respuestas
-    $pregunta = PreguntaForo::findOrFail($request->pregunta_id);
-    $pregunta->increment('numero_respuestas');
 
     // Cargar las relaciones necesarias
     $respuesta->load('usuario');

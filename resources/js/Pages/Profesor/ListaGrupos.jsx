@@ -1,8 +1,20 @@
-import { useEffect, useState } from 'react';
-import { Head, usePage, router,Link } from '@inertiajs/react';
+import { useState } from 'react';
+import { Head, usePage, router } from '@inertiajs/react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import { route} from "ziggy-js";
 
 export default function ListaGrupos({ grupos }) {
+    const user = usePage().props.auth.user;
+
+    const handleUnirse = (grupoId, creadorId) => {
+        // Realiza la solicitud POST a la ruta store de NotificationsController
+        router.post(route('notifications.store'), {
+            grupo_id: grupoId,
+            creador_id: creadorId,
+            usuario_id: user.id
+        });
+    };
+
     return (
         <AuthenticatedLayout>
             <div className="container mx-auto p-6">
@@ -17,8 +29,13 @@ export default function ListaGrupos({ grupos }) {
                                 <p className="text-gray-700 dark:text-gray-300 mt-2">{grupo.descripcion}</p>
                                 <p className="text-gray-700 dark:text-gray-300 mt-2"><strong>Temas:</strong> {grupo.temas_abordados}</p>
                                 <div className="mt-4">
-                                    {/* Botón para que el profesor se una al grupo */}
-                                    <button className="bg-blue-500 text-white p-2 rounded-md">Unirse</button>
+                                    {/* Botón para que el usuario se una al grupo */}
+                                    <button
+                                        className="bg-blue-500 text-white p-2 rounded-md"
+                                        onClick={() => handleUnirse(grupo.id, grupo.creador_id)}
+                                    >
+                                        Unirse
+                                    </button>
                                 </div>
                             </div>
                         ))

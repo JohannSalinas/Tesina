@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\NotificationsController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RecursosEducativosController;
 use Illuminate\Foundation\Application;
@@ -108,6 +109,10 @@ Route::get('/preguntas', [PreguntaForoController::class, 'index'])->name('pregun
 Route::post('/preguntas', [PreguntaForoController::class, 'store'])->name('preguntas.store');
 Route::post('/respuestas', [RespuestaForoController::class, 'store'])->name('respuestas.store');
 
+//Rutas para las notificaciones de unirse a un grupo
+Route::get('/notificaciones', [NotificationsController::class, 'show'])->name('notifications.show');
+Route::post('notificaciones/crear', [NotificationsController::class, 'store'])->name('notifications.store');
+Route::put('notificaciones/{id}', [NotificationsController::class, 'update'])->name('notifications.update');
 });
 
 

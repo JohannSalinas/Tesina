@@ -34,7 +34,7 @@ class GrupoColaboradorController extends Controller
             'temas_abordados' => 'nullable|string',
         ]);
 
-        
+
 
         // Obtener el usuario autenticado
         $user = Auth::user();
@@ -75,7 +75,7 @@ public function edit($id)
     return Inertia::render('EditarGrupoColaboradores', [
         'grupoColaborador' => $grupoColaborador, // Pasa cualquier dato necesario
     ]);
-    
+
 }
 
 // Método para actualizar el grupo de colaboradores
