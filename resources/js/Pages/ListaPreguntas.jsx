@@ -4,75 +4,54 @@ import { Head } from '@inertiajs/react';
 import { useState } from 'react';
 
 const ListaPreguntas = ({ preguntas }) => {
-    const { data, setData, post, processing, errors } = useForm({
+    // Formulario para preguntas
+    const preguntaForm = useForm({
         pregunta: '',
     });
 
-    // Estado para almacenar respuestas de cada pregunta
+    // Estados para manejar respuestas
     const [respuestas, setRespuestas] = useState({});
     const [nuevaRespuesta, setNuevaRespuesta] = useState({});
-    const [processingRespuesta, setProcessingRespuesta] = useState({}); // Estado de procesamiento para respuestas
+    const [processingRespuesta, setProcessingRespuesta] = useState({});
 
     // Manejar el envío de una nueva pregunta
     const handleSubmit = (e) => {
         e.preventDefault();
-        post(route('preguntas.store'), {
-            data,
-            onSuccess: () => {
-                setData('pregunta', ''); // Limpiar el campo de pregunta
-            },
-            onError: (errors) => {
-                console.log(errors);
-            },
-        });
+        preguntaForm.post(route('preguntas.store'));
     };
 
+    // Manejar el envío de una nueva respuesta
     const handleRespuestaSubmit = (e, preguntaId) => {
         e.preventDefault();
-
+    
         if (!nuevaRespuesta[preguntaId]) {
             return;
         }
-
-        // Establecer el estado de procesamiento solo para esta respuesta
-        setProcessingRespuesta((prevState) => ({
-            ...prevState,
-            [preguntaId]: true, // Indicar que esta respuesta está procesándose
+    
+        setProcessingRespuesta(prev => ({
+            ...prev,
+            [preguntaId]: true
         }));
-
-        post(route('respuestas.store'), {
+    
+        // Usar axios directamente
+        axios.post(route('respuestas.store'), {
             pregunta_id: preguntaId,
-            respuesta: nuevaRespuesta[preguntaId],
-        }, {
-            preserveScroll: true,
-            onSuccess: (response) => {
-                // Limpiar el campo de respuesta
-                setNuevaRespuesta({ ...nuevaRespuesta, [preguntaId]: '' });
-                
-                // Actualizar las respuestas locales con la respuesta del servidor
-                setRespuestas((prevRespuestas) => ({
-                    ...prevRespuestas,
-                    [preguntaId]: [
-                        ...(prevRespuestas[preguntaId] || []),
-                        response.respuesta // Usar la respuesta devuelta por el servidor
-                    ],
-                }));
-
-                // Finalizar el procesamiento de la respuesta
-                setProcessingRespuesta((prevState) => ({
-                    ...prevState,
-                    [preguntaId]: false, // Resetear el estado de procesamiento
-                }));
-            },
-            onError: (errors) => {
-                console.error('Error al enviar respuesta:', errors);
-
-                // Finalizar el procesamiento de la respuesta en caso de error
-                setProcessingRespuesta((prevState) => ({
-                    ...prevState,
-                    [preguntaId]: false, // Resetear el estado de procesamiento
-                }));
-            },
+            respuesta: nuevaRespuesta[preguntaId]
+        })
+        .then(() => {
+            setNuevaRespuesta(prev => ({
+                ...prev,
+                [preguntaId]: ''
+            }));
+        })
+        .catch(error => {
+            console.error('Error al enviar respuesta:', error);
+        })
+        .finally(() => {
+            setProcessingRespuesta(prev => ({
+                ...prev,
+                [preguntaId]: false
+            }));
         });
     };
 
@@ -80,7 +59,7 @@ const ListaPreguntas = ({ preguntas }) => {
         <AuthenticatedLayout>
             <Head title="Foro - Preguntas" />
             <div className="container mx-auto py-10 px-5">
-                {/* Formulario para crear una nueva pregunta */}
+                {/* Formulario de pregunta */}
                 <div className="bg-white rounded-lg shadow-md p-6 mb-8">
                     <h2 className="text-3xl font-semibold text-gray-800 text-center mb-4">Haz una nueva pregunta</h2>
                     <form onSubmit={handleSubmit}>
@@ -91,27 +70,27 @@ const ListaPreguntas = ({ preguntas }) => {
                             <input
                                 type="text"
                                 name="pregunta"
-                                value={data.pregunta}
-                                onChange={(e) => setData('pregunta', e.target.value)}
+                                value={preguntaForm.data.pregunta}
+                                onChange={e => preguntaForm.setData('pregunta', e.target.value)}
                                 id="pregunta"
                                 placeholder="Escribe tu pregunta aquí..."
                                 className="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                             />
-                            {errors.pregunta && (
-                                <div className="text-red-600 text-sm mt-2">{errors.pregunta}</div>
+                            {preguntaForm.errors.pregunta && (
+                                <div className="text-red-600 text-sm mt-2">{preguntaForm.errors.pregunta}</div>
                             )}
                         </div>
                         <button
                             type="submit"
-                            disabled={processing} // Deshabilitar solo cuando se está procesando la pregunta
+                            disabled={preguntaForm.processing}
                             className="w-full py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
                         >
-                            {processing ? 'Enviando...' : 'Realizar Pregunta'}
+                            {preguntaForm.processing ? 'Enviando...' : 'Realizar Pregunta'}
                         </button>
                     </form>
                 </div>
 
-                {/* Mostrar todas las preguntas con sus respuestas */}
+                {/* Lista de preguntas */}
                 <div className="space-y-6">
                     <h2 className="text-2xl font-semibold text-gray-800 mb-4">Preguntas del Foro</h2>
                     {preguntas.map((pregunta) => (
@@ -135,19 +114,28 @@ const ListaPreguntas = ({ preguntas }) => {
                                 ))}
                             </div>
 
-                            {/* Formulario para responder */}
+                            {/* Formulario de respuesta */}
                             <div className="mt-4 p-4 border-t border-gray-200">
                                 <form onSubmit={(e) => handleRespuestaSubmit(e, pregunta.id)}>
                                     <input
                                         type="text"
+                                        name="respuesta"
                                         value={nuevaRespuesta[pregunta.id] || ''}
-                                        onChange={(e) => setNuevaRespuesta({ ...nuevaRespuesta, [pregunta.id]: e.target.value })}
+                                        onChange={(e) => setNuevaRespuesta(prev => ({
+                                            ...prev,
+                                            [pregunta.id]: e.target.value
+                                        }))}
                                         placeholder="Escribe tu respuesta..."
                                         className="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                     />
+                                    <input 
+                                        type="hidden" 
+                                        name="pregunta_id" 
+                                        value={pregunta.id} 
+                                    />
                                     <button
                                         type="submit"
-                                        disabled={processingRespuesta[pregunta.id]} // Deshabilitar solo si se está procesando la respuesta
+                                        disabled={processingRespuesta[pregunta.id]}
                                         className="mt-2 w-full py-2 bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500"
                                     >
                                         {processingRespuesta[pregunta.id] ? 'Enviando...' : 'Responder'}
