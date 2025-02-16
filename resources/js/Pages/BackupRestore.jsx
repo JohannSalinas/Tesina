@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import { useForm } from '@inertiajs/inertia-react';
 import { route } from 'ziggy-js';
+import axios from 'axios';
 import { Link } from '@inertiajs/inertia-react';
+import {router} from "@inertiajs/react";
 
 
 const BackupRestore = () => {
@@ -23,28 +25,73 @@ const BackupRestore = () => {
             });
     };
 
-    const handleRestore = (e) => {
-        e.preventDefault();
-        const file = e.target.files[0];
-        if (!file) {
-            setBackupStatus({ type: 'error', message: 'Por favor, seleccione un archivo de respaldo.' });
-            return;
-        }
+    const RestoreForm = () => {
+        const [selectedFile, setSelectedFile] = useState(null);
 
-        setIsRestoring(true);
-        const formData = new FormData();
-        formData.append('backup_file', file);
+        const handleFileChange = (e) => {
+            setSelectedFile(e.target.files[0]);
+        };
 
-        restorePost(route('backup-restore.restore'), formData, {
-            onSuccess: () => {
-                setIsRestoring(false);
-                setBackupStatus({ type: 'success', message: 'Restauración completada con éxito.' });
-            },
-            onError: () => {
-                setIsRestoring(false);
-                setBackupStatus({ type: 'error', message: 'Hubo un error durante la restauración.' });
+        const handleRestore = (e) => {
+            e.preventDefault();
+
+            if (!selectedFile) {
+                setBackupStatus({ type: 'error', message: 'Por favor seleccione un archivo de respaldo.' });
+                return;
             }
-        });
+
+            // Crear un nuevo FormData
+            const formData = new FormData();
+            formData.append('backup_file', selectedFile);
+
+            // Hacer la petición usando el router de Inertia
+            router.post(route('backup-restore.restore'), formData, {
+                forceFormData: true,
+                preserveScroll: true,
+                onSuccess: () => {
+                    setBackupStatus({ type: 'success', message: 'Base de datos restaurada exitosamente.' });
+                    setSelectedFile(null);
+                    // Limpiar el input file
+                    e.target.reset();
+                },
+                onError: (error) => {
+                    setBackupStatus({
+                        type: 'error',
+                        message: error.message || 'Error al restaurar la base de datos.'
+                    });
+                }
+            });
+        };
+
+        return (
+            <form onSubmit={handleRestore} encType="multipart/form-data">
+                <div className="flex items-center gap-4">
+                    <input
+                        type="file"
+                        name="backup_file"
+                        onChange={handleFileChange}
+                        accept=".sql"
+                        className="file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0
+                             file:text-sm file:font-semibold file:bg-violet-50 file:text-violet-700
+                             hover:file:bg-violet-100"
+                    />
+                    <button
+                        type="submit"
+                        disabled={!selectedFile || isRestoringData}
+                        className="px-4 py-2 bg-violet-600 text-white rounded-md hover:bg-violet-700
+                             disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                        {isRestoringData ? 'Restaurando...' : 'Restaurar Base de Datos'}
+                    </button>
+                </div>
+                {/* Opcional: Mostrar nombre del archivo seleccionado */}
+                {selectedFile && (
+                    <div className="mt-2 text-sm text-gray-600">
+                        Archivo seleccionado: {selectedFile.name}
+                    </div>
+                )}
+            </form>
+        );
     };
 
     return (
@@ -77,19 +124,7 @@ const BackupRestore = () => {
                 {/* Sección de Restauración */}
                 <div className="bg-gray-50 p-6 rounded-lg shadow-md">
                     <h2 className="text-lg font-semibold text-gray-800 mb-3">Restauración de Base de Datos</h2>
-                    <input
-                        type="file"
-                        onChange={handleRestore}
-                        className="block w-full text-gray-700 border border-gray-300 rounded-md p-2 mb-3"
-                        accept=".sql,.gz"
-                        disabled={isRestoringData}
-                    />
-                    <button
-                        className="w-full bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 transition"
-                        disabled={isRestoringData}
-                    >
-                        {isRestoringData ? 'Restaurando...' : 'Restaurar Respaldo'}
-                    </button>
+                    <RestoreForm />
                 </div>
             </div>
 

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Symfony\Component\Process\Process;
@@ -36,7 +37,7 @@ class BackupController extends Controller
             // Construir el comando como string en lugar de array
             $command = sprintf(
                 '"%s" --host=%s --user=%s --password=%s %s > "%s"',
-                'C:\\xampp\\mysql\\bin\\mysqldump.exe',
+                'C:\\Program Files\\MySQL\\MySQL Server 8.4\\bin\\mysqldump.exe',
                 escapeshellarg($dbHost),
                 escapeshellarg($dbUser),
                 escapeshellarg($dbPass),
@@ -75,20 +76,24 @@ class BackupController extends Controller
     public function restore(Request $request)
     {
         try {
-            $request->validate([
-                'backup_file' => 'required|file|mimes:sql',
-            ]);
-
-            // Guardar el archivo temporalmente
-            $uploadedFile = $request->file('backup_file');
-            $tempPath = storage_path('app/temp');
-
-            if (!file_exists($tempPath)) {
-                mkdir($tempPath, 0755, true);
+            if (!$request->hasFile('backup_file')) {
+                throw new \Exception('No se ha seleccionado ningún archivo de respaldo.');
             }
 
-            $filePath = $tempPath . '/' . $uploadedFile->getClientOriginalName();
-            move_uploaded_file($uploadedFile->getRealPath(), $filePath);
+            $file = $request->file('backup_file');
+
+            // Validar que sea un archivo SQL
+            if ($file->getClientOriginalExtension() !== 'sql') {
+                throw new \Exception('El archivo debe ser de tipo SQL.');
+            }
+
+            // Guardar el archivo temporalmente
+            $tempPath = storage_path('app/temp/') . $file->getClientOriginalName();
+            if (!Storage::exists('temp')) {
+                Storage::makeDirectory('temp');
+            }
+
+            $file->move(storage_path('app/temp/'), $file->getClientOriginalName());
 
             // Configuración de la base de datos
             $dbHost = config('database.connections.mysql.host', '127.0.0.1');
@@ -96,54 +101,44 @@ class BackupController extends Controller
             $dbPass = config('database.connections.mysql.password');
             $dbName = config('database.connections.mysql.database');
 
-            // Primero intentamos con mysql.exe
+            // Construir el comando de restauración
             $command = sprintf(
-                '"C:\\xampp\\mysql\\bin\\mysql.exe" -h%s -u%s -p%s %s < "%s"',
-                $dbHost,
-                $dbUser,
-                $dbPass,
-                $dbName,
-                $filePath
+                '"%s" --host=%s --user=%s --password=%s %s < "%s"',
+                'C:\\Program Files\\MySQL\\MySQL Server 8.4\\bin\\mysql.exe',
+                escapeshellarg($dbHost),
+                escapeshellarg($dbUser),
+                escapeshellarg($dbPass),
+                escapeshellarg($dbName),
+                $tempPath
             );
 
-            // Log del comando para debugging (omitiendo la contraseña)
-            Log::info('Ejecutando comando de restauración (contraseña omitida)');
-
             // Ejecutar el comando
-            $output = [];
-            $resultCode = 0;
-            exec($command . " 2>&1", $output, $resultCode);
+            $output = null;
+            $resultCode = null;
+            exec($command, $output, $resultCode);
 
-            // Log de la salida para debugging
-            Log::info('Código de resultado: ' . $resultCode);
-            Log::info('Salida del comando: ' . implode("\n", $output));
-
-            // Limpiar archivo temporal
-            if (file_exists($filePath)) {
-                unlink($filePath);
-            }
+            // Eliminar el archivo temporal
+            unlink($tempPath);
 
             if ($resultCode !== 0) {
-                throw new \Exception('Error en la restauración: ' . implode("\n", $output));
+                Log::error('Error en restauración: Código ' . $resultCode . ', Output: ' . implode("\n", $output));
+                throw new \Exception('Error al restaurar la base de datos.');
             }
 
-            return back()->with([
+            Log::info('Restauración completada exitosamente');
+
+            return response()->json([
                 'success' => true,
-                'message' => 'Base de datos restaurada exitosamente'
+                'message' => 'Base de datos restaurada exitosamente.'
             ]);
 
         } catch (\Exception $e) {
-            Log::error('Error en restore: ' . $e->getMessage());
+            Log::error('Error en restauración: ' . $e->getMessage());
 
-            // Limpiar archivo temporal si existe
-            if (isset($filePath) && file_exists($filePath)) {
-                unlink($filePath);
-            }
-
-            return back()->with([
-                'error' => 'Error al restaurar la base de datos: ' . $e->getMessage()
-            ]);
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al restaurar la base de datos: ' . $e->getMessage()
+            ], 500);
         }
     }
-
 }
