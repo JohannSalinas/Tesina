@@ -18,7 +18,7 @@
         </tr>
         @foreach ($recursos as $recurso)
         <tr>
-            <td>{{ $recurso->categoria }}</td>
+            <td>{{ $recurso->tipo }}</td>
             <td>{{ $recurso->total }}</td>
         </tr>
         @endforeach

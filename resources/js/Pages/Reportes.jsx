@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { router } from "@inertiajs/react";
+import {route} from "ziggy-js";
 
 const Reportes = () => {
     const [fechaInicio, setFechaInicio] = useState("");
@@ -11,17 +12,10 @@ const Reportes = () => {
             return;
         }
 
-        let routeName = tipo === "top" ? "reportes.top" : "reportes.categoria";
+        let routeName = tipo === "top" ? "reportes.top" : tipo === "categoria" ? "reportes.categoria" : "reportes.solicitudes";
 
-        router.post(route(routeName), { fecha_inicio: fechaInicio, fecha_fin: fechaFin }, {
-            onSuccess: (page) => {
-                window.location.href = page.props.pdf_url;
-            },
-            onError: (errors) => {
-                console.error(errors);
-                alert("Error al generar el reporte");
-            },
-        });
+        const url = route(routeName, { fecha_inicio: fechaInicio, fecha_fin: fechaFin });
+        window.open(url, "_blank");
     };
 
     return (
@@ -60,6 +54,13 @@ const Reportes = () => {
                     className="w-full md:w-auto px-6 py-3 bg-green-600 text-white rounded-md hover:bg-green-700"
                 >
                     📑 Generar Recursos por Categoría
+                </button>
+
+                <button
+                    onClick={() => generarReporte("solicitudes")}
+                    className="w-full md:w-auto px-6 py-3 bg-yellow-600 text-white rounded-md hover:bg-yellow-700"
+                >
+                    📑 Generar Solicitudes por Usuario
                 </button>
             </div>
         </div>

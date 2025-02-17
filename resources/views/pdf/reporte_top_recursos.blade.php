@@ -20,7 +20,7 @@
         @foreach ($recursos as $index => $recurso)
         <tr>
             <td>{{ $index + 1 }}</td>
-            <td>{{ $recurso->nombre }}</td>
+            <td>{{ $recurso->titulo }}</td>
             <td>{{ $recurso->calificacion }}</td>
         </tr>
         @endforeach

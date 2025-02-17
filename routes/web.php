@@ -116,9 +116,9 @@ Route::post('notificaciones/crear', [NotificationsController::class, 'store'])->
 Route::put('notificaciones/{id}', [NotificationsController::class, 'update'])->name('notifications.update');
 
 Route::get('/reportes', [ReporteController::class, 'index'])->name('reportes.index');
-Route::post('/reportes/top-recursos', [ReporteController::class, 'topRecursos'])->name('reportes.top');
-Route::post('/reportes/recursos-categoria', [ReporteController::class, 'recursosPorCategoria'])->name('reportes.categoria');
-
+Route::get('/reportes/top-recursos', [ReporteController::class, 'topRecursos'])->name('reportes.top');
+Route::get('/reportes/recursos-categoria', [ReporteController::class, 'recursosPorCategoria'])->name('reportes.categoria');
+Route::get('/reportes/recursos-solicitudes', [ReporteController::class, 'recursosPorSolicitudes'])->name('reportes.solicitudes');
 });
 
 
