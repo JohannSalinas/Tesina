@@ -80,6 +80,12 @@ export default function AuthenticatedLayout({ header, children }) {
                                         >
                                             Foro de Preguntas
                                         </NavLink>
+                                        <NavLink
+                                            href={route('reportes.index')}
+                                            active={route().current('reportes.index')}
+                                        >
+                                            Generar Reportes
+                                        </NavLink>
                                     </>
                                 )}
 

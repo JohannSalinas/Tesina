@@ -15,6 +15,7 @@ use App\Http\Controllers\GrupoUsuarioController;
 use App\Http\Controllers\BackupController;
 use App\Http\Controllers\PreguntaForoController;
 use App\Http\Controllers\RespuestaForoController;
+use App\Http\Controllers\ReporteController;
 
 
 Route::get('/', function () {
@@ -113,6 +114,11 @@ Route::post('/respuestas', [RespuestaForoController::class, 'store'])->name('res
 Route::get('/notificaciones', [NotificationsController::class, 'show'])->name('notifications.show');
 Route::post('notificaciones/crear', [NotificationsController::class, 'store'])->name('notifications.store');
 Route::put('notificaciones/{id}', [NotificationsController::class, 'update'])->name('notifications.update');
+
+Route::get('/reportes', [ReporteController::class, 'index'])->name('reportes.index');
+Route::post('/reportes/top-recursos', [ReporteController::class, 'topRecursos'])->name('reportes.top');
+Route::post('/reportes/recursos-categoria', [ReporteController::class, 'recursosPorCategoria'])->name('reportes.categoria');
+
 });
 
 

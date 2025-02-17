@@ -6,6 +6,7 @@ import Notification from "@/Components/Notifications";
 
 const ListaPreguntas = ({ preguntas }) => {
     // Formulario para preguntas
+    
     const preguntaForm = useForm({
         pregunta: '',
     });
@@ -117,7 +118,7 @@ const ListaPreguntas = ({ preguntas }) => {
                     {preguntas.map((pregunta) => (
                         <div key={pregunta.id} className="bg-white rounded-lg shadow-md p-6">
                             <div className="flex justify-between items-center mb-4">
-                                <div className="text-lg font-semibold text-gray-800">{pregunta.usuario?.name || 'Anónimo'}</div>
+                                <div className="text-lg font-semibold text-gray-800">{pregunta.usuario?.nombre || 'Anónimo'}</div>
                                 <div className="text-sm text-gray-500">{new Date(pregunta.created_at).toLocaleString()}</div>
                             </div>
                             <p className="text-gray-700 text-lg">{pregunta.pregunta}</p>
@@ -127,7 +128,7 @@ const ListaPreguntas = ({ preguntas }) => {
                                 {[...(pregunta.respuestas || []), ...(respuestas[pregunta.id] || [])].map((respuesta) => (
                                     <div key={respuesta.id} className="bg-gray-100 rounded-lg p-4 shadow-sm">
                                         <div className="flex justify-between items-center">
-                                            <div className="text-md font-semibold text-gray-800">{respuesta.usuario?.name || 'Anónimo'}</div>
+                                            <div className="text-md font-semibold text-gray-800">{respuesta.usuario?.nombre || 'Anónimo'}</div>
                                             <div className="text-sm text-gray-500">{new Date(respuesta.created_at).toLocaleString()}</div>
                                         </div>
                                         <p className="text-gray-600 mt-2">{respuesta.respuesta}</p>
