@@ -58,6 +58,14 @@ class NotificationsController extends Controller
         if ($request->estatus === 'aceptado') {
             $grupo = GrupoColaborador::findOrFail($notificacion->id_grupo);
             $grupo->increment('numero_inscritos');
+
+            $nuevoRequest = new Request([
+                'usuario_id' => $notificacion->id_usuario_solicitante, // O el dato correcto
+            ]);
+
+            // Llamar al método store con la nueva solicitud
+            $grupoUsuarioController = new GrupoUsuarioController();
+            $grupoUsuarioController->store($nuevoRequest, $notificacion->id_grupo);
         }
 
         // Actualizamos el estatus de la notificación si es aceptado o rechazado
