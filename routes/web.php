@@ -99,7 +99,7 @@ Route::get('/grupo-usuarios', [GrupoUsuarioController::class, 'index'])->name('g
 Route::get('/backup-restore', [BackupController::class, 'index'])->name('backup-restore.index'); // Vista React
 Route::post('/backup-restore/backup', [BackupController::class, 'backup'])->name('backup-restore.backup'); // Respaldo
 Route::post('/backup-restore/restore', [BackupController::class, 'restore'])->name('backup-restore.restore'); // Restauración
-
+Route::get('/backup-restore/download-latest', [BackupController::class, 'downloadLatestBackup'])->name('backup-restore.download-latest'); // Descargar respaldo
 
 Route::get('/profesor/grupos', [GrupoColaboradorController::class, 'indexProfesor'])->name('grupos-colaboradores.profesor');
 Route::get('/profesor/mis-recursos', [RecursosEducativosController::class, 'recursosProfesor'])->name('recursos.profesor');

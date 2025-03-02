@@ -14,15 +14,29 @@ const BackupRestore = () => {
     const { post: restorePost, processing: isRestoringData } = useForm({});
 
 
-    const handleBackup = () => {
-            backupPost(route('backup-restore.backup'), {
-                onSuccess: () => {
-                    setBackupStatus({ type: 'success', message: 'Respaldo realizado exitosamente.' });
-                },
-                onError: () => {
-                    setBackupStatus({ type: 'error', message: 'Hubo un error durante el respaldo.' });
-                }
-            });
+    const handleBackup = async () => {
+        console.log('Entrando en handleBackup');
+        try {
+            const response = await axios.post(route('backup-restore.backup'));
+            console.log('Respuesta exitosa:', response);
+            setBackupStatus({ type: 'success', message: 'Respaldo realizado exitosamente.' });
+
+            // Descargar el archivo recién creado
+            const fileName = response.data.fileName;
+            const downloadUrl = route('backup-restore.download-latest');
+
+            console.log('Descargando archivo:', fileName);
+
+            const link = document.createElement('a');
+            link.href = downloadUrl;
+            link.download = fileName;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        } catch (error) {
+            console.error('Error en la solicitud:', error);
+            setBackupStatus({ type: 'error', message: 'Hubo un error durante el respaldo.' });
+        }
     };
 
     const RestoreForm = () => {

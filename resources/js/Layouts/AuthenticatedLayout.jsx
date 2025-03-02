@@ -1,18 +1,81 @@
+import { useEffect, useState, useRef } from 'react'; // Agregado useRef
+import { router } from '@inertiajs/react';
 import ApplicationLogo from '@/Components/ApplicationLogo';
 import Dropdown from '@/Components/Dropdown';
 import NavLink from '@/Components/NavLink';
 import ResponsiveNavLink from '@/Components/ResponsiveNavLink';
 import { Link, usePage } from '@inertiajs/react';
-import { useState } from 'react';
+import {route} from "ziggy-js";
 
 export default function AuthenticatedLayout({ header, children }) {
     const user = usePage().props.auth.user;
+    const [showingNavigationDropdown, setShowingNavigationDropdown] = useState(false);
+    const [timeLeft, setTimeLeft] = useState(5 * 60); // 5 minutos en segundos
+    const [showTimer, setShowTimer] = useState(true); // Para mostrar/ocultar el contador
 
-    const [showingNavigationDropdown, setShowingNavigationDropdown] =
-        useState(false);
+    const inactivityTimerRef = useRef(null);
+    const countdownTimerRef = useRef(null);
+
+    useEffect(() => {
+        const resetTimer = () => {
+            console.log('Actividad detectada, reiniciando temporizador');
+            clearTimeout(inactivityTimerRef.current);
+            clearInterval(countdownTimerRef.current);
+            setTimeLeft(2.5 * 60); // Reiniciar el contador
+            setShowTimer(true); // Ocultar el contador
+
+            inactivityTimerRef.current = setTimeout(startCountdown, 2.5 * 60 * 1000); // Mostrar contador tras 4 min
+        };
+
+        const startCountdown = () => {
+            console.log('Iniciando el contador de inactividad');
+            setShowTimer(true); // Mostrar el contador
+
+            countdownTimerRef.current = setInterval(() => {
+                setTimeLeft((prevTime) => {
+                    if (prevTime <= 1) {
+                        clearInterval(countdownTimerRef.current);
+                        logoutUser();
+                        return 0;
+                    }
+                    console.log('Contador:', prevTime - 1);
+                    return prevTime - 1;
+                });
+            }, 1000);
+        };
+
+        const logoutUser = () => {
+            console.log('Cerrando sesión por inactividad');
+            router.post(route('logout'));
+        };
+
+        // Eventos de actividad
+        const events = ['keydown', 'scroll', 'touchstart'];
+        events.forEach((event) => {
+            window.addEventListener(event, resetTimer);
+        });
+
+        // Iniciar el temporizador al montar el componente
+        resetTimer();
+
+        return () => {
+            events.forEach((event) => {
+                window.removeEventListener(event, resetTimer);
+            });
+            clearTimeout(inactivityTimerRef.current);
+            clearInterval(countdownTimerRef.current);
+        };
+    }, []); // Corrección aquí
 
     return (
         <div className="min-h-screen bg-gray-100 dark:bg-gray-900">
+            {/* Contador visual */}
+            {showTimer && (
+                <div className="fixed bottom-4 right-4 bg-red-500 text-white px-4 py-2 rounded-lg shadow-lg">
+                    La sesión se cerrará en {Math.floor(timeLeft / 60)}:{String(timeLeft % 60).padStart(2, '0')}
+                </div>
+            )}
+
             <nav className="border-b border-gray-100 bg-white dark:border-gray-700 dark:bg-gray-800">
                 <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                     <div className="flex h-16 justify-between">
@@ -31,7 +94,7 @@ export default function AuthenticatedLayout({ header, children }) {
                                     Dashboard
                                 </NavLink>
                                 {user.user_type === 'admin' && (
-                                <>
+                                    <>
                                         <NavLink
                                             href={route('usuarios.index')}
                                             active={route().current('usuarios.index')}
@@ -39,7 +102,7 @@ export default function AuthenticatedLayout({ header, children }) {
                                             Admin Usuarios
                                         </NavLink>
                                         <NavLink
-                                            href={route('recursos.index')} // You'll need to define this route
+                                            href={route('recursos.index')}
                                             active={route().current('recursos.index')}
                                         >
                                             Gestion Recursos Educativos
@@ -51,13 +114,13 @@ export default function AuthenticatedLayout({ header, children }) {
                                             Gestion Noticias
                                         </NavLink>
                                         <NavLink
-                                            href={route('encuestas.index')} // Enlace a la gestión de encuestas
+                                            href={route('encuestas.index')}
                                             active={route().current('encuestas.index')}
                                         >
                                             Gestion Encuestas
                                         </NavLink>
                                         <NavLink
-                                            href={route('grupos-colaboradores.index')} // Asegúrate de que esta ruta esté definida correctamente
+                                            href={route('grupos-colaboradores.index')}
                                             active={route().current('grupos-colaboradores.index')}
                                         >
                                             Gestión Grupos de Colaboradores
@@ -89,18 +152,16 @@ export default function AuthenticatedLayout({ header, children }) {
                                     </>
                                 )}
 
-                                {/* Botón exclusivo para profesores */}
                                 {user.user_type === 'profesor' && (
-                                <>
-                                    <NavLink href={route('grupos-colaboradores.profesor')} active={route().current('grupos-colaboradores.profesor')}>
-                                        Grupos de Colaboradores
-                                    </NavLink>
-                                    <NavLink href={route('recursos.profesor')} active={route().current('recursos.profesor')}>
-                                        Ver Recursos Educativos
-                                    </NavLink>
-                                </>
+                                    <>
+                                        <NavLink href={route('grupos-colaboradores.profesor')} active={route().current('grupos-colaboradores.profesor')}>
+                                            Grupos de Colaboradores
+                                        </NavLink>
+                                        <NavLink href={route('recursos.profesor')} active={route().current('recursos.profesor')}>
+                                            Ver Recursos Educativos
+                                        </NavLink>
+                                    </>
                                 )}
-
                             </div>
                         </div>
 
@@ -132,14 +193,10 @@ export default function AuthenticatedLayout({ header, children }) {
                                     </Dropdown.Trigger>
 
                                     <Dropdown.Content>
-                                        <Dropdown.Link
-                                            href={route('profile.edit')}
-                                        >
+                                        <Dropdown.Link href={route('profile.edit')}>
                                             Profile
                                         </Dropdown.Link>
-                                        <Dropdown.Link
-                                            href={route('notifications.show')}
-                                        >
+                                        <Dropdown.Link href={route('notifications.show')}>
                                             Notifications
                                         </Dropdown.Link>
                                         <Dropdown.Link
@@ -157,9 +214,7 @@ export default function AuthenticatedLayout({ header, children }) {
                         <div className="-me-2 flex items-center sm:hidden">
                             <button
                                 onClick={() =>
-                                    setShowingNavigationDropdown(
-                                        (previousState) => !previousState,
-                                    )
+                                    setShowingNavigationDropdown((previousState) => !previousState)
                                 }
                                 className="inline-flex items-center justify-center rounded-md p-2 text-gray-400 transition duration-150 ease-in-out hover:bg-gray-100 hover:text-gray-500 focus:bg-gray-100 focus:text-gray-500 focus:outline-none dark:text-gray-500 dark:hover:bg-gray-900 dark:hover:text-gray-400 dark:focus:bg-gray-900 dark:focus:text-gray-400"
                             >
@@ -170,22 +225,14 @@ export default function AuthenticatedLayout({ header, children }) {
                                     viewBox="0 0 24 24"
                                 >
                                     <path
-                                        className={
-                                            !showingNavigationDropdown
-                                                ? 'inline-flex'
-                                                : 'hidden'
-                                        }
+                                        className={!showingNavigationDropdown ? 'inline-flex' : 'hidden'}
                                         strokeLinecap="round"
                                         strokeLinejoin="round"
                                         strokeWidth="2"
                                         d="M4 6h16M4 12h16M4 18h16"
                                     />
                                     <path
-                                        className={
-                                            showingNavigationDropdown
-                                                ? 'inline-flex'
-                                                : 'hidden'
-                                        }
+                                        className={showingNavigationDropdown ? 'inline-flex' : 'hidden'}
                                         strokeLinecap="round"
                                         strokeLinejoin="round"
                                         strokeWidth="2"
@@ -197,12 +244,7 @@ export default function AuthenticatedLayout({ header, children }) {
                     </div>
                 </div>
 
-                <div
-                    className={
-                        (showingNavigationDropdown ? 'block' : 'hidden') +
-                        ' sm:hidden'
-                    }
-                >
+                <div className={(showingNavigationDropdown ? 'block' : 'hidden') + ' sm:hidden'}>
                     <div className="space-y-1 pb-3 pt-2">
                         <ResponsiveNavLink
                             href={route('dashboard')}
