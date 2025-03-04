@@ -185,10 +185,7 @@ class BackupController extends Controller
 
             Log::info('Restauración completada exitosamente');
 
-            return response()->json([
-                'success' => true,
-                'message' => 'Base de datos restaurada exitosamente.'
-            ]);
+            
 
         } catch (\Exception $e) {
             Log::error('Error en restauración: ' . $e->getMessage());

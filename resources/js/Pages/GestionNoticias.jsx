@@ -1,11 +1,12 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, usePage, router, Link } from '@inertiajs/react';
 import { useState } from 'react';
+import Swal from 'sweetalert2';
 
 export default function GestionNoticias() {
     const { noticias } = usePage().props;
 
-    // Estado para el formulario de creación de noticia
+    // Estado del formulario
     const [formData, setFormData] = useState({
         titulo: '',
         descripcion: '',
@@ -14,35 +15,28 @@ export default function GestionNoticias() {
         imagen: null,
     });
 
-    // Estado para el mensaje de error
+    // Estado para errores
     const [error, setError] = useState('');
 
     const handleInputChange = (e) => {
         const { name, value, type, files } = e.target;
         if (type === 'file') {
-            setFormData({
-                ...formData,
-                [name]: files[0],
-            });
+            setFormData({ ...formData, [name]: files[0] });
         } else {
-            setFormData({
-                ...formData,
-                [name]: value,
-            });
+            setFormData({ ...formData, [name]: value });
         }
     };
 
     const handleSubmit = (e) => {
         e.preventDefault();
 
-        // Validación para la fecha: no permitir fecha anterior a la actual
-        const today = new Date().toISOString().split('T')[0]; // Fecha actual en formato YYYY-MM-DD
+        const today = new Date().toISOString().split('T')[0];
         if (formData.fecha_evento < today) {
-            setError('La fecha del evento no puede ser anterior a la fecha actual.');
-            return; // No enviar el formulario
+            setError('La fecha del evento no puede ser anterior a la actual.');
+            return;
         }
 
-        setError(''); // Limpiar error si la fecha es válida
+        setError('');
 
         const form = new FormData();
         form.append('titulo', formData.titulo);
@@ -53,155 +47,187 @@ export default function GestionNoticias() {
 
         router.post('/noticias', form, {
             onSuccess: () => {
-                alert('Noticia creada correctamente.');
-                setFormData({ titulo: '', descripcion: '', lugar: '', fecha_evento: '', imagen: null }); // Limpiar formulario
+                Swal.fire({
+                    icon: 'success',
+                    title: '¡Noticia creada!',
+                    text: 'La noticia se ha creado correctamente.',
+                    confirmButtonColor: '#4CAF50'
+                });
+
+                setFormData({
+                    titulo: '',
+                    descripcion: '',
+                    lugar: '',
+                    fecha_evento: '',
+                    imagen: null
+                });
             },
-            onError: (error) => {
-                alert('Ocurrió un error al crear la noticia.');
-                console.log(error);
+            onError: () => {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Ocurrió un problema al crear la noticia.',
+                    confirmButtonColor: '#F44336'
+                });
             },
         });
     };
 
     const handleDelete = (noticiaId) => {
-        if (confirm(`¿Estás seguro de que deseas eliminar esta noticia con ID: ${noticiaId}?`)) {
-            router.delete(`/noticias/${noticiaId}`, {
-                onSuccess: () => alert('Noticia eliminada correctamente.'),
-                onError: () => alert('Ocurrió un error al intentar eliminar la noticia.'),
-            });
-        }
+        Swal.fire({
+            title: '¿Estás seguro?',
+            text: 'Esta acción eliminará la noticia de forma permanente.',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Sí, eliminar',
+            cancelButtonText: 'Cancelar'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                router.delete(`/noticias/${noticiaId}`, {
+                    onSuccess: () => {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Eliminado',
+                            text: 'La noticia ha sido eliminada.',
+                            confirmButtonColor: '#4CAF50'
+                        });
+                    },
+                    onError: () => {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: 'No se pudo eliminar la noticia.',
+                            confirmButtonColor: '#F44336'
+                        });
+                    }
+                });
+            }
+        });
     };
 
     return (
         <AuthenticatedLayout
             header={
-                <h2 className="text-xl font-semibold leading-tight text-gray-800 dark:text-gray-200">
+                <h2 className="text-2xl font-semibold leading-tight text-gray-800 dark:text-gray-200">
                     Administrar Noticias
                 </h2>
             }
         >
             <Head title="Administrar Noticias" />
 
-            <div className="py-12">
+            <div className="min-h-screen bg-gradient-to-r from-blue-500 via-teal-500 to-green-500 py-12">
                 <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
-                    <div className="overflow-hidden bg-white shadow-sm sm:rounded-lg dark:bg-gray-800">
-                        <div className="p-6 text-gray-900 dark:text-gray-100">
-                            {/* Formulario para crear una nueva noticia */}
-                            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">
-                                Crear una nueva noticia
-                            </h3>
-                            <form onSubmit={handleSubmit} className="space-y-4">
-                                <div>
-                                    <label htmlFor="titulo" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                                        Título
-                                    </label>
-                                    <input
-                                        type="text"
-                                        id="titulo"
-                                        name="titulo"
-                                        value={formData.titulo}
-                                        onChange={handleInputChange}
-                                        className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600"
-                                    />
-                                </div>
-                                <div>
-                                    <label htmlFor="descripcion" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                                        Descripción
-                                    </label>
-                                    <textarea
-                                        id="descripcion"
-                                        name="descripcion"
-                                        value={formData.descripcion}
-                                        onChange={handleInputChange}
-                                        className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600"
-                                    ></textarea>
-                                </div>
-                                <div>
-                                    <label htmlFor="lugar" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                                        Lugar
-                                    </label>
-                                    <input
-                                        type="text"
-                                        id="lugar"
-                                        name="lugar"
-                                        value={formData.lugar}
-                                        onChange={handleInputChange}
-                                        className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600"
-                                    />
-                                </div>
-                                <div>
-                                    <label htmlFor="fecha_evento" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                                        Fecha del Evento
-                                    </label>
-                                    <input
-                                        type="date"
-                                        id="fecha_evento"
-                                        name="fecha_evento"
-                                        value={formData.fecha_evento}
-                                        onChange={handleInputChange}
-                                        className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600"
-                                    />
-                                    {/* Mostrar mensaje de error si la fecha es incorrecta */}
-                                    {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
-                                </div>
-                                <div>
-                                    <label htmlFor="imagen" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                                        Imagen
-                                    </label>
-                                    <input
-                                        type="file"
-                                        id="imagen"
-                                        name="imagen"
-                                        onChange={handleInputChange}
-                                        className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600"
-                                    />
-                                </div>
-                                <button
-                                    type="submit"
-                                    className="w-full bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600"
-                                >
-                                    Crear Noticia
-                                </button>
-                            </form>
+                    <div className="relative bg-white bg-opacity-60 text-gray-800 shadow-lg rounded-2xl p-8 max-w-7xl w-full space-y-6">
+                        {/* Formulario de creación de noticias */}
+                        <h3 className="text-4xl font-semibold text-gray-900 dark:text-gray-100 mb-4">
+                            Crear una nueva noticia
+                        </h3>
+                        <form onSubmit={handleSubmit} className="space-y-6">
+                            <div>
+                                <label htmlFor="titulo" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                                    Título
+                                </label>
+                                <input
+                                    type="text"
+                                    id="titulo"
+                                    name="titulo"
+                                    value={formData.titulo}
+                                    onChange={handleInputChange}
+                                    className="mt-2 block w-full p-4 border border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-teal-500 focus:border-teal-500 dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600"
+                                />
+                            </div>
+                            <div>
+                                <label htmlFor="descripcion" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                                    Descripción
+                                </label>
+                                <textarea
+                                    id="descripcion"
+                                    name="descripcion"
+                                    value={formData.descripcion}
+                                    onChange={handleInputChange}
+                                    className="mt-2 block w-full p-4 border border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-teal-500 focus:border-teal-500 dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600"
+                                ></textarea>
+                            </div>
+                            <div>
+                                <label htmlFor="lugar" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                                    Lugar
+                                </label>
+                                <input
+                                    type="text"
+                                    id="lugar"
+                                    name="lugar"
+                                    value={formData.lugar}
+                                    onChange={handleInputChange}
+                                    className="mt-2 block w-full p-4 border border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-teal-500 focus:border-teal-500 dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600"
+                                />
+                            </div>
+                            <div>
+                                <label htmlFor="fecha_evento" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                                    Fecha del Evento
+                                </label>
+                                <input
+                                    type="date"
+                                    id="fecha_evento"
+                                    name="fecha_evento"
+                                    value={formData.fecha_evento}
+                                    onChange={handleInputChange}
+                                    className="mt-2 block w-full p-4 border border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-teal-500 focus:border-teal-500 dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600"
+                                />
+                                {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
+                            </div>
+                            <div>
+                                <label htmlFor="imagen" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                                    Imagen
+                                </label>
+                                <input
+                                    type="file"
+                                    id="imagen"
+                                    name="imagen"
+                                    onChange={handleInputChange}
+                                    className="mt-2 block w-full p-4 border border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-teal-500 focus:border-teal-500 dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600"
+                                />
+                            </div>
+                            <button
+                                type="submit"
+                                className="w-full bg-teal-600 text-white py-3 px-6 rounded-xl hover:bg-teal-700 transition duration-300 transform hover:scale-105"
+                            >
+                                Crear Noticia
+                            </button>
+                        </form>
 
-                            {/* Tabla de noticias existentes */}
-                            <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700 mt-8">
-                                <thead className="bg-gray-50 dark:bg-gray-700">
+                        {/* Tabla de noticias */}
+                        <div className="overflow-x-auto w-full mt-8">
+                            <table className="w-full border-collapse shadow-lg rounded-2xl overflow-hidden">
+                                {/* Encabezado */}
+                                <thead className="bg-gradient-to-r from-teal-500 to-blue-500 text-white">
                                     <tr>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-300">
-                                            ID
-                                        </th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-300">
-                                            Título
-                                        </th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-300">
-                                            Lugar
-                                        </th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-300">
-                                            Fecha Evento
-                                        </th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-300">
-                                            Acciones
-                                        </th>
+                                        <th className="px-6 py-3 text-left text-sm font-semibold uppercase">ID</th>
+                                        <th className="px-6 py-3 text-left text-sm font-semibold uppercase">Título</th>
+                                        <th className="px-6 py-3 text-left text-sm font-semibold uppercase">Lugar</th>
+                                        <th className="px-6 py-3 text-left text-sm font-semibold uppercase">Fecha Evento</th>
+                                        <th className="px-6 py-3 text-left text-sm font-semibold uppercase">Acciones</th>
                                     </tr>
                                 </thead>
-                                <tbody className="bg-white divide-y divide-gray-200 dark:bg-gray-800 dark:divide-gray-700">
-                                    {noticias.map((noticia) => (
-                                        <tr key={noticia.id}>
-                                            <td className="px-6 py-4 text-sm text-gray-900 dark:text-gray-100">{noticia.id}</td>
-                                            <td className="px-6 py-4 text-sm text-gray-900 dark:text-gray-100">{noticia.titulo}</td>
-                                            <td className="px-6 py-4 text-sm text-gray-900 dark:text-gray-100">{noticia.lugar}</td>
-                                            <td className="px-6 py-4 text-sm text-gray-900 dark:text-gray-100">{noticia.fecha_evento}</td>
-                                            <td className="px-6 py-4 text-sm text-gray-900 dark:text-gray-100">
+                                {/* Cuerpo de la tabla */}
+                                <tbody className="bg-white divide-y divide-gray-200">
+                                    {noticias.map((noticia, index) => (
+                                        <tr key={noticia.id} className={`${index % 2 === 0 ? 'bg-gray-100' : 'bg-white'} hover:bg-gray-200 transition`}>
+                                            <td className="px-6 py-4 text-sm text-gray-900 font-medium">{noticia.id}</td>
+                                            <td className="px-6 py-4 text-sm text-gray-900">{noticia.titulo}</td>
+                                            <td className="px-6 py-4 text-sm text-gray-900">{noticia.lugar}</td>
+                                            <td className="px-6 py-4 text-sm text-gray-900">{noticia.fecha_evento}</td>
+                                            <td className="px-6 py-4 flex space-x-2">
                                                 <button
-                                                    className="px-3 py-1 mr-2 text-white bg-red-500 rounded hover:bg-red-600"
+                                                    className="px-4 py-2 text-white bg-red-500 rounded-lg shadow-md hover:bg-red-600 transition duration-300 transform hover:scale-105"
                                                     onClick={() => handleDelete(noticia.id)}
                                                 >
                                                     Eliminar
                                                 </button>
                                                 <Link
                                                     href={`/noticias/${noticia.id}/editar`}
-                                                    className="px-3 py-1 text-white bg-blue-500 rounded hover:bg-blue-600"
+                                                    className="px-4 py-2 text-white bg-blue-500 rounded-lg shadow-md hover:bg-blue-600 transition duration-300 transform hover:scale-105"
                                                 >
                                                     Modificar
                                                 </Link>

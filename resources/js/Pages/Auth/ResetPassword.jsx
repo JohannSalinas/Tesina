@@ -5,7 +5,7 @@ import TextInput from '@/Components/TextInput';
 import GuestLayout from '@/Layouts/GuestLayout';
 import { Head, useForm } from '@inertiajs/react';
 
-export default function ResetPassword({ token, email }) {
+export default function RestablecerContraseña({ token, email }) {
     const { data, setData, post, processing, errors, reset } = useForm({
         token: token,
         email: email,
@@ -23,12 +23,12 @@ export default function ResetPassword({ token, email }) {
 
     return (
         <GuestLayout>
-            <Head title="Reset Password" />
+            <Head title="Restablecer Contraseña" />
 
-            <form onSubmit={submit}>
+            <form onSubmit={submit} className="space-y-6">
+                {/* Campo de correo electrónico */}
                 <div>
-                    <InputLabel htmlFor="email" value="Email" />
-
+                    <InputLabel htmlFor="email" value="Correo Electrónico" />
                     <TextInput
                         id="email"
                         type="email"
@@ -38,13 +38,12 @@ export default function ResetPassword({ token, email }) {
                         autoComplete="username"
                         onChange={(e) => setData('email', e.target.value)}
                     />
-
                     <InputError message={errors.email} className="mt-2" />
                 </div>
 
-                <div className="mt-4">
-                    <InputLabel htmlFor="password" value="Password" />
-
+                {/* Campo de contraseña */}
+                <div>
+                    <InputLabel htmlFor="password" value="Contraseña" />
                     <TextInput
                         id="password"
                         type="password"
@@ -55,19 +54,18 @@ export default function ResetPassword({ token, email }) {
                         isFocused={true}
                         onChange={(e) => setData('password', e.target.value)}
                     />
-
                     <InputError message={errors.password} className="mt-2" />
                 </div>
 
-                <div className="mt-4">
+                {/* Campo de confirmación de contraseña */}
+                <div>
                     <InputLabel
                         htmlFor="password_confirmation"
-                        value="Confirm Password"
+                        value="Confirmar Contraseña"
                     />
-
                     <TextInput
-                        type="password"
                         id="password_confirmation"
+                        type="password"
                         name="password_confirmation"
                         value={data.password_confirmation}
                         className="mt-1 block w-full"
@@ -76,16 +74,16 @@ export default function ResetPassword({ token, email }) {
                             setData('password_confirmation', e.target.value)
                         }
                     />
-
                     <InputError
                         message={errors.password_confirmation}
                         className="mt-2"
                     />
                 </div>
 
-                <div className="mt-4 flex items-center justify-end">
+                {/* Botón de envío */}
+                <div className="flex items-center justify-end">
                     <PrimaryButton className="ms-4" disabled={processing}>
-                        Reset Password
+                        Restablecer Contraseña
                     </PrimaryButton>
                 </div>
             </form>

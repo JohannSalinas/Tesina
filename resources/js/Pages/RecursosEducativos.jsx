@@ -1,6 +1,7 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, usePage, router, Link } from '@inertiajs/react';
 import { useState } from 'react';
+import Swal from 'sweetalert2';
 
 export default function RecursosEducativos() {
     const { recursos = [], grupos = [] } = usePage().props; // Obtenemos los recursos educativos desde las props pasadas por Inertia
@@ -31,33 +32,67 @@ export default function RecursosEducativos() {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-
+    
         const form = new FormData();
         form.append('titulo', formData.titulo);
         form.append('descripcion', formData.descripcion);
         form.append('tipo', formData.tipo);
         form.append('archivo', formData.archivo);
-        form.append('grupo_id', formData.grupo_id); // Asegúrate de agregar este campo
-
+        form.append('grupo_id', formData.grupo_id);
+    
         router.post('/recursos/crear', form, {
             onSuccess: () => {
-                alert('Recurso creado correctamente.');
+                Swal.fire({
+                    icon: 'success',
+                    title: '¡Recurso creado!',
+                    text: 'El recurso ha sido creado correctamente.',
+                    confirmButtonColor: '#1E88E5',
+                });
                 setFormData({ titulo: '', descripcion: '', tipo: '', archivo: null, grupo_id: '' }); // Limpiar formulario
             },
-            onError: (error) => {
-                alert('Ocurrió un error al crear el recurso.');
-                console.log(error);
+            onError: () => {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Ocurrió un problema al crear el recurso.',
+                    confirmButtonColor: '#d33',
+                });
             },
         });
     };
-
+    
     const handleDelete = (recursoId) => {
-        if (confirm(`¿Estás seguro de que deseas eliminar este recurso con ID: ${recursoId}?`)) {
-            router.delete(`/recursos/${recursoId}`, {
-                onSuccess: () => alert('Recurso eliminado correctamente.'),
-                onError: () => alert('Ocurrió un error al intentar eliminar el recurso.'),
-            });
-        }
+        Swal.fire({
+            title: '¿Estás seguro?',
+            text: `¿Deseas eliminar el recurso con ID: ${recursoId}?`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Sí, eliminar',
+            cancelButtonText: 'Cancelar',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                router.delete(`/recursos/${recursoId}`, {
+                    onSuccess: () => {
+                        Swal.fire({
+                            icon: 'success',
+                            title: '¡Eliminado!',
+                            text: 'El recurso ha sido eliminado correctamente.',
+                            confirmButtonColor: '#1E88E5',
+                        });
+                    },
+                    onError: () => {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: 'Ocurrió un problema al eliminar el recurso.',
+                            confirmButtonColor: '#d33',
+                        });
+                    },
+                });
+            }
+        });
     };
 
     return (
@@ -70,145 +105,151 @@ export default function RecursosEducativos() {
         >
             <Head title="Administrar Recursos Educativos" />
 
-            <div className="py-12">
-                <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
-                    <div className="overflow-hidden bg-white shadow-sm sm:rounded-lg dark:bg-gray-800">
-                        <div className="p-6 text-gray-900 dark:text-gray-100">
-                            {/* Formulario para crear un recurso */}
-                            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">
-                                Crear un nuevo recurso educativo
-                            </h3>
-                            <form onSubmit={handleSubmit} className="space-y-4">
-                                <div>
-                                    <label htmlFor="titulo" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                                        Título
-                                    </label>
-                                    <input
-                                        type="text"
-                                        id="titulo"
-                                        name="titulo"
-                                        value={formData.titulo}
-                                        onChange={handleInputChange}
-                                        className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600"
-                                    />
-                                </div>
-                                <div>
-                                    <label htmlFor="descripcion" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                                        Descripción
-                                    </label>
-                                    <textarea
-                                        id="descripcion"
-                                        name="descripcion"
-                                        value={formData.descripcion}
-                                        onChange={handleInputChange}
-                                        className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600"
-                                    ></textarea>
-                                </div>
-                                <div>
-                                    <label htmlFor="tipo" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                                        Tipo
-                                    </label>
-                                    <select
-                                        id="tipo"
-                                        name="tipo"
-                                        value={formData.tipo}
-                                        onChange={handleInputChange}
-                                        className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600"
-                                    >
-                                        <option value="">Seleccionar tipo</option>
-                                        <option value="PDF">PDF</option>
-                                        <option value="DOCX">DOCX</option>
-                                        <option value="PPTX">PPTX</option>
-                                        
-                                    </select>
-                                </div>
-
-                                 <div>
-                                    <label htmlFor="grupo_id" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                                        Selecciona el Grupo
-                                    </label>
-                                     <select name="grupo_id" id="grupo_id" value={formData.grupo_id} onChange={handleInputChange}>
-                                         <option value="">Selecciona un grupo</option>
-                                         {grupos.length > 0 ? (
-                                             grupos.map((grupo) => (
-                                                 <option key={grupo.id} value={grupo.id}>
-                                                     {grupo.nombre}
-                                                 </option>
-                                             ))
-                                         ) : (
-                                             <option disabled>No hay grupos disponibles</option>
-                                         )}
-                                     </select>
-                                 </div>
-                                <div>
-                                    <label htmlFor="archivo" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                                        Archivo
-                                    </label>
-                                    <input
-                                        type="file"
-                                        id="archivo"
-                                        name="archivo"
-                                        onChange={handleInputChange}
-                                        className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600"
-                                    />
-                                </div>
-                                <button
-                                    type="submit"
-                                    className="w-full bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600"
-                                >
-                                    Crear Recurso
-                                </button>
-                            </form>
-
-                            {/* Tabla de recursos existentes */}
-                            <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700 mt-8">
-                                <thead className="bg-gray-50 dark:bg-gray-700">
-                                    <tr>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-300">
-                                            ID
-                                        </th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-300">
-                                            Título
-                                        </th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-300">
-                                            Tipo
-                                        </th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-300">
-                                            Usuario
-                                        </th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-300">
-                                            Acciones
-                                        </th>
-                                    </tr>
-                                </thead>
-                                <tbody className="bg-white divide-y divide-gray-200 dark:bg-gray-800 dark:divide-gray-700">
-                                    {recursos.map((recurso) => (
-                                        <tr key={recurso.id}>
-                                            <td className="px-6 py-4 text-sm text-gray-900 dark:text-gray-100">{recurso.id}</td>
-                                            <td className="px-6 py-4 text-sm text-gray-900 dark:text-gray-100">{recurso.titulo}</td>
-                                            <td className="px-6 py-4 text-sm text-gray-900 dark:text-gray-100">{recurso.tipo}</td>
-                                            <td className="px-6 py-4 text-sm text-gray-900 dark:text-gray-100">{recurso.user.nombre || 'Desconocido'}</td>
-                                            <td className="px-6 py-4 text-sm text-gray-900 dark:text-gray-100">
-                                                <button
-                                                    className="px-3 py-1 mr-2 text-white bg-red-500 rounded hover:bg-red-600"
-                                                    onClick={() => handleDelete(recurso.id)}
-                                                >
-                                                    Eliminar
-                                                </button>
-                                                <Link
-                                                    href={`/recursos/${recurso.id}/editar`}
-                                                    className="px-3 py-1 text-white bg-blue-500 rounded hover:bg-blue-600"
-                                                >
-                                                     Modificar
-                                                </Link>
-                                            </td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
+            <div className="relative bg-gradient-to-r from-teal-400 to-blue-500 text-white min-h-screen flex flex-col items-center justify-center py-12">
+                {/* Imagen de fondo con un efecto de parallax */}
+                <div className="absolute inset-0 overflow-hidden">
+                    <img
+                        className="object-cover w-full h-full opacity-30"
+                        src="https://images.unsplash.com/photo-1533750342991-d26d54d839b7"
+                        alt="Background"
+                    />
                 </div>
+
+                {/* Contenedor principal */}
+                <div className="relative bg-white bg-opacity-60 text-gray-800 shadow-lg rounded-2xl p-8 max-w-7xl w-full space-y-6">
+                    <h1 className="text-4xl font-extrabold mb-4 text-gray-800">
+                        Crear un nuevo recurso educativo
+                    </h1>
+                    <form onSubmit={handleSubmit} className="space-y-6">
+                        <div>
+                            <label htmlFor="titulo" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                                Título
+                            </label>
+                            <input
+                                type="text"
+                                id="titulo"
+                                name="titulo"
+                                value={formData.titulo}
+                                onChange={handleInputChange}
+                                className="mt-2 block w-full p-4 border border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-teal-500 focus:border-teal-500 dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600"
+                            />
+                        </div>
+                        <div>
+                            <label htmlFor="descripcion" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                                Descripción
+                            </label>
+                            <textarea
+                                id="descripcion"
+                                name="descripcion"
+                                value={formData.descripcion}
+                                onChange={handleInputChange}
+                                className="mt-2 block w-full p-4 border border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-teal-500 focus:border-teal-500 dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600"
+                            ></textarea>
+                        </div>
+                        <div>
+                            <label htmlFor="tipo" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                                Tipo
+                            </label>
+                            <select
+                                id="tipo"
+                                name="tipo"
+                                value={formData.tipo}
+                                onChange={handleInputChange}
+                                className="mt-2 block w-full p-4 border border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-teal-500 focus:border-teal-500 dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600"
+                            >
+                                <option value="">Seleccionar tipo</option>
+                                <option value="PDF">PDF</option>
+                                <option value="DOCX">DOCX</option>
+                                <option value="PPTX">PPTX</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label htmlFor="grupo_id" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                                Selecciona el Grupo
+                            </label>
+                            <select
+                                name="grupo_id"
+                                id="grupo_id"
+                                value={formData.grupo_id}
+                                onChange={handleInputChange}
+                                className="mt-2 block w-full p-4 border border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-teal-500 focus:border-teal-500 dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600"
+                            >
+                                <option value="">Selecciona un grupo</option>
+                                {grupos.length > 0 ? (
+                                    grupos.map((grupo) => (
+                                        <option key={grupo.id} value={grupo.id}>
+                                            {grupo.nombre}
+                                        </option>
+                                    ))
+                                ) : (
+                                    <option disabled>No hay grupos disponibles</option>
+                                )}
+                            </select>
+                        </div>
+                        <div>
+                            <label htmlFor="archivo" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                                Archivo
+                            </label>
+                            <input
+                                type="file"
+                                id="archivo"
+                                name="archivo"
+                                onChange={handleInputChange}
+                                className="mt-2 block w-full p-4 border border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-teal-500 focus:border-teal-500 dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600"
+                            />
+                        </div>
+                        <button
+                            type="submit"
+                            className="w-full bg-teal-600 text-white py-3 px-6 rounded-xl hover:bg-teal-700 transition duration-300 transform hover:scale-105"
+                        >
+                            Crear Recurso
+                        </button>
+                    </form>
+                
+
+                    {/* Tabla de recursos existentes */}
+                    {/* Tabla de recursos existentes */}
+                    <div className="overflow-x-auto w-full mt-8">
+                        <table className="w-full border-collapse shadow-lg rounded-2xl overflow-hidden">
+                        {/* Encabezado */}
+                        <thead className="bg-gradient-to-r from-teal-500 to-blue-500 text-white">
+                    <tr>
+                        <th className="px-6 py-3 text-left text-sm font-semibold uppercase">ID</th>
+                        <th className="px-6 py-3 text-left text-sm font-semibold uppercase">Título</th>
+                        <th className="px-6 py-3 text-left text-sm font-semibold uppercase">Tipo</th>
+                        <th className="px-6 py-3 text-left text-sm font-semibold uppercase">Usuario</th>
+                        <th className="px-6 py-3 text-left text-sm font-semibold uppercase">Acciones</th>
+                    </tr>
+                        </thead>
+        
+                    {/* Cuerpo de la tabla */}
+                    <tbody className="bg-white divide-y divide-gray-200">
+                        {recursos.map((recurso, index) => (
+                    <tr key={recurso.id} className={`${index % 2 === 0 ? "bg-gray-100" : "bg-white"} hover:bg-gray-200 transition`}>
+                        <td className="px-6 py-4 text-sm text-gray-900 font-medium">{recurso.id}</td>
+                        <td className="px-6 py-4 text-sm text-gray-900">{recurso.titulo}</td>
+                        <td className="px-6 py-4 text-sm text-gray-900">{recurso.tipo}</td>
+                        <td className="px-6 py-4 text-sm text-gray-900">{recurso.user.nombre || 'Desconocido'}</td>
+                        <td className="px-6 py-4 flex space-x-2">
+                            <button
+                                className="px-4 py-2 text-white bg-red-500 rounded-lg shadow-md hover:bg-red-600 transition duration-300 transform hover:scale-105"
+                                onClick={() => handleDelete(recurso.id)}
+                            >
+                                Eliminar
+                            </button>
+                            <Link
+                                href={`/recursos/${recurso.id}/editar`}
+                                className="px-4 py-2 text-white bg-blue-500 rounded-lg shadow-md hover:bg-blue-600 transition duration-300 transform hover:scale-105"
+                            >
+                                Modificar
+                            </Link>
+                        </td>
+                    </tr>
+                ))}
+            </tbody>
+        </table>
+    </div>
+    </div>
             </div>
         </AuthenticatedLayout>
     );

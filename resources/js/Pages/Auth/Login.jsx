@@ -23,78 +23,82 @@ export default function Login({ status, canResetPassword }) {
 
     return (
         <GuestLayout>
-            <Head title="Log in" />
+            <Head title="Iniciar sesión" />
 
+            {/* Mensaje de estado */}
             {status && (
                 <div className="mb-4 text-sm font-medium text-green-600">
                     {status}
                 </div>
             )}
 
-            <form onSubmit={submit}>
-                <div>
-                    <InputLabel htmlFor="email" value="Email" />
+            <div className="bg-white p-8 rounded-xl shadow-lg max-w-sm w-full mx-auto">
+                <h2 className="text-2xl font-semibold text-center text-gray-800">¡Bienvenido de nuevo!</h2>
+                <p className="text-center text-sm text-gray-600 mt-2">Por favor, inicia sesión para continuar</p>
 
-                    <TextInput
-                        id="email"
-                        type="email"
-                        name="email"
-                        value={data.email}
-                        className="mt-1 block w-full"
-                        autoComplete="username"
-                        isFocused={true}
-                        onChange={(e) => setData('email', e.target.value)}
-                    />
+                <form onSubmit={submit} className="mt-6 space-y-4">
+                    {/* Entrada de correo electrónico */}
+                    <div>
+                        <InputLabel htmlFor="email" value="Correo Electrónico" />
 
-                    <InputError message={errors.email} className="mt-2" />
-                </div>
+                        <TextInput
+                            id="email"
+                            type="email"
+                            name="email"
+                            value={data.email}
+                            className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
+                            autoComplete="username"
+                            isFocused={true}
+                            onChange={(e) => setData('email', e.target.value)}
+                        />
 
-                <div className="mt-4">
-                    <InputLabel htmlFor="password" value="Password" />
+                        <InputError message={errors.email} className="mt-2" />
+                    </div>
 
-                    <TextInput
-                        id="password"
-                        type="password"
-                        name="password"
-                        value={data.password}
-                        className="mt-1 block w-full"
-                        autoComplete="current-password"
-                        onChange={(e) => setData('password', e.target.value)}
-                    />
+                    {/* Entrada de contraseña */}
+                    <div>
+                        <InputLabel htmlFor="password" value="Contraseña" />
 
-                    <InputError message={errors.password} className="mt-2" />
-                </div>
+                        <TextInput
+                            id="password"
+                            type="password"
+                            name="password"
+                            value={data.password}
+                            className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
+                            autoComplete="current-password"
+                            onChange={(e) => setData('password', e.target.value)}
+                        />
 
-                <div className="mt-4 block">
-                    <label className="flex items-center">
+                        <InputError message={errors.password} className="mt-2" />
+                    </div>
+
+                    {/* Casilla de recordarme */}
+                    <div className="flex items-center">
                         <Checkbox
                             name="remember"
                             checked={data.remember}
-                            onChange={(e) =>
-                                setData('remember', e.target.checked)
-                            }
+                            onChange={(e) => setData('remember', e.target.checked)}
                         />
-                        <span className="ms-2 text-sm text-gray-600 dark:text-gray-400">
-                            Remember me
-                        </span>
-                    </label>
-                </div>
+                        <span className="ml-2 text-sm text-gray-600">Recuérdame</span>
+                    </div>
 
-                <div className="mt-4 flex items-center justify-end">
-                    {canResetPassword && (
-                        <Link
-                            href={route('password.request')}
-                            className="rounded-md text-sm text-gray-600 underline hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:text-gray-400 dark:hover:text-gray-100 dark:focus:ring-offset-gray-800"
-                        >
-                            Forgot your password?
-                        </Link>
-                    )}
+                    {/* Botones de acción */}
+                    <div className="mt-6 flex justify-between items-center">
+                        {canResetPassword && (
+                            <Link
+                                href={route('password.request')}
+                                className="text-sm text-indigo-600 hover:text-indigo-800"
+                            >
+                                ¿Olvidaste tu contraseña?
+                            </Link>
+                        )}
 
-                    <PrimaryButton className="ms-4" disabled={processing}>
-                        Log in
-                    </PrimaryButton>
-                </div>
-            </form>
+                        <PrimaryButton className="w-full py-2 bg-indigo-600 text-white rounded-lg" disabled={processing}>
+                            Iniciar sesión
+                        </PrimaryButton>
+                    </div>
+                </form>
+            </div>
         </GuestLayout>
     );
 }
