@@ -79,6 +79,6 @@ class NotificationsController extends Controller
         $notificacion->save();
 
         // Retornar una respuesta de éxito
-        return response()->json(['message' => 'Notificación actualizada con éxito']);
+        
     }
 }

@@ -1,6 +1,7 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, usePage, router, Link } from '@inertiajs/react';
 import { useState, useEffect } from 'react';
+import Swal from 'sweetalert2';
 
 export default function EditarGrupoColaboradores() {
     const { grupoColaborador, flash } = usePage().props;
@@ -23,24 +24,36 @@ export default function EditarGrupoColaboradores() {
     const handleSubmit = (e) => {
         e.preventDefault();
 
-        // Enviar la solicitud de actualización
         router.put(`/grupos-colaboradores/${grupoColaborador.id}`, formData, {
             onSuccess: () => {
-                // Mostrar mensaje de éxito y redirigir
-                alert('Grupo de colaboradores actualizado correctamente.');
-                router.visit('/grupos-colaboradores');
+                Swal.fire({
+                    title: '¡Éxito!',
+                    text: 'Grupo de colaboradores actualizado correctamente.',
+                    icon: 'success',
+                    confirmButtonColor: '#2563eb',
+                }).then(() => {
+                    router.visit('/grupos-colaboradores');
+                });
             },
-            onError: (error) => {
-                alert('Ocurrió un error al actualizar el grupo de colaboradores.');
-                console.error(error);
+            onError: () => {
+                Swal.fire({
+                    title: 'Error',
+                    text: 'Ocurrió un error al actualizar el grupo de colaboradores.',
+                    icon: 'error',
+                    confirmButtonColor: '#dc2626',
+                });
             },
         });
     };
 
     useEffect(() => {
-        // Verificar si flash está definido y contiene el mensaje success
-        if (flash && flash.success) {
-            alert(flash.success); // Mostrar el mensaje de éxito
+        if (flash?.success) {
+            Swal.fire({
+                title: '¡Éxito!',
+                text: flash.success,
+                icon: 'success',
+                confirmButtonColor: '#2563eb',
+            });
         }
     }, [flash]);
 
@@ -50,75 +63,74 @@ export default function EditarGrupoColaboradores() {
         >
             <Head title="Editar Grupo de Colaboradores" />
 
-            <div className="py-12">
-                <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
-                    <div className="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
-                        <div className="p-6 text-gray-900 dark:text-gray-100">
-                            <h3 className="text-lg font-semibold mb-4">Modificar los detalles del grupo de colaboradores</h3>
-
-                            <form onSubmit={handleSubmit} className="space-y-4">
-                                <div>
-                                    <label htmlFor="nombre" className="block text-sm font-medium">
-                                        Nombre
-                                    </label>
-                                    <input
-                                        type="text"
-                                        id="nombre"
-                                        name="nombre"
-                                        value={formData.nombre}
-                                        onChange={handleInputChange}
-                                        className="w-full p-2 mt-1 border rounded"
-                                    />
-                                </div>
-                                <div>
-                                    <label htmlFor="tipo" className="block text-sm font-medium">
-                                        Tipo
-                                    </label>
-                                    <input
-                                        type="text"
-                                        id="tipo"
-                                        name="tipo"
-                                        value={formData.tipo}
-                                        onChange={handleInputChange}
-                                        className="w-full p-2 mt-1 border rounded"
-                                    />
-                                </div>
-                                <div>
-                                    <label htmlFor="descripcion" className="block text-sm font-medium">
-                                        Descripción
-                                    </label>
-                                    <textarea
-                                        id="descripcion"
-                                        name="descripcion"
-                                        value={formData.descripcion}
-                                        onChange={handleInputChange}
-                                        className="w-full p-2 mt-1 border rounded"
-                                    ></textarea>
-                                </div>
-                                <div>
-                                    <label htmlFor="temas_abordados" className="block text-sm font-medium">
-                                        Temas Abordados
-                                    </label>
-                                    <textarea
-                                        id="temas_abordados"
-                                        name="temas_abordados"
-                                        value={formData.temas_abordados}
-                                        onChange={handleInputChange}
-                                        className="w-full p-2 mt-1 border rounded"
-                                    ></textarea>
-                                </div>
-                                <button className="w-full bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600" type="submit">
-                                    Actualizar Grupo
-                                </button>
-                            </form>
-
-                            <Link
-                                href="/grupos-colaboradores"
-                                className="mt-4 text-blue-500 hover:text-blue-700"
+            {/* Fondo degradado azul a verde */}
+            <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-500 to-green-500 px-4">
+                <div className="max-w-3xl w-full">
+                    {/* Formulario con opacidad y desenfoque */}
+                    <div className="bg-white dark:bg-gray-800 bg-opacity-75 dark:bg-opacity-75 backdrop-blur-lg shadow-xl rounded-xl p-8">
+                        <h3 className="text-2xl font-semibold text-gray-900 dark:text-gray-100 text-center mb-6">
+                            Editar Grupo de Colaboradores
+                        </h3>
+                        <form onSubmit={handleSubmit} className="space-y-4">
+                            <div>
+                                <label htmlFor="nombre" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                                    Nombre
+                                </label>
+                                <input
+                                    type="text"
+                                    id="nombre"
+                                    name="nombre"
+                                    value={formData.nombre}
+                                    onChange={handleInputChange}
+                                    className="mt-1 block w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-200"
+                                />
+                            </div>
+                            <div>
+                                <label htmlFor="tipo" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                                    Tipo
+                                </label>
+                                <input
+                                    type="text"
+                                    id="tipo"
+                                    name="tipo"
+                                    value={formData.tipo}
+                                    onChange={handleInputChange}
+                                    className="mt-1 block w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-200"
+                                />
+                            </div>
+                            <div>
+                                <label htmlFor="descripcion" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                                    Descripción
+                                </label>
+                                <textarea
+                                    id="descripcion"
+                                    name="descripcion"
+                                    value={formData.descripcion}
+                                    onChange={handleInputChange}
+                                    className="mt-1 block w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-200"
+                                ></textarea>
+                            </div>
+                            <div>
+                                <label htmlFor="temas_abordados" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                                    Temas Abordados
+                                </label>
+                                <textarea
+                                    id="temas_abordados"
+                                    name="temas_abordados"
+                                    value={formData.temas_abordados}
+                                    onChange={handleInputChange}
+                                    className="mt-1 block w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-200"
+                                ></textarea>
+                            </div>
+                            <button
+                                type="submit"
+                                className="w-full bg-blue-600 text-white p-3 rounded-lg shadow-md hover:bg-blue-700 transition duration-300"
                             >
-                                Regresar a la lista de grupos
-                            </Link>
-                        </div>
+                                Actualizar Grupo
+                            </button>
+                        </form>
+
+                        
                     </div>
                 </div>
             </div>
