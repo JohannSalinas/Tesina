@@ -168,6 +168,22 @@ export default function AuthenticatedLayout({ header, children }) {
                                         </NavLink>
                                     </>
                                 )}
+                                {user.user_type === 'coordinador' && (
+                                    <>
+                                        <NavLink href={route('grupos-colaboradores.profesor')} active={route().current('grupos-colaboradores.profesor')}>
+                                            Grupos de Colaboradores
+                                        </NavLink>
+                                        <NavLink href={route('recursos.profesor')} active={route().current('recursos.profesor')}>
+                                            Ver Recursos Educativos
+                                        </NavLink>
+                                        <NavLink href={route('noticias.profesor')} active={route().current('noticias.profesor')}>
+                                            Lista de Noticias
+                                        </NavLink>
+                                        <NavLink href={route('preguntas.index')}active={route().current('preguntas.index')}>
+                                            Foro de Preguntas
+                                        </NavLink>
+                                    </>
+                                )}
                             </div>
                         </div>
 

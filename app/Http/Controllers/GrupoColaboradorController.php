@@ -107,8 +107,14 @@ public function update(Request $request, $id)
 
 public function indexProfesor()
 {
-    // Filtra los grupos que son visibles para los profesores, si es necesario
-    $grupos = GrupoColaborador::all(); // o puedes agregar más lógica si es necesario
+    // Obtener el usuario autenticado
+    $usuario = Auth::user();
+
+    // Obtener los IDs de los grupos a los que el usuario ya está unido
+    $gruposUnidos = GrupoUsuario::where('usuario_id', $usuario->id)->pluck('grupo_id')->toArray();
+
+    // Filtrar los grupos para excluir aquellos a los que el usuario ya está unido
+    $grupos = GrupoColaborador::whereNotIn('id', $gruposUnidos)->get();
 
     return Inertia::render('Profesor/ListaGrupos', [
         'grupos' => $grupos
