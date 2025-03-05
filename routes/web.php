@@ -123,6 +123,8 @@ Route::get('/reportes/recursos-categoria', [ReporteController::class, 'recursosP
 Route::get('/reportes/recursos-solicitudes', [ReporteController::class, 'recursosPorSolicitudes'])->name('reportes.solicitudes');
 
 Route::get('/dashboard', [DashboardController::class, 'index'])->middleware(['auth', 'verified'])->name('dashboard');
+Route::get('/noticias/profesor', [NoticiasController::class, 'obtenerNoticias'])->name('noticias.profesor');
+
 });
 
 

@@ -100,4 +100,13 @@ public function update(Request $request, $id)
         // Redirigir con un mensaje de éxito
         return redirect(route('noticias.index'))->with('success', 'Noticia eliminada exitosamente.');
     }
+
+    public function obtenerNoticias()
+{
+    $noticias = Noticia::orderBy('fecha_creacion', 'desc')->get();
+    return inertia('Profesor/ListaNoticias', [
+        'noticias' => $noticias
+    ]);
+}
+
 }
