@@ -16,7 +16,7 @@ use App\Http\Controllers\BackupController;
 use App\Http\Controllers\PreguntaForoController;
 use App\Http\Controllers\RespuestaForoController;
 use App\Http\Controllers\ReporteController;
-
+use App\Http\Controllers\DashboardController;
 
 Route::get('/', function () {
     return Inertia::render('Welcome', [
@@ -26,10 +26,12 @@ Route::get('/', function () {
         'phpVersion' => PHP_VERSION,
     ]);
 });
-
+/*
 Route::get('/dashboard', function () {
     return Inertia::render('Dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
+*/
+
 
 Route::middleware('auth')->group(function () {
     // Rutas de perfil
@@ -119,6 +121,8 @@ Route::get('/reportes', [ReporteController::class, 'index'])->name('reportes.ind
 Route::get('/reportes/top-recursos', [ReporteController::class, 'topRecursos'])->name('reportes.top');
 Route::get('/reportes/recursos-categoria', [ReporteController::class, 'recursosPorCategoria'])->name('reportes.categoria');
 Route::get('/reportes/recursos-solicitudes', [ReporteController::class, 'recursosPorSolicitudes'])->name('reportes.solicitudes');
+
+Route::get('/dashboard', [DashboardController::class, 'index'])->middleware(['auth', 'verified'])->name('dashboard');
 });
 
 
