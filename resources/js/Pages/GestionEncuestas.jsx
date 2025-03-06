@@ -1,6 +1,7 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, usePage, router, Link } from '@inertiajs/react';
 import { useState } from 'react';
+import Swal from 'sweetalert2';
 
 export default function GestionEncuestas() {
     const { encuestas } = usePage().props;
@@ -45,132 +46,175 @@ export default function GestionEncuestas() {
 
         router.post('/encuestas', form, {
             onSuccess: () => {
-                alert('Encuesta creada correctamente.');
+                Swal.fire({
+                    icon: 'success',
+                    title: '¡Encuesta creada!',
+                    text: 'La encuesta se ha creado correctamente.',
+                    confirmButtonColor: '#4CAF50'
+                });
                 setFormData({ titulo: '', descripcion: '', numPreguntas: 1, preguntas: [''] });
             },
-            onError: (error) => {
-                alert('Ocurrió un error al crear la encuesta.');
-                console.error(error);
+            onError: () => {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Ocurrió un problema al crear la encuesta.',
+                    confirmButtonColor: '#F44336'
+                });
             },
         });
     };
 
     const handleDelete = (encuestaId) => {
-        if (confirm(`¿Estás seguro de que deseas eliminar esta encuesta con ID: ${encuestaId}?`)) {
-            router.delete(`/encuestas/${encuestaId}`, {
-                onSuccess: () => alert('Encuesta eliminada correctamente.'),
-                onError: () => alert('Ocurrió un error al intentar eliminar la encuesta.'),
-            });
-        }
+        Swal.fire({
+            title: '¿Estás seguro?',
+            text: 'Esta acción eliminará la encuesta de forma permanente.',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Sí, eliminar',
+            cancelButtonText: 'Cancelar'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                router.delete(`/encuestas/${encuestaId}`, {
+                    onSuccess: () => {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Eliminado',
+                            text: 'La encuesta ha sido eliminada.',
+                            confirmButtonColor: '#4CAF50'
+                        });
+                    },
+                    onError: () => {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: 'No se pudo eliminar la encuesta.',
+                            confirmButtonColor: '#F44336'
+                        });
+                    }
+                });
+            }
+        });
     };
 
     return (
         <AuthenticatedLayout
-            header={<h2 className="text-xl font-semibold leading-tight text-gray-800 dark:text-gray-200">Administrar Encuestas</h2>}
+            header={
+                <h2 className="text-2xl font-semibold leading-tight text-gray-800 dark:text-gray-200">
+                    Administrar Encuestas
+                </h2>
+            }
         >
             <Head title="Administrar Encuestas" />
 
-            <div className="py-12">
-                <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
-                    <div className="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
-                        <div className="p-6 text-gray-900 dark:text-gray-100">
-                            <h3 className="text-lg font-semibold mb-4">Crear una nueva encuesta</h3>
-                            <form onSubmit={handleSubmit} className="space-y-4">
-                                <div>
-                                    <label htmlFor="titulo" className="block text-sm font-medium">
-                                        Título
+            <div className="min-h-screen bg-gradient-to-r from-blue-500 via-teal-500 to-green-500 py-12">
+                <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
+                    <div className="relative bg-white bg-opacity-60 text-gray-800 shadow-lg rounded-2xl p-8 max-w-7xl w-full space-y-6">
+                        {/* Formulario de creación de encuestas */}
+                        <h3 className="text-4xl font-semibold text-gray-900 dark:text-gray-100 mb-4">
+                            Crear una nueva encuesta
+                        </h3>
+                        <form onSubmit={handleSubmit} className="space-y-6">
+                            <div>
+                                <label htmlFor="titulo" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                                    Título
+                                </label>
+                                <input
+                                    type="text"
+                                    id="titulo"
+                                    name="titulo"
+                                    value={formData.titulo}
+                                    onChange={handleInputChange}
+                                    className="mt-2 block w-full p-4 border border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-teal-500 focus:border-teal-500 dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600"
+                                />
+                            </div>
+                            <div>
+                                <label htmlFor="descripcion" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                                    Descripción
+                                </label>
+                                <textarea
+                                    id="descripcion"
+                                    name="descripcion"
+                                    value={formData.descripcion}
+                                    onChange={handleInputChange}
+                                    className="mt-2 block w-full p-4 border border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-teal-500 focus:border-teal-500 dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600"
+                                ></textarea>
+                            </div>
+                            <div>
+                                <label htmlFor="numPreguntas" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                                    Número de Preguntas
+                                </label>
+                                <input
+                                    type="number"
+                                    id="numPreguntas"
+                                    name="numPreguntas"
+                                    value={formData.numPreguntas}
+                                    min="1"
+                                    onChange={(e) => {
+                                        setFormData({
+                                            ...formData,
+                                            numPreguntas: e.target.value,
+                                            preguntas: new Array(parseInt(e.target.value)).fill(''),
+                                        });
+                                    }}
+                                    className="mt-2 block w-full p-4 border border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-teal-500 focus:border-teal-500 dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600"
+                                />
+                            </div>
+                            {/* Renderizamos dinámicamente los campos de preguntas */}
+                            {Array.from({ length: formData.numPreguntas }, (_, index) => (
+                                <div key={index}>
+                                    <label htmlFor={`pregunta_${index + 1}`} className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                                        Pregunta {index + 1}
                                     </label>
                                     <input
                                         type="text"
-                                        id="titulo"
-                                        name="titulo"
-                                        value={formData.titulo}
-                                        onChange={handleInputChange}
-                                        className="w-full p-2 mt-1 border rounded"
+                                        id={`pregunta_${index + 1}`}
+                                        name={`preguntas[${index}]`}
+                                        value={formData.preguntas[index]}
+                                        onChange={(e) => handlePreguntaChange(index, e)}
+                                        className="mt-2 block w-full p-4 border border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-teal-500 focus:border-teal-500 dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600"
                                     />
                                 </div>
-                                <div>
-                                    <label htmlFor="descripcion" className="block text-sm font-medium">
-                                        Descripción
-                                    </label>
-                                    <textarea
-                                        id="descripcion"
-                                        name="descripcion"
-                                        value={formData.descripcion}
-                                        onChange={handleInputChange}
-                                        className="w-full p-2 mt-1 border rounded"
-                                    ></textarea>
-                                </div>
-                                <div>
-                                    <label htmlFor="numPreguntas" className="block text-sm font-medium">
-                                        Número de Preguntas
-                                    </label>
-                                    <input
-                                        type="number"
-                                        id="numPreguntas"
-                                        name="numPreguntas"
-                                        value={formData.numPreguntas}
-                                        min="1"
-                                        onChange={(e) => {
-                                            setFormData({
-                                                ...formData,
-                                                numPreguntas: e.target.value,
-                                                preguntas: new Array(parseInt(e.target.value)).fill(''),
-                                            });
-                                        }}
-                                        className="w-full p-2 mt-1 border rounded"
-                                    />
-                                </div>
-                                {/* Renderizamos dinámicamente los campos de preguntas */}
-                                {Array.from({ length: formData.numPreguntas }, (_, index) => (
-                                    <div key={index}>
-                                        <label htmlFor={`pregunta_${index + 1}`} className="block text-sm font-medium">
-                                            Pregunta {index + 1}
-                                        </label>
-                                        <input
-                                            type="text"
-                                            id={`pregunta_${index + 1}`}
-                                            name={`preguntas[${index}]`}
-                                            value={formData.preguntas[index]}
-                                            onChange={(e) => handlePreguntaChange(index, e)}
-                                            className="w-full p-2 mt-1 border rounded"
-                                        />
-                                    </div>
-                                ))}
-                                <button
-                                    type="submit"
-                                    className="w-full bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600"
-                                >
-                                    Crear Encuesta
-                                </button>
-                            </form>
+                            ))}
+                            <button
+                                type="submit"
+                                className="w-full bg-teal-600 text-white py-3 px-6 rounded-xl hover:bg-teal-700 transition duration-300 transform hover:scale-105"
+                            >
+                                Crear Encuesta
+                            </button>
+                        </form>
 
-                            <h3 className="text-lg font-semibold mt-8">Encuestas Existentes</h3>
-                            <table className="w-full mt-4">
-                                <thead>
+                        {/* Tabla de encuestas */}
+                        <div className="overflow-x-auto w-full mt-8">
+                            <table className="w-full border-collapse shadow-lg rounded-2xl overflow-hidden">
+                                {/* Encabezado */}
+                                <thead className="bg-gradient-to-r from-teal-500 to-blue-500 text-white">
                                     <tr>
-                                        <th className="border px-4 py-2">ID</th>
-                                        <th className="border px-4 py-2">Título</th>
-                                        <th className="border px-4 py-2">Descripción</th>
-                                        <th className="border px-4 py-2">Acciones</th>
+                                        <th className="px-6 py-3 text-left text-sm font-semibold uppercase">ID</th>
+                                        <th className="px-6 py-3 text-left text-sm font-semibold uppercase">Título</th>
+                                        <th className="px-6 py-3 text-left text-sm font-semibold uppercase">Descripción</th>
+                                        <th className="px-6 py-3 text-left text-sm font-semibold uppercase">Acciones</th>
                                     </tr>
                                 </thead>
-                                <tbody>
-                                    {encuestas.map((encuesta) => (
-                                        <tr key={encuesta.id}>
-                                            <td className="border px-4 py-2">{encuesta.id}</td>
-                                            <td className="border px-4 py-2">{encuesta.titulo}</td>
-                                            <td className="border px-4 py-2">{encuesta.descripcion}</td>
-                                            <td className="border px-4 py-2">
+                                {/* Cuerpo de la tabla */}
+                                <tbody className="bg-white divide-y divide-gray-200">
+                                    {encuestas.map((encuesta, index) => (
+                                        <tr key={encuesta.id} className={`${index % 2 === 0 ? 'bg-gray-100' : 'bg-white'} hover:bg-gray-200 transition`}>
+                                            <td className="px-6 py-4 text-sm text-gray-900 font-medium">{encuesta.id}</td>
+                                            <td className="px-6 py-4 text-sm text-gray-900">{encuesta.titulo}</td>
+                                            <td className="px-6 py-4 text-sm text-gray-900">{encuesta.descripcion}</td>
+                                            <td className="px-6 py-4 flex space-x-2">
                                                 <button
-                                                    className="bg-red-500 text-white py-1 px-2 rounded hover:bg-red-600 mr-2"
+                                                    className="px-4 py-2 text-white bg-red-500 rounded-lg shadow-md hover:bg-red-600 transition duration-300 transform hover:scale-105"
                                                     onClick={() => handleDelete(encuesta.id)}
                                                 >
                                                     Eliminar
                                                 </button>
                                                 <Link
                                                     href={`/encuestas/${encuesta.id}/editar`}
-                                                    className="px-3 py-1 text-white bg-blue-500 rounded hover:bg-blue-600"
+                                                    className="px-4 py-2 text-white bg-blue-500 rounded-lg shadow-md hover:bg-blue-600 transition duration-300 transform hover:scale-105"
                                                 >
                                                     Modificar
                                                 </Link>
@@ -179,37 +223,39 @@ export default function GestionEncuestas() {
                                     ))}
                                 </tbody>
                             </table>
+                        </div>
 
-                            {/* Tabla de preguntas relacionadas con la encuesta */}
-                            {encuestas.length > 0 && (
-                                <div className="mt-8">
-                                    <h3 className="text-lg font-semibold mb-4">Preguntas de la Encuesta</h3>
-                                    {encuestas.map((encuesta) => (
-                                        <div key={encuesta.id}>
-                                            <h4 className="text-lg font-semibold">{encuesta.titulo}</h4>
-                                            <table className="w-full mt-4 border">
-                                                <thead>
+                        {/* Tabla de preguntas relacionadas con la encuesta */}
+                        {encuestas.length > 0 && (
+                            <div className="mt-8">
+                                <h3 className="text-4xl font-semibold text-gray-900 dark:text-gray-100 mb-4">Preguntas de la Encuesta</h3>
+                                {encuestas.map((encuesta) => (
+                                    <div key={encuesta.id}>
+                                        <h4 className="text-2xl font-semibold text-gray-900 dark:text-gray-100">{encuesta.titulo}</h4>
+                                        <div className="overflow-x-auto w-full mt-4">
+                                            <table className="w-full border-collapse shadow-lg rounded-2xl overflow-hidden">
+                                                <thead className="bg-gradient-to-r from-teal-500 to-blue-500 text-white">
                                                     <tr>
-                                                        <th className="border px-4 py-2">ID Pregunta</th>
-                                                        <th className="border px-4 py-2">ID Encuesta</th>
-                                                        <th className="border px-4 py-2">Pregunta</th>
+                                                        <th className="px-6 py-3 text-left text-sm font-semibold uppercase">ID Pregunta</th>
+                                                        <th className="px-6 py-3 text-left text-sm font-semibold uppercase">ID Encuesta</th>
+                                                        <th className="px-6 py-3 text-left text-sm font-semibold uppercase">Pregunta</th>
                                                     </tr>
                                                 </thead>
-                                                <tbody>
+                                                <tbody className="bg-white divide-y divide-gray-200">
                                                     {encuesta.preguntas.map((pregunta) => (
-                                                        <tr key={pregunta.id}>
-                                                            <td className="border px-4 py-2">{pregunta.id}</td>
-                                                            <td className="border px-4 py-2">{pregunta.encuesta_id}</td>
-                                                            <td className="border px-4 py-2">{pregunta.pregunta}</td>
+                                                        <tr key={pregunta.id} className="hover:bg-gray-200 transition">
+                                                            <td className="px-6 py-4 text-sm text-gray-900 font-medium">{pregunta.id}</td>
+                                                            <td className="px-6 py-4 text-sm text-gray-900">{pregunta.encuesta_id}</td>
+                                                            <td className="px-6 py-4 text-sm text-gray-900">{pregunta.pregunta}</td>
                                                         </tr>
                                                     ))}
                                                 </tbody>
                                             </table>
                                         </div>
-                                    ))}
-                                </div>
-                            )}
-                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>

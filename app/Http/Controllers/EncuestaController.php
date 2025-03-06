@@ -82,35 +82,34 @@ class EncuestaController extends Controller
     {
         // Validación de los datos
         $request->validate([
-            'titulo' => 'required|string|max:255',
-            'descripcion' => 'nullable|string',
-            'preguntas' => 'nullable|array|min:1', // Asegura que las preguntas sean un array
-            'preguntas.*' => 'nullable|string|max:255', // Cada pregunta debe ser una cadena de texto
+            'titulo' => 'required|string|max:255', // Título obligatorio
+            'descripcion' => 'required|string', // Descripción obligatoria
+            'preguntas' => 'required|array|min:1', // Asegura que las preguntas sean un array y que haya al menos una
+            'preguntas.*' => 'required|string|max:255', // Cada pregunta debe ser una cadena de texto no vacía
         ]);
-
+    
         // Encontrar la encuesta
         $encuesta = Encuesta::findOrFail($id);
-
+    
         // Actualizar la encuesta
-        $encuesta->update($request->only(['titulo', 'descripcion']));
-
-        // Si se han enviado preguntas, actualizarlas
-        if ($request->has('preguntas')) {
-            // Eliminar las preguntas existentes
-            PreguntaEncuesta::where('encuesta_id', $encuesta->id)->delete();
-
-            // Guardar las nuevas preguntas
-            foreach ($request->preguntas as $pregunta) {
-                PreguntaEncuesta::create([
-                    'encuesta_id' => $encuesta->id,
-                    'pregunta' => $pregunta,
-                ]);
-            }
+        $encuesta->update([
+            'titulo' => $request->titulo,
+            'descripcion' => $request->descripcion,
+        ]);
+    
+        // Eliminar las preguntas existentes
+        PreguntaEncuesta::where('encuesta_id', $encuesta->id)->delete();
+    
+        // Guardar las nuevas preguntas
+        foreach ($request->preguntas as $pregunta) {
+            PreguntaEncuesta::create([
+                'encuesta_id' => $encuesta->id,
+                'pregunta' => $pregunta,
+            ]);
         }
-
+    
         return redirect()->route('encuestas.index')->with('success', 'Encuesta actualizada correctamente.');
     }
-
 
     public function obtenerEncuestas()
     {
