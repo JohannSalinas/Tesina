@@ -79,10 +79,49 @@ export default function AuthenticatedLayout({ header, children }) {
             {/* Barra de navegación */}
             <nav className="bg-white dark:bg-gray-800 shadow-lg rounded-lg">
                 <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+                    {/* Texto destacado */}
+                    <div className="flex justify-center py-4">
+                        <span className="text-2xl font-black text-gray-700 dark:text-gray-300 uppercase tracking-wider font-sans">
+                            PLATAFORMA PARA RECURSOS EDUCATIVOS ABIERTOS PARA DOCENTES
+                        </span>
+                    </div>
+
                     <div className="flex h-16 justify-between">
                         <div className="flex items-center">
+                            {/* Botón de menú móvil */}
+                            <div className="flex items-center sm:hidden">
+                                <button
+                                    onClick={() =>
+                                        setShowingNavigationDropdown((previousState) => !previousState)
+                                    }
+                                    className="inline-flex items-center justify-center rounded-md p-2 text-gray-400 transition duration-150 ease-in-out hover:bg-gray-100 hover:text-gray-500 focus:bg-gray-100 focus:text-gray-500 focus:outline-none dark:text-gray-500 dark:hover:bg-gray-900 dark:hover:text-gray-400 dark:focus:bg-gray-900 dark:focus:text-gray-400"
+                                >
+                                    <svg
+                                        className="h-6 w-6"
+                                        stroke="currentColor"
+                                        fill="none"
+                                        viewBox="0 0 24 24"
+                                    >
+                                        <path
+                                            className={!showingNavigationDropdown ? 'inline-flex' : 'hidden'}
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                            strokeWidth="2"
+                                            d="M4 6h16M4 12h16M4 18h16"
+                                        />
+                                        <path
+                                            className={showingNavigationDropdown ? 'inline-flex' : 'hidden'}
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                            strokeWidth="2"
+                                            d="M6 18L18 6M6 6l12 12"
+                                        />
+                                    </svg>
+                                </button>
+                            </div>
+
+                            {/* NavLinks para pantallas grandes */}
                             <div className="hidden space-x-4 sm:-my-px sm:ml-10 sm:flex">
-                                {/* NavLinks personalizados */}
                                 <NavLink
                                     href={route('dashboard')}
                                     active={route().current('dashboard')}
@@ -316,38 +355,6 @@ export default function AuthenticatedLayout({ header, children }) {
                                 </Dropdown>
                             </div>
                         </div>
-
-                        {/* Menú móvil */}
-                        <div className="-mr-2 flex items-center sm:hidden">
-                            <button
-                                onClick={() =>
-                                    setShowingNavigationDropdown((previousState) => !previousState)
-                                }
-                                className="inline-flex items-center justify-center rounded-md p-2 text-gray-400 transition duration-150 ease-in-out hover:bg-gray-100 hover:text-gray-500 focus:bg-gray-100 focus:text-gray-500 focus:outline-none dark:text-gray-500 dark:hover:bg-gray-900 dark:hover:text-gray-400 dark:focus:bg-gray-900 dark:focus:text-gray-400"
-                            >
-                                <svg
-                                    className="h-6 w-6"
-                                    stroke="currentColor"
-                                    fill="none"
-                                    viewBox="0 0 24 24"
-                                >
-                                    <path
-                                        className={!showingNavigationDropdown ? 'inline-flex' : 'hidden'}
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        strokeWidth="2"
-                                        d="M4 6h16M4 12h16M4 18h16"
-                                    />
-                                    <path
-                                        className={showingNavigationDropdown ? 'inline-flex' : 'hidden'}
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        strokeWidth="2"
-                                        d="M6 18L18 6M6 6l12 12"
-                                    />
-                                </svg>
-                            </button>
-                        </div>
                     </div>
                 </div>
 
@@ -360,6 +367,128 @@ export default function AuthenticatedLayout({ header, children }) {
                         >
                             Dashboard
                         </ResponsiveNavLink>
+                        {user.user_type === 'admin' && (
+                            <>
+                                <ResponsiveNavLink
+                                    href={route('usuarios.index')}
+                                    active={route().current('usuarios.index')}
+                                >
+                                    Admin Usuarios
+                                </ResponsiveNavLink>
+                                <ResponsiveNavLink
+                                    href={route('recursos.index')}
+                                    active={route().current('recursos.index')}
+                                >
+                                    Gestion Recursos Educativos
+                                </ResponsiveNavLink>
+                                <ResponsiveNavLink
+                                    href={route('noticias.index')}
+                                    active={route().current('noticias.index')}
+                                >
+                                    Gestion Noticias
+                                </ResponsiveNavLink>
+                                <ResponsiveNavLink
+                                    href={route('encuestas.index')}
+                                    active={route().current('encuestas.index')}
+                                >
+                                    Gestion Encuestas
+                                </ResponsiveNavLink>
+                                <ResponsiveNavLink
+                                    href={route('grupos-colaboradores.index')}
+                                    active={route().current('grupos-colaboradores.index')}
+                                >
+                                    Gestión Grupos de Colaboradores
+                                </ResponsiveNavLink>
+                                <ResponsiveNavLink
+                                    href={route('grupo-usuarios.index')}
+                                    active={route().current('grupo-usuarios.index')}
+                                >
+                                    Grupo Usuarios
+                                </ResponsiveNavLink>
+                                <ResponsiveNavLink
+                                    href={route('backup-restore.index')}
+                                    active={route().current('backup-restore.index')}
+                                >
+                                    Respaldo y Restauración BD
+                                </ResponsiveNavLink>
+                                <ResponsiveNavLink
+                                    href={route('preguntas.index')}
+                                    active={route().current('preguntas.index')}
+                                >
+                                    Foro de Preguntas
+                                </ResponsiveNavLink>
+                                <ResponsiveNavLink
+                                    href={route('reportes.index')}
+                                    active={route().current('reportes.index')}
+                                >
+                                    Generar Reportes
+                                </ResponsiveNavLink>
+                            </>
+                        )}
+
+                        {user.user_type === 'profesor' && (
+                            <>
+                                <ResponsiveNavLink
+                                    href={route('grupos-colaboradores.profesor')}
+                                    active={route().current('grupos-colaboradores.profesor')}
+                                >
+                                    Grupos de Colaboradores
+                                </ResponsiveNavLink>
+                                <ResponsiveNavLink
+                                    href={route('recursos.profesor')}
+                                    active={route().current('recursos.profesor')}
+                                >
+                                    Ver Recursos Educativos
+                                </ResponsiveNavLink>
+                                <ResponsiveNavLink
+                                    href={route('noticias.profesor')}
+                                    active={route().current('noticias.profesor')}
+                                >
+                                    Lista de Noticias
+                                </ResponsiveNavLink>
+                                <ResponsiveNavLink
+                                    href={route('preguntas.index')}
+                                    active={route().current('preguntas.index')}
+                                >
+                                    Foro de Preguntas
+                                </ResponsiveNavLink>
+                                <ResponsiveNavLink
+                                    href={route('encuestas.profesor')}
+                                    active={route().current('encuestas.profesor')}
+                                >
+                                    Lista de Encuestas
+                                </ResponsiveNavLink>
+                            </>
+                        )}
+
+                        {user.user_type === 'coordinador' && (
+                            <>
+                                <ResponsiveNavLink
+                                    href={route('grupos-colaboradores.profesor')}
+                                    active={route().current('grupos-colaboradores.profesor')}
+                                >
+                                    Grupos de Colaboradores
+                                </ResponsiveNavLink>
+                                <ResponsiveNavLink
+                                    href={route('recursos.profesor')}
+                                    active={route().current('recursos.profesor')}
+                                >
+                                    Ver Recursos Educativos
+                                </ResponsiveNavLink>
+                                <ResponsiveNavLink
+                                    href={route('noticias.profesor')}
+                                    active={route().current('noticias.profesor')}
+                                >
+                                    Lista de Noticias
+                                </ResponsiveNavLink>
+                                <ResponsiveNavLink
+                                    href={route('preguntas.index')}
+                                    active={route().current('preguntas.index')}
+                                >
+                                    Foro de Preguntas
+                                </ResponsiveNavLink>
+                            </>
+                        )}
                     </div>
 
                     <div className="border-t border-gray-200 pb-1 pt-4 dark:border-gray-600">
