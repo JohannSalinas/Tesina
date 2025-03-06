@@ -7,6 +7,8 @@ use Inertia\Inertia;
 use App\Models\RecursoEducativo;
 use App\Models\GrupoColaborador;
 use App\Models\GrupoUsuario;
+use App\Models\User;
+use Illuminate\Support\Facades\DB;
 
 class DashboardController extends Controller
 {
@@ -30,11 +32,20 @@ class DashboardController extends Controller
         ->take(5) // Obtiene solo los 5 primeros
         ->get();
 
+        // Obtener la distribución de usuarios por grado académico
+        $usuariosPorGradoAcademico = User::select('gradoAcademico', DB::raw('COUNT(*) as total'))
+            ->groupBy('gradoAcademico')
+            ->get();
+
         return Inertia::render('Dashboard', [
             'recursosNuevos' => $recursosNuevos,
             'recursosMejorCalificados' => $recursosMejorCalificados,
             'gruposMasGrandes' => $gruposMasGrandes,
             'gruposMasRecursos' => $gruposMasRecursos, // Nuevo dato
+            'usuariosPorGradoAcademico' => $usuariosPorGradoAcademico, // Enviar la distribución de usuarios
         ]);
+
+        
+        
     }
 }
