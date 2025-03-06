@@ -8,19 +8,6 @@ import { FaStar } from 'react-icons/fa'; // Agregar iconos
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, ArcElement); // Registra ArcElement
 
-const barData = {
-  labels: ['Recurso 1', 'Recurso 2', 'Recurso 3'],
-  datasets: [
-    {
-      label: 'Calificaciones',
-      data: [5, 4, 3],
-      backgroundColor: 'rgba(75, 192, 192, 0.2)',
-      borderColor: 'rgba(75, 192, 192, 1)',
-      borderWidth: 1,
-    },
-  ],
-};
-
 const pieData = {
   labels: ['Grupo A', 'Grupo B', 'Grupo C'],
   datasets: [
@@ -33,7 +20,20 @@ const pieData = {
   ],
 };
 
-export default function Dashboard({ recursosNuevos, recursosMejorCalificados, gruposMasGrandes }) {
+export default function Dashboard({ recursosNuevos, recursosMejorCalificados, gruposMasGrandes, gruposMasRecursos}) {
+    const barData = {
+        labels: gruposMasRecursos.map(grupo => grupo.nombre), // Nombres de los grupos
+        datasets: [
+            {
+                label: 'Recursos',
+                data: gruposMasRecursos.map(grupo => grupo.recursos_count), // Cantidad de recursos
+                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                borderColor: 'rgba(75, 192, 192, 1)',
+                borderWidth: 1,
+            },
+        ],
+    };
+
   return (
     <AuthenticatedLayout
       header={
@@ -66,7 +66,7 @@ export default function Dashboard({ recursosNuevos, recursosMejorCalificados, gr
 
             {/* Gráfico de Barras */}
             <div className="bg-white shadow-xl rounded-lg p-6 hover:shadow-2xl transition-all">
-              <h3 className="text-lg font-bold mb-4 text-gray-800">Calificación de Recursos</h3>
+              <h3 className="text-lg font-bold mb-4 text-gray-800">Grupos con mas Recursos</h3>
               <div className="h-72">
                 <Bar data={barData} options={{ responsive: true }} />
               </div>

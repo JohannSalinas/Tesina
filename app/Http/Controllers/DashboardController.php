@@ -19,15 +19,22 @@ class DashboardController extends Controller
         $recursosMejorCalificados = RecursoEducativo::orderByDesc('calificacion')->take(5)->get();
 
         // Obtener los 5 grupos con más miembros
-        $gruposMasGrandes = GrupoColaborador::withCount('usuarios') // Cuenta los usuarios en cada grupo
-            ->orderByDesc('usuarios_count') // Ordena por la cantidad de miembros
-            ->take(5) // Obtiene solo los 5 primeros
+        $gruposMasGrandes = GrupoColaborador::withCount('usuarios')
+            ->orderByDesc('usuarios_count')
+            ->take(5)
             ->get();
+
+        // Obtener los 5 grupos con más recursos
+        $gruposMasRecursos = GrupoColaborador::withCount('recursos') // Cuenta los recursos en cada grupo
+        ->orderByDesc('recursos_count') // Ordena por cantidad de recursos
+        ->take(5) // Obtiene solo los 5 primeros
+        ->get();
 
         return Inertia::render('Dashboard', [
             'recursosNuevos' => $recursosNuevos,
             'recursosMejorCalificados' => $recursosMejorCalificados,
-            'gruposMasGrandes' => $gruposMasGrandes
+            'gruposMasGrandes' => $gruposMasGrandes,
+            'gruposMasRecursos' => $gruposMasRecursos, // Nuevo dato
         ]);
     }
 }

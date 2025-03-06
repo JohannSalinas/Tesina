@@ -1,14 +1,12 @@
 import React, { useState } from 'react';
 import { Link } from '@inertiajs/inertia-react';
-import DocViewer, { DocViewerRenderers } from "@cyntler/react-doc-viewer";
-import "@cyntler/react-doc-viewer/dist/index.css";
+import FileViewer from 'react-file-viewer';
 import Swal from 'sweetalert2';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 
 const ListaRecursos = ({ grupos }) => {
     const [calificacion, setCalificacion] = useState({});
 
-    // Función para manejar la calificación
     const handleCalificar = async (recursoId, nuevaCalificacion) => {
         try {
             setCalificacion((prev) => ({
@@ -24,10 +22,9 @@ const ListaRecursos = ({ grupos }) => {
         }
     };
 
-    // Generar documentos compatibles con DocViewer
     const getFileDocs = (recurso) => {
-        if (!recurso || !recurso.archivo_path) return [];
-        return [{ uri: `/storage/${recurso.archivo_path}` }];
+        if (!recurso || !recurso.archivo_path) return null;
+        return `/storage/${recurso.archivo_path}`;
     };
 
     return (
@@ -52,20 +49,16 @@ const ListaRecursos = ({ grupos }) => {
 
                                                 <p className="text-gray-600 mb-4">{recurso.descripcion}</p>
 
-                                                {/* Vista previa del archivo con react-doc-viewer */}
-{recurso.archivo_path && (
-    <div className="overflow-hidden rounded-lg">
-        <DocViewer
-            pluginRenderers={DocViewerRenderers}
-            documents={getFileDocs(recurso)}
-            style={{
-                width: "100%",
-                height: "300px",
-                maxHeight: "300px",  // Asegura que no se sobrepase la altura de la tarjeta
-            }}
-        />
-    </div>
-)}
+                                                {/* Vista previa del archivo con react-file-viewer */}
+                                                {recurso.archivo_path && (
+                                                    <div className="h-96 overflow-auto border rounded-lg shadow-md">
+                                                        <FileViewer
+                                                            fileType={recurso.archivo_path.split('.').pop()}
+                                                            filePath={getFileDocs(recurso)}
+                                                            onError={(e) => console.error('Error al cargar el archivo:', e)}
+                                                        />
+                                                    </div>
+                                                )}
 
                                                 {/* Calificación */}
                                                 <div className="flex items-center mt-4">
@@ -98,8 +91,6 @@ const ListaRecursos = ({ grupos }) => {
                     ) : (
                         <p className="text-gray-200 text-center w-full">No estás inscrito en ningún grupo.</p>
                     )}
-
-                    
                 </div>
             </div>
         </AuthenticatedLayout>

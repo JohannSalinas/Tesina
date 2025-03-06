@@ -10,4 +10,7 @@ export default defineConfig({
         }),
         react(),
     ],
+    optimizeDeps: {
+        include: ['pptxgenjs'], // Forzar la optimización de pptxgenjs
+    },
 });

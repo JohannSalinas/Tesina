@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use Dompdf\Dompdf;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 use App\Models\RecursoEducativo;
 use Illuminate\Support\Facades\Validator;
@@ -10,6 +12,7 @@ use Illuminate\Support\Facades\Storage;
 use App\Models\GrupoUsuario; // Para obtener los grupos del usuario
 use App\Models\GrupoColaborador; // Si se necesita el grupo completo
 use Illuminate\Support\Facades\Auth;
+use PhpOffice\PhpPresentation\IOFactory;
 
 class RecursosEducativosController extends Controller
 {
@@ -46,6 +49,10 @@ class RecursosEducativosController extends Controller
         // Guardar el archivo en 'public/recursos' y obtener la ruta
         $archivoPath = $request->file('archivo')->store('recursos', 'public');
 
+        // Si el archivo es PPTX, convertirlo a PDF
+        if ($validatedData['tipo'] === 'PPTX') {
+            $archivoPath = $this->convertPptxToPdf($archivoPath);
+        }
 
         // Crear el recurso en la base de datos
         $recurso = RecursoEducativo::create([
@@ -58,6 +65,48 @@ class RecursosEducativosController extends Controller
         ]);
 
         return redirect()->route('recursos.index')->with('message', 'Recurso educativo creado exitosamente.');
+    }
+
+// Función para convertir PPTX a PDF
+
+    /**
+     * @throws \Exception
+     */
+    private function convertPptxToPdf($archivoPath)
+    {
+        // Ruta completa del archivo PPTX
+        $pptxPath = storage_path('app/public/' . $archivoPath);
+
+        // Cargar el archivo PPTX
+        $phpPresentation = IOFactory::load($pptxPath);
+
+        // Crear un nuevo PDF
+        $dompdf = new Dompdf();
+
+        // Generar el contenido HTML del PPTX
+        $html = '<h1>' . $phpPresentation->getProperties()->getTitle() . '</h1>';
+        foreach ($phpPresentation->getAllSlides() as $slide) {
+            foreach ($slide->getShapeCollection() as $shape) {
+                if ($shape instanceof \PhpOffice\PhpPresentation\Shape\RichText) {
+                    $html .= '<p>' . $shape->getPlainText() . '</p>';
+                }
+            }
+        }
+
+        // Cargar el HTML en Dompdf
+        $dompdf->loadHtml($html);
+
+        // Renderizar el PDF
+        $dompdf->render();
+
+        // Guardar el PDF en el almacenamiento
+        $pdfPath = str_replace('.pptx', '.pdf', $archivoPath);
+        Storage::disk('public')->put($pdfPath, $dompdf->output());
+
+        // Eliminar el archivo PPTX original
+        Storage::disk('public')->delete($archivoPath);
+
+        return $pdfPath;
     }
 
     public function edit($id)
@@ -73,7 +122,7 @@ class RecursosEducativosController extends Controller
         $recurso = RecursoEducativo::findOrFail($id);
 
         // Agregar la línea de log para ver los datos recibidos
-        \Log::info('Datos recibidos para actualización:', $request->all());
+        Log::info('Datos recibidos para actualización:', $request->all());
 
         $validator = Validator::make($request->all(), [
             'titulo' => 'required|max:255',
@@ -87,12 +136,18 @@ class RecursosEducativosController extends Controller
         }
 
         // Verificar si se proporcionó un nuevo archivo y manejar la actualización
-        $archivoPath = $recurso->url;  // Asignar la URL actual por defecto
+        $archivoPath = $recurso->archivo_path;  // Asignar la URL actual por defecto
         if ($request->hasFile('archivo')) {
             // Eliminar el archivo anterior si existe
-            $this->deleteFile($recurso->url);
+            $this->deleteFile($recurso->archivo_path);
             // Almacenar el nuevo archivo y obtener su ruta
             $archivoPath = $request->file('archivo')->store('recursos', 'public');
+        }
+        $recurso->archivo_path = null;
+
+        $validatedData = $validator->validated(); // Obtiene los datos validados
+        if ($validatedData['tipo'] === 'PPTX') {
+            $archivoPath = $this->convertPptxToPdf($archivoPath);
         }
 
         // Actualizar el recurso con los nuevos datos
@@ -100,7 +155,7 @@ class RecursosEducativosController extends Controller
             'titulo' => $request->titulo,
             'descripcion' => $request->descripcion,
             'tipo' => $request->tipo,
-            'url' => $archivoPath,  // Se usa la nueva URL del archivo si fue cargado
+            'archivo_path' => $archivoPath,  // Se usa la nueva URL del archivo si fue cargado
         ]);
 
         return redirect()->route('recursos.index')->with('message', 'Recurso educativo actualizado exitosamente.');
