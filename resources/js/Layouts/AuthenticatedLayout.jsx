@@ -166,6 +166,9 @@ export default function AuthenticatedLayout({ header, children }) {
                                         <NavLink href={route('preguntas.index')}active={route().current('preguntas.index')}>
                                             Foro de Preguntas
                                         </NavLink>
+                                        <NavLink href={route('encuestas.profesor')}active={route().current('encuestas.profesor')}>
+                                            Lista de Encuestas
+                                        </NavLink>
                                     </>
                                 )}
                                 {user.user_type === 'coordinador' && (

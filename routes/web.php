@@ -125,6 +125,9 @@ Route::get('/reportes/recursos-solicitudes', [ReporteController::class, 'recurso
 Route::get('/dashboard', [DashboardController::class, 'index'])->middleware(['auth', 'verified'])->name('dashboard');
 Route::get('/noticias/profesor', [NoticiasController::class, 'obtenerNoticias'])->name('noticias.profesor');
 
+Route::get('/encuestas/profesor', [EncuestaController::class, 'obtenerEncuestas'])->name('encuestas.profesor');
+Route::post('/encuestas/{id}/responder', [EncuestaController::class, 'responder']);
+
 });
 
 

@@ -29,4 +29,9 @@ class Encuesta extends Model
     {
         return $this->hasMany(PreguntaEncuesta::class);
     }
+    
+    public function preguntas_encuesta()
+    {
+        return $this->hasMany(PreguntaEncuesta::class);
+    }
 }

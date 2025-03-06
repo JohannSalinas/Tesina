@@ -4,8 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Models\Encuesta;
 use App\Models\PreguntaEncuesta;
+use App\Models\RespuestasEncuesta;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Inertia\Inertia;
+
 
 class EncuestaController extends Controller
 {
@@ -107,4 +110,39 @@ class EncuestaController extends Controller
 
         return redirect()->route('encuestas.index')->with('success', 'Encuesta actualizada correctamente.');
     }
+
+
+    public function obtenerEncuestas()
+    {
+    $encuestas = Encuesta::with('preguntas_encuesta')->get(); // Carga las encuestas con las preguntas relacionadas
+    return inertia('Profesor/ListaEncuesta', [
+        'encuestas' => $encuestas,
+    ]);
+    }
+
+    public function responder(Request $request, $id)
+{
+    $encuesta = Encuesta::find($id);
+
+    if (!$encuesta) {
+        return response()->json(['error' => 'Encuesta no encontrada'], 404);
+    }
+
+    // Validar las respuestas
+    $validated = $request->validate([
+        'respuestas' => 'required|array',
+        'respuestas.*' => 'in:Totalmente de acuerdo,De acuerdo,Neutral,En desacuerdo,Totalmente en desacuerdo',
+    ]);
+
+    // Guardar las respuestas
+    foreach ($validated['respuestas'] as $preguntaId => $respuesta) {
+        RespuestasEncuesta::create([
+            'encuesta_id' => $encuesta->id,
+            'pregunta_id' => $preguntaId,
+            'respuesta' => $respuesta,
+        ]);
+    }
+
+    return response()->json(['message' => 'Respuestas enviadas con éxito']);
+}
 }
