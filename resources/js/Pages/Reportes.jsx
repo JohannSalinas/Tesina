@@ -10,24 +10,49 @@ const Reportes = () => {
     const [fechaFin, setFechaFin] = useState("");
 
     const generarReporte = (tipo) => {
+        // Validar que se hayan seleccionado ambas fechas
         if (!fechaInicio || !fechaFin) {
             Swal.fire({
                 icon: 'error',
-                title: 'Selecciona un rango de fechas',
+                title: 'Error',
+                text: 'Selecciona un rango de fechas.',
                 showConfirmButton: false,
                 timer: 1500
             });
             return;
         }
 
-        let routeName = tipo === "top" ? "reportes.top" : tipo === "categoria" ? "reportes.categoria" : "reportes.solicitudes";
+        // Validar que la fecha de inicio sea menor que la fecha de fin
+        if (fechaInicio > fechaFin) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'La fecha de inicio debe ser menor que la fecha de fin.',
+                showConfirmButton: false,
+                timer: 1500
+            });
+            return;
+        }
 
+        // Determinar la ruta según el tipo de reporte
+        let routeName = tipo === "top" 
+            ? "reportes.top" 
+            : tipo === "categoria" 
+            ? "reportes.categoria" 
+            : "reportes.solicitudes";
+
+        // Abrir el reporte en una nueva pestaña
         const url = route(routeName, { fecha_inicio: fechaInicio, fecha_fin: fechaFin });
         window.open(url, "_blank");
 
+        // Mostrar mensaje de éxito
         Swal.fire({
             icon: 'success',
-            title: `Reporte ${tipo === "top" ? "Top 5 Mejor Calificados" : tipo === "categoria" ? "Recursos por Categoría" : "Solicitudes por Usuario"} generado con éxito.`,
+            title: `Reporte ${tipo === "top" 
+                ? "Top 5 Mejor Calificados" 
+                : tipo === "categoria" 
+                ? "Recursos por Categoría" 
+                : "Solicitudes por Usuario"} generado con éxito.`,
             showConfirmButton: false,
             timer: 1500
         });

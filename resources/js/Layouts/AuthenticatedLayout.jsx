@@ -1,11 +1,11 @@
-import { useEffect, useState, useRef } from 'react'; // Agregado useRef
+import { useEffect, useState, useRef } from 'react';
 import { router } from '@inertiajs/react';
 import ApplicationLogo from '@/Components/ApplicationLogo';
 import Dropdown from '@/Components/Dropdown';
 import NavLink from '@/Components/NavLink';
 import ResponsiveNavLink from '@/Components/ResponsiveNavLink';
 import { Link, usePage } from '@inertiajs/react';
-import {route} from "ziggy-js";
+import { route } from 'ziggy-js';
 
 export default function AuthenticatedLayout({ header, children }) {
     const user = usePage().props.auth.user;
@@ -24,7 +24,7 @@ export default function AuthenticatedLayout({ header, children }) {
             setTimeLeft(5 * 60); // Reiniciar el contador
             setShowTimer(true); // Ocultar el contador
 
-            inactivityTimerRef.current = setTimeout(startCountdown, .1 * 100 * 1000); // Mostrar contador tras 4 min
+            inactivityTimerRef.current = setTimeout(startCountdown, 4 * 60 * 1000); // Mostrar contador tras 4 min
         };
 
         const startCountdown = () => {
@@ -65,10 +65,10 @@ export default function AuthenticatedLayout({ header, children }) {
             clearTimeout(inactivityTimerRef.current);
             clearInterval(countdownTimerRef.current);
         };
-    }, []); // Corrección aquí
+    }, []);
 
     return (
-        <div className="min-h-screen bg-gray-100 dark:bg-gray-900">
+        <div className="min-h-screen bg-gradient-to-r from-blue-500 via-teal-500 to-green-500 py-10 px-5">
             {/* Contador visual */}
             {showTimer && (
                 <div className="fixed bottom-4 right-4 bg-red-500 text-white px-4 py-2 rounded-lg shadow-lg">
@@ -76,20 +76,19 @@ export default function AuthenticatedLayout({ header, children }) {
                 </div>
             )}
 
-            <nav className="border-b border-gray-100 bg-white dark:border-gray-700 dark:bg-gray-800">
+            {/* Barra de navegación */}
+            <nav className="bg-white dark:bg-gray-800 shadow-lg rounded-lg">
                 <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                     <div className="flex h-16 justify-between">
-                        <div className="flex">
-                            <div className="flex shrink-0 items-center">
-                                <Link href="/">
-                                    <ApplicationLogo className="block h-9 w-auto fill-current text-gray-800 dark:text-gray-200" />
-                                </Link>
-                            </div>
-
-                            <div className="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
+                        <div className="flex items-center">
+                            <div className="hidden space-x-4 sm:-my-px sm:ml-10 sm:flex">
+                                {/* NavLinks personalizados */}
                                 <NavLink
                                     href={route('dashboard')}
                                     active={route().current('dashboard')}
+                                    className="px-4 py-2 text-sm font-semibold transition duration-300 ease-in-out transform hover:scale-105 rounded-lg"
+                                    activeClassName="bg-green-600 text-white shadow-lg"
+                                    inactiveClassName="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-green-50 dark:hover:bg-green-100"
                                 >
                                     Dashboard
                                 </NavLink>
@@ -98,54 +97,81 @@ export default function AuthenticatedLayout({ header, children }) {
                                         <NavLink
                                             href={route('usuarios.index')}
                                             active={route().current('usuarios.index')}
+                                            className="px-4 py-2 text-sm font-semibold transition duration-300 ease-in-out transform hover:scale-105 rounded-lg"
+                                            activeClassName="bg-green-600 text-white shadow-lg"
+                                            inactiveClassName="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-green-50 dark:hover:bg-green-100"
                                         >
                                             Admin Usuarios
                                         </NavLink>
                                         <NavLink
                                             href={route('recursos.index')}
                                             active={route().current('recursos.index')}
+                                            className="px-4 py-2 text-sm font-semibold transition duration-300 ease-in-out transform hover:scale-105 rounded-lg"
+                                            activeClassName="bg-green-600 text-white shadow-lg"
+                                            inactiveClassName="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-green-50 dark:hover:bg-green-100"
                                         >
                                             Gestion Recursos Educativos
                                         </NavLink>
                                         <NavLink
                                             href={route('noticias.index')}
                                             active={route().current('noticias.index')}
+                                            className="px-4 py-2 text-sm font-semibold transition duration-300 ease-in-out transform hover:scale-105 rounded-lg"
+                                            activeClassName="bg-green-600 text-white shadow-lg"
+                                            inactiveClassName="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-green-50 dark:hover:bg-green-100"
                                         >
                                             Gestion Noticias
                                         </NavLink>
                                         <NavLink
                                             href={route('encuestas.index')}
                                             active={route().current('encuestas.index')}
+                                            className="px-4 py-2 text-sm font-semibold transition duration-300 ease-in-out transform hover:scale-105 rounded-lg"
+                                            activeClassName="bg-green-600 text-white shadow-lg"
+                                            inactiveClassName="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-green-50 dark:hover:bg-green-100"
                                         >
                                             Gestion Encuestas
                                         </NavLink>
                                         <NavLink
                                             href={route('grupos-colaboradores.index')}
                                             active={route().current('grupos-colaboradores.index')}
+                                            className="px-4 py-2 text-sm font-semibold transition duration-300 ease-in-out transform hover:scale-105 rounded-lg"
+                                            activeClassName="bg-green-600 text-white shadow-lg"
+                                            inactiveClassName="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-green-50 dark:hover:bg-green-100"
                                         >
                                             Gestión Grupos de Colaboradores
                                         </NavLink>
                                         <NavLink
                                             href={route('grupo-usuarios.index')}
                                             active={route().current('grupo-usuarios.index')}
+                                            className="px-4 py-2 text-sm font-semibold transition duration-300 ease-in-out transform hover:scale-105 rounded-lg"
+                                            activeClassName="bg-green-600 text-white shadow-lg"
+                                            inactiveClassName="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-green-50 dark:hover:bg-green-100"
                                         >
                                             Grupo Usuarios
                                         </NavLink>
                                         <NavLink
                                             href={route('backup-restore.index')}
                                             active={route().current('backup-restore.index')}
+                                            className="px-4 py-2 text-sm font-semibold transition duration-300 ease-in-out transform hover:scale-105 rounded-lg"
+                                            activeClassName="bg-green-600 text-white shadow-lg"
+                                            inactiveClassName="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-green-50 dark:hover:bg-green-100"
                                         >
                                             Respaldo y Restauración BD
                                         </NavLink>
                                         <NavLink
                                             href={route('preguntas.index')}
                                             active={route().current('preguntas.index')}
+                                            className="px-4 py-2 text-sm font-semibold transition duration-300 ease-in-out transform hover:scale-105 rounded-lg"
+                                            activeClassName="bg-green-600 text-white shadow-lg"
+                                            inactiveClassName="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-green-50 dark:hover:bg-green-100"
                                         >
                                             Foro de Preguntas
                                         </NavLink>
                                         <NavLink
                                             href={route('reportes.index')}
                                             active={route().current('reportes.index')}
+                                            className="px-4 py-2 text-sm font-semibold transition duration-300 ease-in-out transform hover:scale-105 rounded-lg"
+                                            activeClassName="bg-green-600 text-white shadow-lg"
+                                            inactiveClassName="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-green-50 dark:hover:bg-green-100"
                                         >
                                             Generar Reportes
                                         </NavLink>
@@ -154,35 +180,90 @@ export default function AuthenticatedLayout({ header, children }) {
 
                                 {user.user_type === 'profesor' && (
                                     <>
-                                        <NavLink href={route('grupos-colaboradores.profesor')} active={route().current('grupos-colaboradores.profesor')}>
+                                        <NavLink
+                                            href={route('grupos-colaboradores.profesor')}
+                                            active={route().current('grupos-colaboradores.profesor')}
+                                            className="px-4 py-2 text-sm font-semibold transition duration-300 ease-in-out transform hover:scale-105 rounded-lg"
+                                            activeClassName="bg-green-600 text-white shadow-lg"
+                                            inactiveClassName="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-green-50 dark:hover:bg-green-100"
+                                        >
                                             Grupos de Colaboradores
                                         </NavLink>
-                                        <NavLink href={route('recursos.profesor')} active={route().current('recursos.profesor')}>
+                                        <NavLink
+                                            href={route('recursos.profesor')}
+                                            active={route().current('recursos.profesor')}
+                                            className="px-4 py-2 text-sm font-semibold transition duration-300 ease-in-out transform hover:scale-105 rounded-lg"
+                                            activeClassName="bg-green-600 text-white shadow-lg"
+                                            inactiveClassName="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-green-50 dark:hover:bg-green-100"
+                                        >
                                             Ver Recursos Educativos
                                         </NavLink>
-                                        <NavLink href={route('noticias.profesor')} active={route().current('noticias.profesor')}>
+                                        <NavLink
+                                            href={route('noticias.profesor')}
+                                            active={route().current('noticias.profesor')}
+                                            className="px-4 py-2 text-sm font-semibold transition duration-300 ease-in-out transform hover:scale-105 rounded-lg"
+                                            activeClassName="bg-green-600 text-white shadow-lg"
+                                            inactiveClassName="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-green-50 dark:hover:bg-green-100"
+                                        >
                                             Lista de Noticias
                                         </NavLink>
-                                        <NavLink href={route('preguntas.index')}active={route().current('preguntas.index')}>
+                                        <NavLink
+                                            href={route('preguntas.index')}
+                                            active={route().current('preguntas.index')}
+                                            className="px-4 py-2 text-sm font-semibold transition duration-300 ease-in-out transform hover:scale-105 rounded-lg"
+                                            activeClassName="bg-green-600 text-white shadow-lg"
+                                            inactiveClassName="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-green-50 dark:hover:bg-green-100"
+                                        >
                                             Foro de Preguntas
                                         </NavLink>
-                                        <NavLink href={route('encuestas.profesor')}active={route().current('encuestas.profesor')}>
+                                        <NavLink
+                                            href={route('encuestas.profesor')}
+                                            active={route().current('encuestas.profesor')}
+                                            className="px-4 py-2 text-sm font-semibold transition duration-300 ease-in-out transform hover:scale-105 rounded-lg"
+                                            activeClassName="bg-green-600 text-white shadow-lg"
+                                            inactiveClassName="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-green-50 dark:hover:bg-green-100"
+                                        >
                                             Lista de Encuestas
                                         </NavLink>
                                     </>
                                 )}
+
                                 {user.user_type === 'coordinador' && (
                                     <>
-                                        <NavLink href={route('grupos-colaboradores.profesor')} active={route().current('grupos-colaboradores.profesor')}>
+                                        <NavLink
+                                            href={route('grupos-colaboradores.profesor')}
+                                            active={route().current('grupos-colaboradores.profesor')}
+                                            className="px-4 py-2 text-sm font-semibold transition duration-300 ease-in-out transform hover:scale-105 rounded-lg"
+                                            activeClassName="bg-green-600 text-white shadow-lg"
+                                            inactiveClassName="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-green-50 dark:hover:bg-green-100"
+                                        >
                                             Grupos de Colaboradores
                                         </NavLink>
-                                        <NavLink href={route('recursos.profesor')} active={route().current('recursos.profesor')}>
+                                        <NavLink
+                                            href={route('recursos.profesor')}
+                                            active={route().current('recursos.profesor')}
+                                            className="px-4 py-2 text-sm font-semibold transition duration-300 ease-in-out transform hover:scale-105 rounded-lg"
+                                            activeClassName="bg-green-600 text-white shadow-lg"
+                                            inactiveClassName="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-green-50 dark:hover:bg-green-100"
+                                        >
                                             Ver Recursos Educativos
                                         </NavLink>
-                                        <NavLink href={route('noticias.profesor')} active={route().current('noticias.profesor')}>
+                                        <NavLink
+                                            href={route('noticias.profesor')}
+                                            active={route().current('noticias.profesor')}
+                                            className="px-4 py-2 text-sm font-semibold transition duration-300 ease-in-out transform hover:scale-105 rounded-lg"
+                                            activeClassName="bg-green-600 text-white shadow-lg"
+                                            inactiveClassName="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-green-50 dark:hover:bg-green-100"
+                                        >
                                             Lista de Noticias
                                         </NavLink>
-                                        <NavLink href={route('preguntas.index')}active={route().current('preguntas.index')}>
+                                        <NavLink
+                                            href={route('preguntas.index')}
+                                            active={route().current('preguntas.index')}
+                                            className="px-4 py-2 text-sm font-semibold transition duration-300 ease-in-out transform hover:scale-105 rounded-lg"
+                                            activeClassName="bg-green-600 text-white shadow-lg"
+                                            inactiveClassName="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-green-50 dark:hover:bg-green-100"
+                                        >
                                             Foro de Preguntas
                                         </NavLink>
                                     </>
@@ -190,19 +271,19 @@ export default function AuthenticatedLayout({ header, children }) {
                             </div>
                         </div>
 
-                        <div className="hidden sm:ms-6 sm:flex sm:items-center">
-                            <div className="relative ms-3">
+                        {/* Menú de usuario */}
+                        <div className="hidden sm:ml-6 sm:flex sm:items-center">
+                            <div className="relative ml-3">
                                 <Dropdown>
                                     <Dropdown.Trigger>
                                         <span className="inline-flex rounded-md">
                                             <button
                                                 type="button"
-                                                className="inline-flex items-center rounded-md border border-transparent bg-white px-3 py-2 text-sm font-medium leading-4 text-gray-500 transition duration-150 ease-in-out hover:text-gray-700 focus:outline-none dark:bg-gray-800 dark:text-gray-400 dark:hover:text-gray-300"
+                                                className="inline-flex items-center rounded-md border border-transparent bg-white px-3 py-2 text-sm font-medium leading-4 text-gray-700 transition duration-150 ease-in-out hover:text-blue-600 focus:outline-none dark:bg-gray-800 dark:text-gray-300 dark:hover:text-blue-400"
                                             >
                                                 {user.name}
-
                                                 <svg
-                                                    className="-me-0.5 ms-2 h-4 w-4"
+                                                    className="-mr-0.5 ml-2 h-4 w-4"
                                                     xmlns="http://www.w3.org/2000/svg"
                                                     viewBox="0 0 20 20"
                                                     fill="currentColor"
@@ -219,24 +300,25 @@ export default function AuthenticatedLayout({ header, children }) {
 
                                     <Dropdown.Content>
                                         <Dropdown.Link href={route('profile.edit')}>
-                                            Profile
+                                            Perfil
                                         </Dropdown.Link>
                                         <Dropdown.Link href={route('notifications.show')}>
-                                            Notifications
+                                            Notificaciones
                                         </Dropdown.Link>
                                         <Dropdown.Link
                                             href={route('logout')}
                                             method="post"
                                             as="button"
                                         >
-                                            Log Out
+                                            Cerrar Sesión
                                         </Dropdown.Link>
                                     </Dropdown.Content>
                                 </Dropdown>
                             </div>
                         </div>
 
-                        <div className="-me-2 flex items-center sm:hidden">
+                        {/* Menú móvil */}
+                        <div className="-mr-2 flex items-center sm:hidden">
                             <button
                                 onClick={() =>
                                     setShowingNavigationDropdown((previousState) => !previousState)
@@ -269,6 +351,7 @@ export default function AuthenticatedLayout({ header, children }) {
                     </div>
                 </div>
 
+                {/* Menú móvil desplegable */}
                 <div className={(showingNavigationDropdown ? 'block' : 'hidden') + ' sm:hidden'}>
                     <div className="space-y-1 pb-3 pt-2">
                         <ResponsiveNavLink
@@ -291,32 +374,36 @@ export default function AuthenticatedLayout({ header, children }) {
 
                         <div className="mt-3 space-y-1">
                             <ResponsiveNavLink href={route('profile.edit')}>
-                                Profile
+                                Perfil
                             </ResponsiveNavLink>
                             <ResponsiveNavLink href={route('notifications.show')}>
-                                Notifications
+                                Notificaciones
                             </ResponsiveNavLink>
                             <ResponsiveNavLink
                                 method="post"
                                 href={route('logout')}
                                 as="button"
                             >
-                                Log Out
+                                Cerrar Sesión
                             </ResponsiveNavLink>
                         </div>
                     </div>
                 </div>
             </nav>
 
+            {/* Encabezado */}
             {header && (
-                <header className="bg-white shadow dark:bg-gray-800">
+                <header className="bg-white shadow dark:bg-gray-800 rounded-lg mt-6">
                     <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
                         {header}
                     </div>
                 </header>
             )}
 
-            <main>{children}</main>
+            {/* Contenido principal */}
+            <main className="mt-6 p-6 bg-white dark:bg-gray-800 rounded-lg shadow-lg">
+                {children}
+            </main>
         </div>
     );
 }

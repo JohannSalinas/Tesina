@@ -12,30 +12,42 @@ use Illuminate\Support\Facades\Response;
 
 class ReporteController extends Controller
 {
-
     public function index()
     {
         return Inertia::render('Reportes');
     }
 
+    // Validar que la fecha de inicio sea menor que la fecha de fin
+    private function validarFechas($fechaInicio, $fechaFin)
+    {
+        if ($fechaInicio > $fechaFin) {
+            
+        }
+        return null;
+    }
 
     // Generar reporte de los Top 5 mejor calificados
     public function topRecursos(Request $request)
     {
         $fechaInicio = $request->input('fecha_inicio');
-    $fechaFin = $request->input('fecha_fin');
+        $fechaFin = $request->input('fecha_fin');
 
-    $recursos = RecursoEducativo::whereBetween('created_at', [$fechaInicio, $fechaFin])
-        ->orderByDesc('calificacion')
-        ->limit(5)
-        ->get();
+        // Validar fechas
+        $validacion = $this->validarFechas($fechaInicio, $fechaFin);
+        if ($validacion) {
+            return $validacion;
+        }
 
-    $pdf = Pdf::loadView('pdf.reporte_top_recursos', compact('recursos', 'fechaInicio', 'fechaFin'));
+        $recursos = RecursoEducativo::whereBetween('created_at', [$fechaInicio, $fechaFin])
+            ->orderByDesc('calificacion')
+            ->limit(5)
+            ->get();
+
+        $pdf = Pdf::loadView('pdf.reporte_top_recursos', compact('recursos', 'fechaInicio', 'fechaFin'));
 
         return response()->streamDownload(function () use ($pdf) {
             echo $pdf->output();
         }, 'Top_5_Mejor_Calificados.pdf');
-
     }
 
     // Generar reporte de recursos por categorías (grupos)
@@ -43,6 +55,12 @@ class ReporteController extends Controller
     {
         $fechaInicio = $request->input('fecha_inicio');
         $fechaFin = $request->input('fecha_fin');
+
+        // Validar fechas
+        $validacion = $this->validarFechas($fechaInicio, $fechaFin);
+        if ($validacion) {
+            return $validacion;
+        }
 
         $recursos = RecursoEducativo::whereBetween('created_at', [$fechaInicio, $fechaFin])
             ->selectRaw('tipo, COUNT(*) as total')
@@ -58,6 +76,12 @@ class ReporteController extends Controller
     {
         $fechaInicio = $request->input('fecha_inicio');
         $fechaFin = $request->input('fecha_fin');
+
+        // Validar fechas
+        $validacion = $this->validarFechas($fechaInicio, $fechaFin);
+        if ($validacion) {
+            return $validacion;
+        }
 
         $solicitudes = NotificacionUnirseGrupo::whereBetween('created_at', [$fechaInicio, $fechaFin])
             ->get();
