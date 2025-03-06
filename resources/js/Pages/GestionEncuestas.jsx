@@ -8,7 +8,8 @@ export default function GestionEncuestas() {
     const [formData, setFormData] = useState({
         titulo: '',
         descripcion: '',
-        preguntas: '',
+        numPreguntas: 1, // Valor inicial para el número de preguntas
+        preguntas: [''], // Pregunta inicial vacía
     });
 
     const handleInputChange = (e) => {
@@ -19,18 +20,33 @@ export default function GestionEncuestas() {
         });
     };
 
+    const handlePreguntaChange = (index, e) => {
+        const updatedPreguntas = [...formData.preguntas];
+        updatedPreguntas[index] = e.target.value;
+        setFormData({
+            ...formData,
+            preguntas: updatedPreguntas,
+        });
+    };
+
     const handleSubmit = (e) => {
         e.preventDefault();
 
+        // Usar FormData para enviar los datos como un formulario
         const form = new FormData();
         form.append('titulo', formData.titulo);
         form.append('descripcion', formData.descripcion);
-        form.append('preguntas', formData.preguntas);
+        form.append('numPreguntas', formData.numPreguntas);
+
+        // Enviar cada pregunta individualmente como un campo
+        formData.preguntas.forEach((pregunta, index) => {
+            form.append(`preguntas[${index}]`, pregunta);
+        });
 
         router.post('/encuestas', form, {
             onSuccess: () => {
                 alert('Encuesta creada correctamente.');
-                setFormData({ titulo: '', descripcion: '', preguntas: '' });
+                setFormData({ titulo: '', descripcion: '', numPreguntas: 1, preguntas: [''] });
             },
             onError: (error) => {
                 alert('Ocurrió un error al crear la encuesta.');
@@ -86,18 +102,45 @@ export default function GestionEncuestas() {
                                     ></textarea>
                                 </div>
                                 <div>
-                                    <label htmlFor="preguntas" className="block text-sm font-medium">
-                                        Preguntas
+                                    <label htmlFor="numPreguntas" className="block text-sm font-medium">
+                                        Número de Preguntas
                                     </label>
-                                    <textarea
-                                        id="preguntas"
-                                        name="preguntas"
-                                        value={formData.preguntas}
-                                        onChange={handleInputChange}
+                                    <input
+                                        type="number"
+                                        id="numPreguntas"
+                                        name="numPreguntas"
+                                        value={formData.numPreguntas}
+                                        min="1"
+                                        onChange={(e) => {
+                                            setFormData({
+                                                ...formData,
+                                                numPreguntas: e.target.value,
+                                                preguntas: new Array(parseInt(e.target.value)).fill(''),
+                                            });
+                                        }}
                                         className="w-full p-2 mt-1 border rounded"
-                                    ></textarea>
+                                    />
                                 </div>
-                                <button className="w-full bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600" type="submit">
+                                {/* Renderizamos dinámicamente los campos de preguntas */}
+                                {Array.from({ length: formData.numPreguntas }, (_, index) => (
+                                    <div key={index}>
+                                        <label htmlFor={`pregunta_${index + 1}`} className="block text-sm font-medium">
+                                            Pregunta {index + 1}
+                                        </label>
+                                        <input
+                                            type="text"
+                                            id={`pregunta_${index + 1}`}
+                                            name={`preguntas[${index}]`}
+                                            value={formData.preguntas[index]}
+                                            onChange={(e) => handlePreguntaChange(index, e)}
+                                            className="w-full p-2 mt-1 border rounded"
+                                        />
+                                    </div>
+                                ))}
+                                <button
+                                    type="submit"
+                                    className="w-full bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600"
+                                >
                                     Crear Encuesta
                                 </button>
                             </form>
@@ -136,6 +179,36 @@ export default function GestionEncuestas() {
                                     ))}
                                 </tbody>
                             </table>
+
+                            {/* Tabla de preguntas relacionadas con la encuesta */}
+                            {encuestas.length > 0 && (
+                                <div className="mt-8">
+                                    <h3 className="text-lg font-semibold mb-4">Preguntas de la Encuesta</h3>
+                                    {encuestas.map((encuesta) => (
+                                        <div key={encuesta.id}>
+                                            <h4 className="text-lg font-semibold">{encuesta.titulo}</h4>
+                                            <table className="w-full mt-4 border">
+                                                <thead>
+                                                    <tr>
+                                                        <th className="border px-4 py-2">ID Pregunta</th>
+                                                        <th className="border px-4 py-2">ID Encuesta</th>
+                                                        <th className="border px-4 py-2">Pregunta</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    {encuesta.preguntas.map((pregunta) => (
+                                                        <tr key={pregunta.id}>
+                                                            <td className="border px-4 py-2">{pregunta.id}</td>
+                                                            <td className="border px-4 py-2">{pregunta.encuesta_id}</td>
+                                                            <td className="border px-4 py-2">{pregunta.pregunta}</td>
+                                                        </tr>
+                                                    ))}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
                         </div>
                     </div>
                 </div>

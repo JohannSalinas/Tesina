@@ -21,10 +21,10 @@ export default function AuthenticatedLayout({ header, children }) {
             console.log('Actividad detectada, reiniciando temporizador');
             clearTimeout(inactivityTimerRef.current);
             clearInterval(countdownTimerRef.current);
-            setTimeLeft(2.5 * 60); // Reiniciar el contador
+            setTimeLeft(5 * 60); // Reiniciar el contador
             setShowTimer(true); // Ocultar el contador
 
-            inactivityTimerRef.current = setTimeout(startCountdown, 2.5 * 60 * 1000); // Mostrar contador tras 4 min
+            inactivityTimerRef.current = setTimeout(startCountdown, .1 * 100 * 1000); // Mostrar contador tras 4 min
         };
 
         const startCountdown = () => {

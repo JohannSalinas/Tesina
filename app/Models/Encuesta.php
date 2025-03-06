@@ -23,4 +23,10 @@ class Encuesta extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    // Relación con las preguntas
+    public function preguntas()
+    {
+        return $this->hasMany(PreguntaEncuesta::class);
+    }
 }

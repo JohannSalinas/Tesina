@@ -5,8 +5,14 @@ export default function EditarEncuesta({ encuesta }) {
     const { data, setData, put, errors } = useForm({
         titulo: encuesta.titulo,
         descripcion: encuesta.descripcion || '',
-        preguntas: encuesta.preguntas || '',
+        preguntas: encuesta.preguntas.map((pregunta) => pregunta.pregunta), // Solo los textos de las preguntas
     });
+
+    const handlePreguntaChange = (index, e) => {
+        const updatedPreguntas = [...data.preguntas];
+        updatedPreguntas[index] = e.target.value;
+        setData('preguntas', updatedPreguntas);
+    };
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -53,20 +59,46 @@ export default function EditarEncuesta({ encuesta }) {
                                     ></textarea>
                                     {errors.descripcion && <span className="text-red-500 text-sm">{errors.descripcion}</span>}
                                 </div>
+                                
+                                {/* Aquí ya no se permite cambiar el número de preguntas */}
                                 <div>
-                                    <label htmlFor="preguntas" className="block text-sm font-medium">
-                                        Preguntas
+                                    <label htmlFor="numPreguntas" className="block text-sm font-medium">
+                                        Número de Preguntas (no editable)
                                     </label>
-                                    <textarea
-                                        id="preguntas"
-                                        name="preguntas"
-                                        value={data.preguntas}
-                                        onChange={(e) => setData('preguntas', e.target.value)}
-                                        className="w-full p-2 mt-1 border rounded"
-                                    ></textarea>
-                                    {errors.preguntas && <span className="text-red-500 text-sm">{errors.preguntas}</span>}
+                                    <input
+                                        type="number"
+                                        id="numPreguntas"
+                                        name="numPreguntas"
+                                        value={encuesta.preguntas.length} // Mostrar el número actual de preguntas
+                                        disabled
+                                        className="w-full p-2 mt-1 border rounded bg-gray-100"
+                                    />
                                 </div>
-                                <button className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600" type="submit">
+
+                                {/* Renderizamos las preguntas y permitimos su edición */}
+                                {data.preguntas.map((pregunta, index) => (
+                                    <div key={index}>
+                                        <label htmlFor={`pregunta_${index + 1}`} className="block text-sm font-medium">
+                                            Pregunta {index + 1}
+                                        </label>
+                                        <input
+                                            type="text"
+                                            id={`pregunta_${index + 1}`}
+                                            name={`preguntas[${index}]`}
+                                            value={pregunta}
+                                            onChange={(e) => handlePreguntaChange(index, e)}
+                                            className="w-full p-2 mt-1 border rounded"
+                                        />
+                                        {errors.preguntas && errors.preguntas[index] && (
+                                            <span className="text-red-500 text-sm">{errors.preguntas[index]}</span>
+                                        )}
+                                    </div>
+                                ))}
+
+                                <button
+                                    type="submit"
+                                    className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600"
+                                >
                                     Actualizar Encuesta
                                 </button>
                             </form>
