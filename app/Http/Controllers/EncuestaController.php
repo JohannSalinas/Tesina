@@ -29,7 +29,7 @@ class EncuestaController extends Controller
 {
     $request->validate([
         'titulo' => 'required|string|max:255',
-        'descripcion' => 'nullable|string',
+        'descripcion' => 'required|string',
         'numPreguntas' => 'required|integer|min:1',
         'preguntas' => 'required|array', // Validamos que preguntas sea un array
         'preguntas.*' => 'required|string|max:255', // Validamos cada pregunta individualmente
@@ -39,7 +39,7 @@ class EncuestaController extends Controller
     $encuesta = Encuesta::create([
         'titulo' => $request->titulo,
         'descripcion' => $request->descripcion,
-        'num_preguntas' => $request->numPreguntas,
+        'preguntas' => $request->numPreguntas,
         'user_id' => Auth::id(),
     ]);
 
@@ -149,9 +149,9 @@ class EncuestaController extends Controller
                 ]);
             }
 
-            return response()->json(['success' => 'Encuesta enviada correctamente.'], 200);
+            
         } else {
-            return response()->json(['error' => 'Ya has respondido a esta encuesta.'], 400);
+            
         }
     }
 }

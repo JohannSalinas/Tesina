@@ -33,6 +33,17 @@ export default function GestionEncuestas() {
     const handleSubmit = (e) => {
         e.preventDefault();
 
+        // Validar que el número de preguntas esté entre 1 y 10
+        if (formData.numPreguntas < 1 || formData.numPreguntas > 10) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'El número de preguntas debe estar entre 1 y 10.',
+                confirmButtonColor: '#F44336'
+            });
+            return;
+        }
+
         // Usar FormData para enviar los datos como un formulario
         const form = new FormData();
         form.append('titulo', formData.titulo);
@@ -100,9 +111,7 @@ export default function GestionEncuestas() {
     };
 
     return (
-        <AuthenticatedLayout
-            
-        >
+        <AuthenticatedLayout>
             <Head title="Administrar Encuestas" />
 
             <div className="min-h-screen bg-gradient-to-r from-blue-500 via-teal-500 to-green-500 py-12">
@@ -148,11 +157,13 @@ export default function GestionEncuestas() {
                                     name="numPreguntas"
                                     value={formData.numPreguntas}
                                     min="1"
+                                    max="10"
                                     onChange={(e) => {
+                                        const numPreguntas = Math.min(Math.max(parseInt(e.target.value), 1), 10); // Limitar a 10
                                         setFormData({
                                             ...formData,
-                                            numPreguntas: e.target.value,
-                                            preguntas: new Array(parseInt(e.target.value)).fill(''),
+                                            numPreguntas: numPreguntas,
+                                            preguntas: new Array(numPreguntas).fill(''),
                                         });
                                     }}
                                     className="mt-2 block w-full p-4 border border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-teal-500 focus:border-teal-500 dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600"
