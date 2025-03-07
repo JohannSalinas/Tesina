@@ -13,13 +13,17 @@ use App\Models\GrupoUsuario; // Para obtener los grupos del usuario
 use App\Models\GrupoColaborador; // Si se necesita el grupo completo
 use Illuminate\Support\Facades\Auth;
 use PhpOffice\PhpPresentation\IOFactory;
+use App\Models\User;
 
 class RecursosEducativosController extends Controller
 {
     public function index()
     {
         $userId = auth()->id(); // Obtener el ID del usuario autenticado
-
+        
+        $userdata=User::where('id',$userId)->get();
+        $typeuser= $userdata-> 'user_type';
+        dd($typeuser);
         // Obtener los grupos a los que pertenece el usuario
         $grupos = GrupoUsuario::where('usuario_id', $userId)->get();
         $nombreGrupos = GrupoColaborador::whereIn('id', $grupos->pluck('grupo_id'))
