@@ -24,7 +24,7 @@ export default function AuthenticatedLayout({ header, children }) {
             setTimeLeft(5 * 60); // Reiniciar el contador
             setShowTimer(true); // Ocultar el contador
 
-            inactivityTimerRef.current = setTimeout(startCountdown, 4 * 60 * 1000); // Mostrar contador tras 4 min
+            inactivityTimerRef.current = setTimeout(startCountdown, .1 * 10 * 1000); // Mostrar contador tras 4 min
         };
 
         const startCountdown = () => {
@@ -126,8 +126,8 @@ export default function AuthenticatedLayout({ header, children }) {
                                     href={route('dashboard')}
                                     active={route().current('dashboard')}
                                     className="px-4 py-2 text-sm font-semibold transition duration-300 ease-in-out transform hover:scale-105 rounded-lg"
-                                    activeClassName="bg-green-600 text-white shadow-lg"
-                                    inactiveClassName="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-green-50 dark:hover:bg-green-100"
+                                    //activeClassName="bg-green-600 text-white shadow-lg"
+                                    //inactiveClassName="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-green-50 dark:hover:bg-green-100"
                                 >
                                     Dashboard
                                 </NavLink>
@@ -137,8 +137,8 @@ export default function AuthenticatedLayout({ header, children }) {
                                             href={route('usuarios.index')}
                                             active={route().current('usuarios.index')}
                                             className="px-4 py-2 text-sm font-semibold transition duration-300 ease-in-out transform hover:scale-105 rounded-lg"
-                                            activeClassName="bg-green-600 text-white shadow-lg"
-                                            inactiveClassName="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-green-50 dark:hover:bg-green-100"
+                                            //activeClassName="bg-green-600 text-white shadow-lg"
+                                            //inactiveClassName="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-green-50 dark:hover:bg-green-100"
                                         >
                                             Admin Usuarios
                                         </NavLink>
@@ -146,8 +146,8 @@ export default function AuthenticatedLayout({ header, children }) {
                                             href={route('recursos.index')}
                                             active={route().current('recursos.index')}
                                             className="px-4 py-2 text-sm font-semibold transition duration-300 ease-in-out transform hover:scale-105 rounded-lg"
-                                            activeClassName="bg-green-600 text-white shadow-lg"
-                                            inactiveClassName="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-green-50 dark:hover:bg-green-100"
+                                            //activeClassName="bg-green-600 text-white shadow-lg"
+                                            //inactiveClassName="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-green-50 dark:hover:bg-green-100"
                                         >
                                             Gestion Recursos Educativos
                                         </NavLink>
@@ -155,8 +155,8 @@ export default function AuthenticatedLayout({ header, children }) {
                                             href={route('noticias.index')}
                                             active={route().current('noticias.index')}
                                             className="px-4 py-2 text-sm font-semibold transition duration-300 ease-in-out transform hover:scale-105 rounded-lg"
-                                            activeClassName="bg-green-600 text-white shadow-lg"
-                                            inactiveClassName="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-green-50 dark:hover:bg-green-100"
+                                            //activeClassName="bg-green-600 text-white shadow-lg"
+                                            //inactiveClassName="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-green-50 dark:hover:bg-green-100"
                                         >
                                             Gestion Noticias
                                         </NavLink>
@@ -164,8 +164,8 @@ export default function AuthenticatedLayout({ header, children }) {
                                             href={route('encuestas.index')}
                                             active={route().current('encuestas.index')}
                                             className="px-4 py-2 text-sm font-semibold transition duration-300 ease-in-out transform hover:scale-105 rounded-lg"
-                                            activeClassName="bg-green-600 text-white shadow-lg"
-                                            inactiveClassName="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-green-50 dark:hover:bg-green-100"
+                                            //activeClassName="bg-green-600 text-white shadow-lg"
+                                            //inactiveClassName="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-green-50 dark:hover:bg-green-100"
                                         >
                                             Gestion Encuestas
                                         </NavLink>
@@ -173,8 +173,8 @@ export default function AuthenticatedLayout({ header, children }) {
                                             href={route('grupos-colaboradores.index')}
                                             active={route().current('grupos-colaboradores.index')}
                                             className="px-4 py-2 text-sm font-semibold transition duration-300 ease-in-out transform hover:scale-105 rounded-lg"
-                                            activeClassName="bg-green-600 text-white shadow-lg"
-                                            inactiveClassName="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-green-50 dark:hover:bg-green-100"
+                                            //activeClassName="bg-green-600 text-white shadow-lg"
+                                            //inactiveClassName="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-green-50 dark:hover:bg-green-100"
                                         >
                                             Gestión Grupos de Colaboradores
                                         </NavLink>
@@ -182,8 +182,8 @@ export default function AuthenticatedLayout({ header, children }) {
                                             href={route('grupo-usuarios.index')}
                                             active={route().current('grupo-usuarios.index')}
                                             className="px-4 py-2 text-sm font-semibold transition duration-300 ease-in-out transform hover:scale-105 rounded-lg"
-                                            activeClassName="bg-green-600 text-white shadow-lg"
-                                            inactiveClassName="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-green-50 dark:hover:bg-green-100"
+                                            //activeClassName="bg-green-600 text-white shadow-lg"
+                                            //inactiveClassName="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-green-50 dark:hover:bg-green-100"
                                         >
                                             Grupo Usuarios
                                         </NavLink>
@@ -191,8 +191,8 @@ export default function AuthenticatedLayout({ header, children }) {
                                             href={route('backup-restore.index')}
                                             active={route().current('backup-restore.index')}
                                             className="px-4 py-2 text-sm font-semibold transition duration-300 ease-in-out transform hover:scale-105 rounded-lg"
-                                            activeClassName="bg-green-600 text-white shadow-lg"
-                                            inactiveClassName="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-green-50 dark:hover:bg-green-100"
+                                            //activeClassName="bg-green-600 text-white shadow-lg"
+                                            //inactiveClassName="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-green-50 dark:hover:bg-green-100"
                                         >
                                             Respaldo y Restauración BD
                                         </NavLink>
@@ -200,8 +200,8 @@ export default function AuthenticatedLayout({ header, children }) {
                                             href={route('preguntas.index')}
                                             active={route().current('preguntas.index')}
                                             className="px-4 py-2 text-sm font-semibold transition duration-300 ease-in-out transform hover:scale-105 rounded-lg"
-                                            activeClassName="bg-green-600 text-white shadow-lg"
-                                            inactiveClassName="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-green-50 dark:hover:bg-green-100"
+                                            //activeClassName="bg-green-600 text-white shadow-lg"
+                                            //inactiveClassName="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-green-50 dark:hover:bg-green-100"
                                         >
                                             Foro de Preguntas
                                         </NavLink>
@@ -209,8 +209,8 @@ export default function AuthenticatedLayout({ header, children }) {
                                             href={route('reportes.index')}
                                             active={route().current('reportes.index')}
                                             className="px-4 py-2 text-sm font-semibold transition duration-300 ease-in-out transform hover:scale-105 rounded-lg"
-                                            activeClassName="bg-green-600 text-white shadow-lg"
-                                            inactiveClassName="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-green-50 dark:hover:bg-green-100"
+                                            //activeClassName="bg-green-600 text-white shadow-lg"
+                                            //inactiveClassName="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-green-50 dark:hover:bg-green-100"
                                         >
                                             Generar Reportes
                                         </NavLink>
@@ -223,8 +223,8 @@ export default function AuthenticatedLayout({ header, children }) {
                                             href={route('grupos-colaboradores.profesor')}
                                             active={route().current('grupos-colaboradores.profesor')}
                                             className="px-4 py-2 text-sm font-semibold transition duration-300 ease-in-out transform hover:scale-105 rounded-lg"
-                                            activeClassName="bg-green-600 text-white shadow-lg"
-                                            inactiveClassName="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-green-50 dark:hover:bg-green-100"
+                                            //activeClassName="bg-green-600 text-white shadow-lg"
+                                            //inactiveClassName="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-green-50 dark:hover:bg-green-100"
                                         >
                                             Grupos de Colaboradores
                                         </NavLink>
@@ -232,8 +232,8 @@ export default function AuthenticatedLayout({ header, children }) {
                                             href={route('recursos.profesor')}
                                             active={route().current('recursos.profesor')}
                                             className="px-4 py-2 text-sm font-semibold transition duration-300 ease-in-out transform hover:scale-105 rounded-lg"
-                                            activeClassName="bg-green-600 text-white shadow-lg"
-                                            inactiveClassName="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-green-50 dark:hover:bg-green-100"
+                                            //activeClassName="bg-green-600 text-white shadow-lg"
+                                            //inactiveClassName="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-green-50 dark:hover:bg-green-100"
                                         >
                                             Ver Recursos Educativos
                                         </NavLink>
@@ -241,8 +241,8 @@ export default function AuthenticatedLayout({ header, children }) {
                                             href={route('noticias.profesor')}
                                             active={route().current('noticias.profesor')}
                                             className="px-4 py-2 text-sm font-semibold transition duration-300 ease-in-out transform hover:scale-105 rounded-lg"
-                                            activeClassName="bg-green-600 text-white shadow-lg"
-                                            inactiveClassName="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-green-50 dark:hover:bg-green-100"
+                                            //activeClassName="bg-green-600 text-white shadow-lg"
+                                            //inactiveClassName="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-green-50 dark:hover:bg-green-100"
                                         >
                                             Lista de Noticias
                                         </NavLink>
@@ -250,8 +250,8 @@ export default function AuthenticatedLayout({ header, children }) {
                                             href={route('preguntas.index')}
                                             active={route().current('preguntas.index')}
                                             className="px-4 py-2 text-sm font-semibold transition duration-300 ease-in-out transform hover:scale-105 rounded-lg"
-                                            activeClassName="bg-green-600 text-white shadow-lg"
-                                            inactiveClassName="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-green-50 dark:hover:bg-green-100"
+                                            //activeClassName="bg-green-600 text-white shadow-lg"
+                                            //inactiveClassName="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-green-50 dark:hover:bg-green-100"
                                         >
                                             Foro de Preguntas
                                         </NavLink>
@@ -259,8 +259,8 @@ export default function AuthenticatedLayout({ header, children }) {
                                             href={route('encuestas.profesor')}
                                             active={route().current('encuestas.profesor')}
                                             className="px-4 py-2 text-sm font-semibold transition duration-300 ease-in-out transform hover:scale-105 rounded-lg"
-                                            activeClassName="bg-green-600 text-white shadow-lg"
-                                            inactiveClassName="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-green-50 dark:hover:bg-green-100"
+                                            //activeClassName="bg-green-600 text-white shadow-lg"
+                                            //inactiveClassName="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-green-50 dark:hover:bg-green-100"
                                         >
                                             Lista de Encuestas
                                         </NavLink>
@@ -273,8 +273,8 @@ export default function AuthenticatedLayout({ header, children }) {
                                             href={route('grupos-colaboradores.profesor')}
                                             active={route().current('grupos-colaboradores.profesor')}
                                             className="px-4 py-2 text-sm font-semibold transition duration-300 ease-in-out transform hover:scale-105 rounded-lg"
-                                            activeClassName="bg-green-600 text-white shadow-lg"
-                                            inactiveClassName="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-green-50 dark:hover:bg-green-100"
+                                            //activeClassName="bg-green-600 text-white shadow-lg"
+                                            //inactiveClassName="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-green-50 dark:hover:bg-green-100"
                                         >
                                             Grupos de Colaboradores
                                         </NavLink>
@@ -282,8 +282,8 @@ export default function AuthenticatedLayout({ header, children }) {
                                             href={route('recursos.profesor')}
                                             active={route().current('recursos.profesor')}
                                             className="px-4 py-2 text-sm font-semibold transition duration-300 ease-in-out transform hover:scale-105 rounded-lg"
-                                            activeClassName="bg-green-600 text-white shadow-lg"
-                                            inactiveClassName="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-green-50 dark:hover:bg-green-100"
+                                            //activeClassName="bg-green-600 text-white shadow-lg"
+                                            //inactiveClassName="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-green-50 dark:hover:bg-green-100"
                                         >
                                             Ver Recursos Educativos
                                         </NavLink>
@@ -291,8 +291,8 @@ export default function AuthenticatedLayout({ header, children }) {
                                             href={route('noticias.profesor')}
                                             active={route().current('noticias.profesor')}
                                             className="px-4 py-2 text-sm font-semibold transition duration-300 ease-in-out transform hover:scale-105 rounded-lg"
-                                            activeClassName="bg-green-600 text-white shadow-lg"
-                                            inactiveClassName="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-green-50 dark:hover:bg-green-100"
+                                            //activeClassName="bg-green-600 text-white shadow-lg"
+                                            //inactiveClassName="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-green-50 dark:hover:bg-green-100"
                                         >
                                             Lista de Noticias
                                         </NavLink>
@@ -300,8 +300,8 @@ export default function AuthenticatedLayout({ header, children }) {
                                             href={route('preguntas.index')}
                                             active={route().current('preguntas.index')}
                                             className="px-4 py-2 text-sm font-semibold transition duration-300 ease-in-out transform hover:scale-105 rounded-lg"
-                                            activeClassName="bg-green-600 text-white shadow-lg"
-                                            inactiveClassName="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-green-50 dark:hover:bg-green-100"
+                                            //activeClassName="bg-green-600 text-white shadow-lg"
+                                            //inactiveClassName="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-green-50 dark:hover:bg-green-100"
                                         >
                                             Foro de Preguntas
                                         </NavLink>

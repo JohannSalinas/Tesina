@@ -97,7 +97,7 @@ export default function GestionGruposColaboradores() {
 
     return (
         <AuthenticatedLayout
-            header={<h2 className="text-2xl font-semibold leading-tight text-gray-800 dark:text-gray-200">Administrar Grupos de Colaboradores</h2>}
+            
         >
             <Head title="Administrar Grupos de Colaboradores" />
 

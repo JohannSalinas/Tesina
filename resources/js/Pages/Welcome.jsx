@@ -1,23 +1,25 @@
 import { Head, Link } from '@inertiajs/react';
 import { FaSignInAlt, FaUserPlus } from 'react-icons/fa';
 
-
 export default function Welcome({ auth }) {
     return (
         <>
             <Head title="Bienvenido" />
             <div className="relative bg-gradient-to-r from-teal-400 to-blue-500 text-white min-h-screen flex flex-col items-center justify-center">
-                {/* Imagen de fondo con un efecto de parallax */}
-                <div className="absolute inset-0 overflow-hidden">
-                    <img
-                        className="object-cover w-full h-full opacity-50"
-                        src="https://images.unsplash.com/photo-1533750342991-d26d54d839b7"
-                        alt="Background"
-                    />
+
+                {/* Texto destacado más arriba con diseño mejorado */}
+                <div className="absolute top-10 text-center px-4">
+                    <div className="bg-white/20 backdrop-blur-lg p-8 md:p-10 rounded-2xl border border-white/40 shadow-2xl inline-block">
+                        <h1 className="text-5xl md:text-6xl font-extrabold uppercase font-sans tracking-wide drop-shadow-lg">
+                            <span className="bg-clip-text text-transparent bg-gradient-to-r from-blue-600 via-blue-800 to-blue-900 animate-text-glow">
+                                PLATAFORMA PARA RECURSOS EDUCATIVOS ABIERTOS PARA DOCENTES
+                            </span>
+                        </h1>
+                    </div>
                 </div>
-                
+
                 {/* Contenedor principal */}
-                <div className="relative bg-white bg-opacity-60 text-gray-800 shadow-lg rounded-2xl p-8 max-w-lg w-full text-center space-y-6">
+                <div className="relative bg-white bg-opacity-60 text-gray-800 shadow-lg rounded-2xl p-8 max-w-lg w-full text-center space-y-6 mt-24">
                     <h1 className="text-4xl font-extrabold mb-4 text-gray-800">
                         ¡Bienvenido a la Plataforma Educativa!
                     </h1>

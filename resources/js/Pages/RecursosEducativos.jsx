@@ -97,11 +97,7 @@ export default function RecursosEducativos() {
 
     return (
         <AuthenticatedLayout
-            header={
-                <h2 className="text-xl font-semibold leading-tight text-gray-800 dark:text-gray-200">
-                    Administrar Recursos Educativos
-                </h2>
-            }
+            
         >
             <Head title="Administrar Recursos Educativos" />
 

@@ -50,11 +50,7 @@ export default function Dashboard({ recursosNuevos, recursosMejorCalificados, gr
 
     return (
         <AuthenticatedLayout
-            header={
-                <h2 className="text-2xl font-bold leading-tight text-gray-900 dark:text-gray-200">
-                    Dashboard
-                </h2>
-            }
+            
         >
             <Head title="Dashboard" />
 
