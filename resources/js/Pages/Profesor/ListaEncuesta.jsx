@@ -91,7 +91,7 @@ export default function ListaEncuesta() {
         } catch (error) {
             Swal.fire({
                 title: "Error",
-                text: "Hubo un error al enviar la encuesta.",
+                text: "Ya has respondido a esta encuesta.",
                 icon: "error",
                 confirmButtonColor: "#4F46E5",
             });

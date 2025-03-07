@@ -5,7 +5,7 @@ import Swal from 'sweetalert2';
 
 export default function RecursosEducativos() {
     const { recursos = [], grupos = [] } = usePage().props; // Obtenemos los recursos educativos desde las props pasadas por Inertia
-
+    console.log(recursos);
     // Estado para el formulario de creación de recurso
     const [formData, setFormData] = useState({
         titulo: '',
@@ -32,14 +32,14 @@ export default function RecursosEducativos() {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-    
+
         const form = new FormData();
         form.append('titulo', formData.titulo);
         form.append('descripcion', formData.descripcion);
         form.append('tipo', formData.tipo);
         form.append('archivo', formData.archivo);
         form.append('grupo_id', formData.grupo_id);
-    
+
         router.post('/recursos/crear', form, {
             onSuccess: () => {
                 Swal.fire({
@@ -60,7 +60,7 @@ export default function RecursosEducativos() {
             },
         });
     };
-    
+
     const handleDelete = (recursoId) => {
         Swal.fire({
             title: '¿Estás seguro?',
@@ -97,7 +97,7 @@ export default function RecursosEducativos() {
 
     return (
         <AuthenticatedLayout
-            
+
         >
             <Head title="Administrar Recursos Educativos" />
 
@@ -201,7 +201,7 @@ export default function RecursosEducativos() {
                             Crear Recurso
                         </button>
                     </form>
-                
+
 
                     {/* Tabla de recursos existentes */}
                     {/* Tabla de recursos existentes */}
@@ -217,7 +217,7 @@ export default function RecursosEducativos() {
                         <th className="px-6 py-3 text-left text-sm font-semibold uppercase">Acciones</th>
                     </tr>
                         </thead>
-        
+
                     {/* Cuerpo de la tabla */}
                     <tbody className="bg-white divide-y divide-gray-200">
                         {recursos.map((recurso, index) => (

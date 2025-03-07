@@ -7,6 +7,7 @@ use App\Models\PreguntaEncuesta;
 use App\Models\RespuestasEncuesta;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 
 
@@ -70,7 +71,7 @@ class EncuestaController extends Controller
     {
         // Recupera la encuesta junto con las preguntas relacionadas
         $encuesta = Encuesta::with('preguntas')->findOrFail($id);
-        
+
         // Pasa la encuesta con las preguntas al frontend
         return inertia('EditarEncuesta', ['encuesta' => $encuesta]);
     }
@@ -87,19 +88,19 @@ class EncuestaController extends Controller
             'preguntas' => 'required|array|min:1', // Asegura que las preguntas sean un array y que haya al menos una
             'preguntas.*' => 'required|string|max:255', // Cada pregunta debe ser una cadena de texto no vacía
         ]);
-    
+
         // Encontrar la encuesta
         $encuesta = Encuesta::findOrFail($id);
-    
+
         // Actualizar la encuesta
         $encuesta->update([
             'titulo' => $request->titulo,
             'descripcion' => $request->descripcion,
         ]);
-    
+
         // Eliminar las preguntas existentes
         PreguntaEncuesta::where('encuesta_id', $encuesta->id)->delete();
-    
+
         // Guardar las nuevas preguntas
         foreach ($request->preguntas as $pregunta) {
             PreguntaEncuesta::create([
@@ -107,7 +108,7 @@ class EncuestaController extends Controller
                 'pregunta' => $pregunta,
             ]);
         }
-    
+
         return redirect()->route('encuestas.index')->with('success', 'Encuesta actualizada correctamente.');
     }
 
@@ -121,28 +122,36 @@ class EncuestaController extends Controller
 
     public function responder(Request $request, $id)
     {
-    $encuesta = Encuesta::find($id);
+        $user_id = Auth::id(); // No es necesario convertirlo a string
 
-    if (!$encuesta) {
-        
-    }
+        // Verificar si el usuario ya ha respondido la encuesta
+        $validateReadyResponse = RespuestasEncuesta::where('user_id', $user_id)
+            ->where('pregunta_id', $id)
+            ->exists(); // Ejecutar la consulta con exists()
 
-    // Validar las respuestas y el user_id
-    $validated = $request->validate([
-        'respuestas' => 'required|array',
-        'respuestas.*' => 'in:Totalmente de acuerdo,De acuerdo,Neutral,En desacuerdo,Totalmente en desacuerdo',
-        'user_id' => 'required|exists:users,id', // Asegúrate de que el user_id exista en la tabla users
-    ]);
+        Log::info('Usuario ya respondió la encuesta: ' . ($validateReadyResponse ? 'Sí' : 'No')); // Registrar el resultado
 
-    // Guardar las respuestas junto con el user_id
-    foreach ($validated['respuestas'] as $preguntaId => $respuesta) {
-        RespuestasEncuesta::create([
-            'pregunta_id' => $preguntaId,
-            'respuesta' => $respuesta,
-            'user_id' => $validated['user_id'], // Agregar el user_id
-        ]);
-    }
+        if (!$validateReadyResponse) {
+            // Validar las respuestas y el user_id
+            $validated = $request->validate([
+                'respuestas' => 'required|array',
+                'respuestas.*' => 'in:Totalmente de acuerdo,De acuerdo,Neutral,En desacuerdo,Totalmente en desacuerdo',
+                'user_id' => 'required|exists:users,id', // Asegúrate de que el user_id exista en la tabla users
+            ]);
 
-    
+            // Guardar las respuestas junto con el user_id
+            foreach ($validated['respuestas'] as $preguntaId => $respuesta) {
+                RespuestasEncuesta::create([
+                    'pregunta_id' => $preguntaId,
+                    'respuesta' => $respuesta,
+                    'user_id' => $validated['user_id'], // Agregar el user_id
+                    'encuesta_id' => $id, // Asegúrate de guardar el ID de la encuesta
+                ]);
+            }
+
+            return response()->json(['success' => 'Encuesta enviada correctamente.'], 200);
+        } else {
+            return response()->json(['error' => 'Ya has respondido a esta encuesta.'], 400);
+        }
     }
 }

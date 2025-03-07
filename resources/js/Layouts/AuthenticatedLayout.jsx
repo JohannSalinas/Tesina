@@ -264,6 +264,15 @@ export default function AuthenticatedLayout({ header, children }) {
                                         >
                                             Lista de Encuestas
                                         </NavLink>
+                                        <NavLink
+                                            href={route('recursos.index')}
+                                            active={route().current('recursos.index')}
+                                            className="px-4 py-2 text-sm font-semibold transition duration-300 ease-in-out transform hover:scale-105 rounded-lg"
+                                            //activeClassName="bg-green-600 text-white shadow-lg"
+                                            //inactiveClassName="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-green-50 dark:hover:bg-green-100"
+                                        >
+                                            Gestion Recursos Educativos
+                                        </NavLink>
                                     </>
                                 )}
 

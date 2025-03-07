@@ -20,21 +20,32 @@ class RecursosEducativosController extends Controller
     public function index()
     {
         $userId = auth()->id(); // Obtener el ID del usuario autenticado
-        
+
         $userdata=User::where('id',$userId)->get();
-        $typeuser= $userdata-> 'user_type';
-        dd($typeuser);
+        $typeuser= $userdata->pluck('user_type');
         // Obtener los grupos a los que pertenece el usuario
         $grupos = GrupoUsuario::where('usuario_id', $userId)->get();
         $nombreGrupos = GrupoColaborador::whereIn('id', $grupos->pluck('grupo_id'))
             ->get(['id', 'nombre']);
 
-        // Obtener todos los recursos educativos con la relación del usuario
-        $recursos = RecursoEducativo::with('user:id,nombre')->get();
-        return Inertia::render('RecursosEducativos', [
-            'recursos' => $recursos,
-            'grupos' => $nombreGrupos,
-        ]);
+        if ($typeuser->contains('admin')) {
+            // Obtener todos los recursos educativos con la relación del usuario
+            $recursos = RecursoEducativo::with('user:id,nombre')->get();
+            return Inertia::render('RecursosEducativos', [
+                'recursos' => $recursos,
+                'grupos' => $nombreGrupos,
+            ]);
+        }
+        else{
+            // Obtener los recursos educativos del usuario autenticado
+            $recursos = RecursoEducativo::with('user:id,nombre')->where('user_id', $userId)->get();
+            return Inertia::render('Profesor/MisRecursos', [
+                'recursos' => $recursos,
+                'grupos' => $nombreGrupos,
+            ]);
+        }
+
+
     }
 
     public function store(Request $request)
@@ -130,7 +141,7 @@ class RecursosEducativosController extends Controller
 
         $validator = Validator::make($request->all(), [
             'titulo' => 'required|max:255',
-            'descripcion' => 'nullable|max:1000',
+            'descripcion' => 'required|max:1000',
             'tipo' => 'required|in:PDF,DOCX,PPTX,Enlace Web',  // Validación correcta
             'archivo' => 'nullable|file|max:10240',
         ]);
@@ -150,7 +161,7 @@ class RecursosEducativosController extends Controller
         $recurso->archivo_path = null;
 
         $validatedData = $validator->validated(); // Obtiene los datos validados
-        if ($validatedData['tipo'] === 'PPTX') {
+        if ($validatedData['tipo'] === 'PPTX' && isset($validatedData['archivo'])) {
             $archivoPath = $this->convertPptxToPdf($archivoPath);
         }
 
