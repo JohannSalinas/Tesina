@@ -7,7 +7,6 @@ import axios from "axios"; // Asegúrate de importar axios
 export default function ListaEncuesta() {
     const { encuestas, auth } = usePage().props; // Obtén el usuario autenticado desde las props
     const [respuestas, setRespuestas] = useState({}); // Para almacenar las respuestas del usuario
-    const [encuestasRespondidas, setEncuestasRespondidas] = useState({}); // Estado para llevar control de las encuestas respondidas
 
     useEffect(() => {
         if (encuestas.length === 0) {
@@ -83,11 +82,8 @@ export default function ListaEncuesta() {
                 confirmButtonColor: "#4F46E5",
             });
 
-            // Cerrar encuesta (en el backend actualizar el estado de la encuesta)
-            setEncuestasRespondidas({
-                ...encuestasRespondidas,
-                [encuestaId]: true,
-            });
+            // Recargar la página para actualizar el estado de las encuestas
+            window.location.reload();
         } catch (error) {
             Swal.fire({
                 title: "Error",
@@ -118,6 +114,13 @@ export default function ListaEncuesta() {
                                     </h2>
                                     <p className="text-gray-700 text-base mt-2">{encuesta.descripcion}</p>
 
+                                    {/* Mostrar mensaje si ya fue contestada */}
+                                    {encuesta.ya_contestada && (
+                                        <div className="mt-4 bg-yellow-100 p-4 rounded-lg text-yellow-800">
+                                            <p>Ya has contestado esta encuesta.</p>
+                                        </div>
+                                    )}
+
                                     {/* Mostrar las preguntas de la encuesta desde la tabla preguntas_encuesta */}
                                     <div className="mt-4">
                                         {encuesta.preguntas_encuesta.map((pregunta, index) => (
@@ -136,7 +139,12 @@ export default function ListaEncuesta() {
                                                                 name={`pregunta_${pregunta.id}`}
                                                                 value={opcion}
                                                                 onChange={() => handleRespuestaChange(pregunta.id, opcion)}
-                                                                checked={respuestas[pregunta.id] === opcion}
+                                                                checked={
+                                                                    encuesta.ya_contestada
+                                                                        ? pregunta.respuesta_usuario?.respuesta === opcion
+                                                                        : respuestas[pregunta.id] === opcion
+                                                                }
+                                                                disabled={encuesta.ya_contestada} // Deshabilitar si ya fue contestada
                                                                 className="h-4 w-4 text-blue-500 border-gray-300 focus:ring-0"
                                                             />
                                                             <label
@@ -157,15 +165,15 @@ export default function ListaEncuesta() {
                                         <button
                                             onClick={() => enviarEncuesta(encuesta.id)} // Aquí pasamos la encuesta.id
                                             disabled={
-                                                !todasRespondidas(encuesta.preguntas_encuesta) || encuestasRespondidas[encuesta.id]
+                                                !todasRespondidas(encuesta.preguntas_encuesta) || encuesta.ya_contestada
                                             }
                                             className={`px-4 py-2 text-white font-bold rounded-lg ${
-                                                todasRespondidas(encuesta.preguntas_encuesta) && !encuestasRespondidas[encuesta.id]
+                                                todasRespondidas(encuesta.preguntas_encuesta) && !encuesta.ya_contestada
                                                     ? "bg-indigo-600 hover:bg-indigo-700"
                                                     : "bg-gray-400 cursor-not-allowed"
                                             }`}
                                         >
-                                            {encuestasRespondidas[encuesta.id]
+                                            {encuesta.ya_contestada
                                                 ? "Encuesta Respondida"
                                                 : todasRespondidas(encuesta.preguntas_encuesta)
                                                 ? "Contestar encuesta"

@@ -114,10 +114,34 @@ class EncuestaController extends Controller
 
     public function obtenerEncuestas()
     {
-    $encuestas = Encuesta::with('preguntas_encuesta')->get(); // Carga las encuestas con las preguntas relacionadas
-    return inertia('Profesor/ListaEncuesta', [
-        'encuestas' => $encuestas,
-    ]);
+        $usuarioId = Auth::id(); // Obtener el ID del usuario autenticado
+
+        // Obtener las encuestas con sus preguntas y respuestas
+        $encuestas = Encuesta::with(['preguntas_encuesta.respuestas' => function ($query) use ($usuarioId) {
+            $query->where('user_id', $usuarioId); // Cargar solo las respuestas del usuario actual
+        }])
+            ->orderBy('fecha_creacion', 'desc') // Ordenar por fecha de creación (más nuevas primero)
+            ->get()
+            ->map(function ($encuesta) use ($usuarioId) {
+                // Verificar si el usuario ya ha contestado esta encuesta
+                $encuesta->ya_contestada = $encuesta->preguntas_encuesta
+                    ->flatMap(function ($pregunta) {
+                        return $pregunta->respuestas; // Obtener todas las respuestas de las preguntas
+                    })
+                    ->contains('user_id', $usuarioId); // Verificar si alguna respuesta pertenece al usuario
+    
+                // Agregar las respuestas del usuario a cada pregunta
+                $encuesta->preguntas_encuesta->each(function ($pregunta) use ($usuarioId) {
+                    $pregunta->respuesta_usuario = $pregunta->respuestas
+                        ->firstWhere('user_id', $usuarioId); // Obtener la respuesta del usuario
+                });
+    
+                return $encuesta;
+            });
+    
+        return inertia('Profesor/ListaEncuesta', [
+            'encuestas' => $encuestas,
+        ]);
     }
 
     public function responder(Request $request, $id)
