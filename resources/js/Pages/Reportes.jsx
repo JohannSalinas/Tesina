@@ -35,11 +35,23 @@ const Reportes = () => {
         }
 
         // Determinar la ruta según el tipo de reporte
-        let routeName = tipo === "top" 
-            ? "reportes.top" 
-            : tipo === "categoria" 
-            ? "reportes.categoria" 
-            : "reportes.solicitudes";
+        let routeName;
+        switch (tipo) {
+            case "top":
+                routeName = "reportes.top";
+                break;
+            case "categoria":
+                routeName = "reportes.categoria";
+                break;
+            case "solicitudes":
+                routeName = "reportes.solicitudes";
+                break;
+            case "indicadores":
+                routeName = "reportes.indicadores";
+                break;
+            default:
+                routeName = "reportes.solicitudes";
+        }
 
         // Abrir el reporte en una nueva pestaña
         const url = route(routeName, { fecha_inicio: fechaInicio, fecha_fin: fechaFin });
@@ -52,6 +64,8 @@ const Reportes = () => {
                 ? "Top 5 Mejor Calificados" 
                 : tipo === "categoria" 
                 ? "Recursos por Categoría" 
+                : tipo === "indicadores"
+                ? "Indicadores de la Encuesta Aplicada"
                 : "Solicitudes por Usuario"} generado con éxito.`,
             showConfirmButton: false,
             timer: 1500
@@ -104,6 +118,14 @@ const Reportes = () => {
                             className="w-full md:w-auto px-6 py-3 bg-yellow-600 text-white rounded-md hover:bg-yellow-700"
                         >
                             📑 Generar Solicitudes por Usuario
+                        </button>
+
+                        {/* Nuevo botón para generar indicadores de la encuesta */}
+                        <button
+                            onClick={() => generarReporte("indicadores")}
+                            className="w-full md:w-auto px-6 py-3 bg-purple-600 text-white rounded-md hover:bg-purple-700"
+                        >
+                            📈 Generar Indicadores de la Encuesta Aplicada
                         </button>
                     </div>
                 </div>

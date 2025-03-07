@@ -6,9 +6,12 @@ use App\Models\NotificacionUnirseGrupo;
 use Illuminate\Http\Request;
 use Barryvdh\DomPDF\Facade\Pdf;
 use App\Models\RecursoEducativo;
+use App\Models\RespuestasEncuesta;
 use Carbon\Carbon;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Response;
+use Illuminate\Support\Facades\DB;
+
 
 class ReporteController extends Controller
 {
@@ -90,4 +93,51 @@ class ReporteController extends Controller
 
         return $pdf->download('Recursos_Por_Solicitudes.pdf');
     }
+
+    // Agrega esta función a tu controlador ReporteController
+    public function indicadoresEncuesta(Request $request)
+{
+    $fechaInicio = $request->input('fecha_inicio');
+    $fechaFin = $request->input('fecha_fin');
+
+    // Validar fechas
+    $validacion = $this->validarFechas($fechaInicio, $fechaFin);
+    if ($validacion) {
+        return $validacion;
+    }
+
+    // Consulta para contar las respuestas por encuesta y tipo de respuesta
+    $respuestas = RespuestasEncuesta::whereBetween('respuestas_encuesta.created_at', [$fechaInicio, $fechaFin])
+        ->join('preguntas_encuesta', 'respuestas_encuesta.pregunta_id', '=', 'preguntas_encuesta.id')
+        ->select(
+            'preguntas_encuesta.encuesta_id',
+            'respuestas_encuesta.respuesta',
+            DB::raw('count(*) as total')
+        )
+        ->groupBy('preguntas_encuesta.encuesta_id', 'respuestas_encuesta.respuesta')
+        ->get();
+
+    // Organizar los datos por encuesta
+    $encuestas = [];
+    foreach ($respuestas as $respuesta) {
+        $encuestaId = $respuesta->encuesta_id;
+        if (!isset($encuestas[$encuestaId])) {
+            $encuestas[$encuestaId] = [
+                'Totalmente de acuerdo' => 0,
+                'De acuerdo' => 0,
+                'Neutral' => 0,
+                'En desacuerdo' => 0,
+                'Totalmente en desacuerdo' => 0,
+            ];
+        }
+        $encuestas[$encuestaId][$respuesta->respuesta] = $respuesta->total;
+    }
+
+    // Generar el PDF
+    $pdf = Pdf::loadView('pdf.reporte_indicadores_encuesta', compact('encuestas', 'fechaInicio', 'fechaFin'));
+
+    return $pdf->download('Indicadores_Encuesta_Aplicada.pdf');
+}
+
+
 }

@@ -121,6 +121,7 @@ Route::get('/reportes', [ReporteController::class, 'index'])->name('reportes.ind
 Route::get('/reportes/top-recursos', [ReporteController::class, 'topRecursos'])->name('reportes.top');
 Route::get('/reportes/recursos-categoria', [ReporteController::class, 'recursosPorCategoria'])->name('reportes.categoria');
 Route::get('/reportes/recursos-solicitudes', [ReporteController::class, 'recursosPorSolicitudes'])->name('reportes.solicitudes');
+Route::get('/reportes/indicadores', [ReporteController::class, 'indicadoresEncuesta'])->name('reportes.indicadores');
 
 Route::get('/dashboard', [DashboardController::class, 'index'])->middleware(['auth', 'verified'])->name('dashboard');
 Route::get('/noticias/profesor', [NoticiasController::class, 'obtenerNoticias'])->name('noticias.profesor');

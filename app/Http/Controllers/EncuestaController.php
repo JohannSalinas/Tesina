@@ -120,28 +120,29 @@ class EncuestaController extends Controller
     }
 
     public function responder(Request $request, $id)
-{
+    {
     $encuesta = Encuesta::find($id);
 
     if (!$encuesta) {
-        return response()->json(['error' => 'Encuesta no encontrada'], 404);
+        
     }
 
-    // Validar las respuestas
+    // Validar las respuestas y el user_id
     $validated = $request->validate([
         'respuestas' => 'required|array',
         'respuestas.*' => 'in:Totalmente de acuerdo,De acuerdo,Neutral,En desacuerdo,Totalmente en desacuerdo',
+        'user_id' => 'required|exists:users,id', // Asegúrate de que el user_id exista en la tabla users
     ]);
 
-    // Guardar las respuestas
+    // Guardar las respuestas junto con el user_id
     foreach ($validated['respuestas'] as $preguntaId => $respuesta) {
         RespuestasEncuesta::create([
-            'encuesta_id' => $encuesta->id,
             'pregunta_id' => $preguntaId,
             'respuesta' => $respuesta,
+            'user_id' => $validated['user_id'], // Agregar el user_id
         ]);
     }
 
-    return response()->json(['message' => 'Respuestas enviadas con éxito']);
-}
+    
+    }
 }

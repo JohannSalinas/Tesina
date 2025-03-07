@@ -2,9 +2,10 @@ import { useEffect, useState } from "react";
 import { usePage } from "@inertiajs/react";
 import Swal from "sweetalert2";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout"; // Asegúrate de importar tu layout
+import axios from "axios"; // Asegúrate de importar axios
 
 export default function ListaEncuesta() {
-    const { encuestas } = usePage().props;
+    const { encuestas, auth } = usePage().props; // Obtén el usuario autenticado desde las props
     const [respuestas, setRespuestas] = useState({}); // Para almacenar las respuestas del usuario
     const [encuestasRespondidas, setEncuestasRespondidas] = useState({}); // Estado para llevar control de las encuestas respondidas
 
@@ -46,7 +47,6 @@ export default function ListaEncuesta() {
     };
 
     const enviarEncuesta = async (encuestaId) => {
-        // Aquí, usa encuestaId en lugar de encuesta directamente
         const encuesta = encuestas.find((encuesta) => encuesta.id === encuestaId);
 
         if (!encuesta) {
@@ -69,10 +69,11 @@ export default function ListaEncuesta() {
             return;
         }
 
-        // Aquí enviamos las respuestas al backend
+        // Aquí enviamos las respuestas al backend junto con el user_id
         try {
             await axios.post(`/encuestas/${encuestaId}/responder`, {
                 respuestas,
+                user_id: auth.user.id, // Agregar el user_id del usuario autenticado
             });
 
             Swal.fire({
