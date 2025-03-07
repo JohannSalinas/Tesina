@@ -8,6 +8,7 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use App\Models\RecursoEducativo;
 use App\Models\RespuestasEncuesta;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\DB;
@@ -24,7 +25,7 @@ class ReporteController extends Controller
     private function validarFechas($fechaInicio, $fechaFin)
     {
         if ($fechaInicio > $fechaFin) {
-            
+
         }
         return null;
     }
@@ -65,14 +66,43 @@ class ReporteController extends Controller
             return $validacion;
         }
 
+        // Obtener los recursos
         $recursos = RecursoEducativo::whereBetween('created_at', [$fechaInicio, $fechaFin])
             ->selectRaw('tipo, COUNT(*) as total')
             ->groupBy('tipo')
             ->get();
 
-        $pdf = Pdf::loadView('pdf.reporte_recursos_categoria', compact('recursos', 'fechaInicio', 'fechaFin'));
+        // Preparar datos para la gráfica
+        $categorias = $recursos->pluck('tipo')->toArray();
+        $totales = $recursos->pluck('total')->toArray();
+
+        // Construir la URL de la gráfica usando image-charts
+        $chartUrl = $this->generarGrafica($categorias, $totales);
+
+        // Descargar la imagen y guardarla temporalmente
+        $imageContent = file_get_contents($chartUrl);
+        $imageName = 'grafica_' . time() . '.png'; // Nombre único para la imagen
+        Storage::disk('public')->put($imageName, $imageContent);
+
+        // Ruta de la imagen guardada
+        $imagePath = storage_path('app/public/' . $imageName);
+
+        // Pasar la ruta de la imagen a la vista
+        $pdf = Pdf::loadView('pdf.reporte_recursos_categoria', compact('recursos', 'fechaInicio', 'fechaFin', 'imagePath'));
 
         return $pdf->download('Recursos_Por_Categoria.pdf');
+    }
+
+    private function generarGrafica($categorias, $totales)
+    {
+        // Convertir arrays a cadenas para la URL
+        $labels = implode('|', $categorias);
+        $data = implode(',', $totales);
+
+        // Construir la URL de la gráfica
+        $chartUrl = "https://image-charts.com/chart?cht=bvs&chd=t:$data&chl=$labels&chs=600x400&chco=4F81BD&chxt=x,y&chxl=0:|$labels&chxr=1,0," . max($totales);
+
+        return $chartUrl;
     }
 
     public function recursosPorSolicitudes(Request $request)

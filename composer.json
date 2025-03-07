@@ -9,6 +9,7 @@
         "php": "^8.2",
         "barryvdh/laravel-dompdf": "^3.1",
         "dompdf/dompdf": "^3.1",
+        "image-charts/image-charts": "^6.1",
         "inertiajs/inertia-laravel": "^1.0",
         "laravel/framework": "^11.31",
         "laravel/sanctum": "^4.0",

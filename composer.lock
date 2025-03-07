@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "9b92a7400df79c199ec29cf67052daf6",
+    "content-hash": "c11a28539f5af99939c7f6f7494aaa70",
     "packages": [
         {
             "name": "barryvdh/laravel-dompdf",
@@ -1285,6 +1285,72 @@
                 }
             ],
             "time": "2023-12-03T19:50:20+00:00"
+        },
+        {
+            "name": "image-charts/image-charts",
+            "version": "6.1.4",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/image-charts/php.git",
+                "reference": "1cde4470cba3a90db9b19024f9c8b30b526d4b84"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/image-charts/php/zipball/1cde4470cba3a90db9b19024f9c8b30b526d4b84",
+                "reference": "1cde4470cba3a90db9b19024f9c8b30b526d4b84",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^7.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "": ""
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "François-Guillaume Ribreau",
+                    "homepage": "https://www.image-charts.com/"
+                }
+            ],
+            "description": "Official Image-Charts.com API client library",
+            "homepage": "https://github.com/",
+            "keywords": [
+                "animated",
+                "api",
+                "backend-end",
+                "bar",
+                "bubble",
+                "chart",
+                "chart url",
+                "charts",
+                "doughnut",
+                "front-end",
+                "gif",
+                "horizontal-bar",
+                "image",
+                "imagecharts",
+                "jpeg",
+                "jpg",
+                "line",
+                "pie",
+                "png",
+                "polar"
+            ],
+            "support": {
+                "issues": "https://github.com/image-charts/php/issues",
+                "source": "https://github.com/image-charts/php/tree/6.1.4"
+            },
+            "time": "2022-04-29T15:23:36+00:00"
         },
         {
             "name": "inertiajs/inertia-laravel",
