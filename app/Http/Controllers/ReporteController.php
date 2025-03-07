@@ -100,7 +100,22 @@ class ReporteController extends Controller
         $data = implode(',', $totales);
 
         // Construir la URL de la gráfica
-        $chartUrl = "https://image-charts.com/chart?cht=bvs&chd=t:$data&chl=$labels&chs=600x400&chco=4F81BD&chxt=x,y&chxl=0:|$labels&chxr=1,0," . max($totales);
+       // Construir la URL de la gráfica con un diseño mejorado
+       $chartUrl = "https://image-charts.com/chart?" .
+       "cht=bvs&" . // Tipo de gráfica: barras verticales
+       "chd=t:$data&" . // Datos de la gráfica
+       "chl=$labels&" . // Etiquetas de las barras
+       "chs=600x400&" . // Tamaño de la gráfica
+       "chco=4F81BD|8A2BE2|FF6347|32CD32|FFD700&" . // Colores de las barras
+       "chxt=x,y&" . // Mostrar ejes X e Y
+       "chxl=0:|$labels&" . // Etiquetas del eje X
+       "chxr=1,0," . max($totales) . "&" . // Rango del eje Y
+       "chf=b0,lg,90,3498db,0,ffffff,1&" . // Fondo degradado
+       "chds=0," . max($totales) . "&" . // Escala de los datos
+       "chtt=Recursos+por+Categoría&" . // Título de la gráfica
+       "chts=000000,16&" . // Color y tamaño del título
+       "chma=30,30,30,30&" . // Márgenes
+       "chg=20,20"; // Líneas de la cuadrícula
 
         return $chartUrl;
     }
@@ -116,10 +131,22 @@ class ReporteController extends Controller
             return $validacion;
         }
 
-        $solicitudes = NotificacionUnirseGrupo::whereBetween('created_at', [$fechaInicio, $fechaFin])
-            ->get();
+        // Obtener las solicitudes con nombres de usuarios y grupos
+        $solicitudes = NotificacionUnirseGrupo::whereBetween('notificaciones_unirse_grupo.created_at', [$fechaInicio, $fechaFin])
+        ->join('users as solicitante', 'notificaciones_unirse_grupo.id_usuario_solicitante', '=', 'solicitante.id')
+        ->join('users as creador', 'notificaciones_unirse_grupo.id_usuario_creador_grupo', '=', 'creador.id')
+        ->join('grupos_colaboradores', 'notificaciones_unirse_grupo.id_grupo', '=', 'grupos_colaboradores.id')
+        ->select(
+            'notificaciones_unirse_grupo.*',
+            'solicitante.nombre as nombre_solicitante', // Nombre del usuario solicitante
+            'creador.nombre as nombre_creador', // Nombre del usuario creador del grupo
+            'grupos_colaboradores.nombre as nombre_grupo', // Nombre del grupo
+            'notificaciones_unirse_grupo.estatus' // Campo estatus
+        )
+        ->get();
 
-        $pdf = Pdf::loadView('pdf.reporte_recursos_solicitudes', compact('solicitudes', 'fechaInicio', 'fechaFin'));
+            // Generar el PDF
+            $pdf = Pdf::loadView('pdf.reporte_recursos_solicitudes', compact('solicitudes', 'fechaInicio', 'fechaFin'));
 
         return $pdf->download('Recursos_Por_Solicitudes.pdf');
     }
@@ -139,20 +166,21 @@ class ReporteController extends Controller
     // Consulta para contar las respuestas por encuesta y tipo de respuesta
     $respuestas = RespuestasEncuesta::whereBetween('respuestas_encuesta.created_at', [$fechaInicio, $fechaFin])
         ->join('preguntas_encuesta', 'respuestas_encuesta.pregunta_id', '=', 'preguntas_encuesta.id')
+        ->join('encuestas', 'preguntas_encuesta.encuesta_id', '=', 'encuestas.id') // Unir con la tabla encuestas
         ->select(
-            'preguntas_encuesta.encuesta_id',
+            'encuestas.titulo', // Seleccionar el título de la encuesta
             'respuestas_encuesta.respuesta',
             DB::raw('count(*) as total')
         )
-        ->groupBy('preguntas_encuesta.encuesta_id', 'respuestas_encuesta.respuesta')
+        ->groupBy('encuestas.titulo', 'respuestas_encuesta.respuesta') // Agrupar por título de la encuesta
         ->get();
 
     // Organizar los datos por encuesta
     $encuestas = [];
     foreach ($respuestas as $respuesta) {
-        $encuestaId = $respuesta->encuesta_id;
-        if (!isset($encuestas[$encuestaId])) {
-            $encuestas[$encuestaId] = [
+        $tituloEncuesta = $respuesta->titulo; // Usar el título de la encuesta como clave
+        if (!isset($encuestas[$tituloEncuesta])) {
+            $encuestas[$tituloEncuesta] = [
                 'Totalmente de acuerdo' => 0,
                 'De acuerdo' => 0,
                 'Neutral' => 0,
@@ -160,7 +188,7 @@ class ReporteController extends Controller
                 'Totalmente en desacuerdo' => 0,
             ];
         }
-        $encuestas[$encuestaId][$respuesta->respuesta] = $respuesta->total;
+        $encuestas[$tituloEncuesta][$respuesta->respuesta] = $respuesta->total;
     }
 
     // Generar el PDF
