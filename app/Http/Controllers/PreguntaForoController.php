@@ -12,7 +12,10 @@ class PreguntaForoController extends Controller
     // Mostrar todas las preguntas del foro
     public function index()
     {
-        $preguntas = PreguntaForo::with(['usuario', 'respuestas.usuario'])->get();
+        // Obtener las preguntas ordenadas por fecha de creación (más nuevas primero)
+        $preguntas = PreguntaForo::with(['usuario', 'respuestas.usuario'])
+            ->orderBy('created_at', 'desc') // Ordenar por fecha de creación en orden descendente
+            ->get();
 
         return Inertia::render('ListaPreguntas', [
             'preguntas' => $preguntas
