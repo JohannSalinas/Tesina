@@ -93,6 +93,27 @@ class User extends Authenticatable
     {
         return $this->hasMany(GrupoUsuario::class, 'usuario_id');
     }
-   
+
+    public function notificacionesPendientes()
+    {
+        // Notificaciones pendientes para el usuario creador del grupo
+        return $this->hasMany(NotificacionUnirseGrupo::class, 'id_usuario_creador_grupo')
+            ->where('estatus', 'pendiente');
+    }
+
+    public function notificacionesAceptadas()
+    {
+        // Notificaciones aceptadas para el usuario solicitante y visibles (visible = 1)
+        return $this->hasMany(NotificacionUnirseGrupo::class, 'id_usuario_solicitante')
+            ->where('estatus', 'aceptado')
+            ->where('visible', 1);
+    }
+
+    public function notificacionesActivas()
+    {
+        // Combinar notificaciones pendientes y aceptadas
+        return $this->notificacionesPendientes->merge($this->notificacionesAceptadas);
+    }
+
 
 }

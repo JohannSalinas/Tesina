@@ -9,6 +9,7 @@ import { route } from 'ziggy-js';
 
 export default function AuthenticatedLayout({ header, children }) {
     const user = usePage().props.auth.user;
+    const notificacionesActivas = user ? user.notificacionesActivas : 0;
     const [showingNavigationDropdown, setShowingNavigationDropdown] = useState(false);
     const [timeLeft, setTimeLeft] = useState(5 * 60); // 5 minutos en segundos
     const [showTimer, setShowTimer] = useState(true); // Para mostrar/ocultar el contador
@@ -352,6 +353,11 @@ export default function AuthenticatedLayout({ header, children }) {
                                         </Dropdown.Link>
                                         <Dropdown.Link href={route('notifications.show')}>
                                             Notificaciones
+                                            {notificacionesActivas > 0 && (
+                                                <span className="ml-2 inline-flex items-center justify-center h-4 w-4 bg-red-500 text-white text-xs rounded-full">
+                                                    {notificacionesActivas}
+                                                </span>
+                                            )}
                                         </Dropdown.Link>
                                         <Dropdown.Link
                                             href={route('logout')}
