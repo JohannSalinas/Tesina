@@ -41,7 +41,7 @@ class UserController extends Controller
     // Manejo de archivo
     if ($request->hasFile('foto')) {
         $this->deleteFile($user->foto); // Asume que guardas la ruta en `foto`
-        $user->foto = $request->file('foto')->store('recursos', 'public');
+        $user->foto = $request->file('foto')->store('fotos', 'public');
     }
 
     $user->update($request->only([

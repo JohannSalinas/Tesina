@@ -32,15 +32,20 @@ class RegisteredUserController extends Controller
     {
         $request->validate([
             'nombre' => 'required|string|max:255',
-            'apellidos' => 'nullable|string|max:255',
+            'apellidos' => 'required|string|max:255',
             'email' => 'required|string|lowercase|email|max:255|unique:'.User::class,
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
             'user_type' => 'required|in:profesor,coordinador',
             'genero' => 'required|in:masculino,femenino,otro',
             'gradoAcademico' => 'required|in:licenciatura,maestria,doctorado',
-            'fechaNacimiento' => 'nullable|date',
-            'foto' => 'nullable|image|max:10240',  // Validación de la imagen
+            'fechaNacimiento' => 'required|date',
+            'foto' => 'required|image|max:10240',  // Validación de la imagen
         ]);
+
+        $fechaNacimiento = \Carbon\Carbon::parse($request->fechaNacimiento);
+        if ($fechaNacimiento->diffInYears(\Carbon\Carbon::now()) < 18) {
+            return redirect()->back()->withErrors(['fechaNacimiento' => 'Debes tener al menos 18 años.']);
+        }
 
         // Handle the image upload
         $fotoPath = null;

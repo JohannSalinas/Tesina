@@ -1,9 +1,61 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, usePage, router, Link } from '@inertiajs/react';
 import Swal from 'sweetalert2';
+import { useState } from 'react';
 
 export default function AdminUsuarios() {
     const { users } = usePage().props;
+    const [formData, setFormData] = useState({
+        nombre: '',
+        email: '',
+        password: '',
+        user_type: '',
+        genero: '',
+        apellidos: '',
+        gradoAcademico: '',
+        fechaNacimiento: '',
+        foto: null,
+    });
+
+    const handleChange = (e) => {
+        const { name, value, files } = e.target;
+        if (name === 'foto') {
+            setFormData((prev) => ({ ...prev, [name]: files[0] }));
+        } else {
+            setFormData((prev) => ({ ...prev, [name]: value }));
+        }
+    };
+
+    const handleSubmit = (e) => {
+        e.preventDefault();
+
+        const data = new FormData();
+        for (const key in formData) {
+            if (formData[key] !== null && formData[key] !== '') {
+                data.append(key, formData[key]);
+            }
+        }
+
+        router.post('/usuarios', data, {
+            onSuccess: () => {
+                Swal.fire('Éxito', 'Usuario creado correctamente.', 'success');
+                setFormData({
+                    nombre: '',
+                    email: '',
+                    password: '',
+                    user_type: '',
+                    genero: '',
+                    apellidos: '',
+                    gradoAcademico: '',
+                    fechaNacimiento: '',
+                    foto: null,
+                });
+            },
+            onError: (errors) => {
+                Swal.fire('Error', 'Hubo un problema al crear el usuario.', 'error');
+            },
+        });
+    };
 
     const handleDelete = (userId) => {
         Swal.fire({
@@ -30,23 +82,138 @@ export default function AdminUsuarios() {
     };
 
     return (
-        <AuthenticatedLayout
-            
-        >
+        <AuthenticatedLayout>
             <Head title="Administrar Usuarios" />
 
             <div className="relative bg-gradient-to-r from-teal-400 to-blue-500 text-white min-h-screen flex flex-col items-center justify-center py-12">
-                {/* Imagen de fondo con opacidad */}
-                <div className="absolute inset-0 overflow-hidden">
-                    <img
-                        className="object-cover w-full h-full opacity-30"
-                        src="https://images.unsplash.com/photo-1533750342991-d26d54d839b7"
-                        alt="Background"
-                    />
-                </div>
-
                 <div className="relative bg-white bg-opacity-60 text-gray-800 shadow-lg rounded-2xl p-8 max-w-7xl w-full space-y-6">
                     <h1 className="text-4xl font-extrabold mb-4 text-gray-800">Administrar Usuarios</h1>
+
+                    {/* Formulario para crear un nuevo usuario */}
+                    <form onSubmit={handleSubmit} className="bg-white p-6 rounded-lg shadow-md space-y-4">
+                        <h2 className="text-2xl font-bold text-gray-800">Crear Nuevo Usuario</h2>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700">Nombre</label>
+                                <input
+                                    type="text"
+                                    name="nombre"
+                                    value={formData.nombre}
+                                    onChange={handleChange}
+                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500"
+                                    required
+                                />
+                            </div>
+
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700">Apellidos</label>
+                                <input
+                                    type="text"
+                                    name="apellidos"
+                                    value={formData.apellidos}
+                                    onChange={handleChange}
+                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500"
+                                    required
+                                />
+                            </div>
+
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700">Email</label>
+                                <input
+                                    type="email"
+                                    name="email"
+                                    value={formData.email}
+                                    onChange={handleChange}
+                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500"
+                                    required
+                                />
+                            </div>
+
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700">Contraseña</label>
+                                <input
+                                    type="password"
+                                    name="password"
+                                    value={formData.password}
+                                    onChange={handleChange}
+                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500"
+                                    required
+                                />
+                            </div>
+
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700">Tipo de Usuario</label>
+                                <select
+                                    name="user_type"
+                                    value={formData.user_type}
+                                    onChange={handleChange}
+                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500"
+                                    required
+                                >
+                                    <option value="">Seleccione un tipo</option>
+                                    <option value="admin">Admin</option>
+                                    <option value="coordinador">Coordinador</option>
+                                    <option value="profesor">Profesor</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700">Género</label>
+                                <select
+                                    name="genero"
+                                    value={formData.genero}
+                                    onChange={handleChange}
+                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500"
+                                    required
+                                >
+                                    <option value="">Seleccione un género</option>
+                                    <option value="Masculino">Masculino</option>
+                                    <option value="Femenino">Femenino</option>
+                                    <option value="Otro">Otro</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700">Grado Académico</label>
+                                <input
+                                    type="text"
+                                    name="gradoAcademico"
+                                    value={formData.gradoAcademico}
+                                    onChange={handleChange}
+                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500"
+                                />
+                            </div>
+
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700">Fecha de Nacimiento</label>
+                                <input
+                                    type="date"
+                                    name="fechaNacimiento"
+                                    value={formData.fechaNacimiento}
+                                    onChange={handleChange}
+                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500"
+                                />
+                            </div>
+
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700">Foto de Perfil</label>
+                                <input
+                                    type="file"
+                                    name="foto"
+                                    onChange={handleChange}
+                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500"
+                                />
+                            </div>
+                        </div>
+
+                        <button
+                            type="submit"
+                            className="w-full bg-teal-500 text-white py-2 px-4 rounded-md hover:bg-teal-600 transition duration-300"
+                        >
+                            Crear Usuario
+                        </button>
+                    </form>
 
                     {/* Tabla de usuarios */}
                     <div className="overflow-x-auto w-full mt-8">
