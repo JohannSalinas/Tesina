@@ -2,6 +2,7 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, usePage, router, Link } from '@inertiajs/react';
 import Swal from 'sweetalert2';
 import { useState } from 'react';
+import {route} from "ziggy-js";
 
 export default function AdminUsuarios() {
     const { users } = usePage().props;
@@ -36,7 +37,9 @@ export default function AdminUsuarios() {
             }
         }
 
-        router.post('/usuarios', data, {
+        console.log([...data.entries()]); // Verifica los datos que se están enviando
+
+        router.post(route('storeNewUser'), data, {
             onSuccess: () => {
                 Swal.fire('Éxito', 'Usuario creado correctamente.', 'success');
                 setFormData({
@@ -52,8 +55,10 @@ export default function AdminUsuarios() {
                 });
             },
             onError: (errors) => {
-                Swal.fire('Error', 'Hubo un problema al crear el usuario.', 'error');
-            },
+                console.log(errors); // Verifica los errores que se están recibiendo
+                const errorMessage = errors.message || 'Hubo un problema al crear el usuario.';
+                Swal.fire('Error', errorMessage, 'error');
+            }
         });
     };
 
@@ -141,7 +146,17 @@ export default function AdminUsuarios() {
                                     required
                                 />
                             </div>
-
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700">Confirmar Contraseña</label>
+                                <input
+                                    type="password"
+                                    name="password_confirmation"
+                                    value={formData.password_confirmation}
+                                    onChange={handleChange}
+                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500"
+                                    required
+                                />
+                            </div>
                             <div>
                                 <label className="block text-sm font-medium text-gray-700">Tipo de Usuario</label>
                                 <select
@@ -168,21 +183,26 @@ export default function AdminUsuarios() {
                                     required
                                 >
                                     <option value="">Seleccione un género</option>
-                                    <option value="Masculino">Masculino</option>
-                                    <option value="Femenino">Femenino</option>
-                                    <option value="Otro">Otro</option>
+                                    <option value="masculino">Masculino</option>
+                                    <option value="femenino">Femenino</option>
+                                    <option value="otro">Otro</option>
                                 </select>
                             </div>
 
                             <div>
                                 <label className="block text-sm font-medium text-gray-700">Grado Académico</label>
-                                <input
-                                    type="text"
+                                <select
                                     name="gradoAcademico"
                                     value={formData.gradoAcademico}
                                     onChange={handleChange}
                                     className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500"
-                                />
+                                    required
+                                >
+                                    <option value="">Seleccione un grado academico</option>
+                                    <option value="licenciatura">Licenciatura</option>
+                                    <option value="maestria">Maestria</option>
+                                    <option value="doctorado">Doctorado</option>
+                                </select>
                             </div>
 
                             <div>

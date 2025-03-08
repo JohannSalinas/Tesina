@@ -3,12 +3,50 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
+use Illuminate\Validation\Rules;
 
 class UserController extends Controller
 {
+
+    public function storeNewUser(Request $request)
+    {
+        $request->validate([
+            'nombre' => 'required|string|max:255',
+            'email' => 'required|string|lowercase|email|max:255|unique:'.User::class,
+            'password' => ['required', 'confirmed', Rules\Password::defaults()],
+            'user_type' => 'required|in:admin,profesor,coordinador',
+            'genero' => 'required|in:masculino,femenino,otro',
+            'apellidos' => 'nullable|string|max:255',
+            'gradoAcademico' => 'required|in:licenciatura,maestria,doctorado',
+            'fechaNacimiento' => 'nullable|date',
+            'foto' => 'nullable|image|max:10240',
+        ]);
+
+        // Handle the image upload
+        $fotoPath = null;
+        if ($request->hasFile('foto')) {
+            $fotoPath = $request->file('foto')->store('fotos', 'public');
+        }
+
+        $user = User::create([
+            'nombre' => $request->nombre,
+            'apellidos' => $request->apellidos,
+            'email' => $request->email,
+            'password' => Hash::make($request->password),
+            'user_type' => $request->user_type,
+            'genero' => $request->genero,
+            'gradoAcademico' => $request->gradoAcademico,
+            'fechaNacimiento' => $request->fechaNacimiento,
+            'foto' => $fotoPath,
+        ]);
+
+        return redirect(route('usuarios.index'));
+    }
     public function edit($id)
     {
         $user = User::findOrFail($id);
@@ -64,9 +102,9 @@ class UserController extends Controller
         try {
             $user = User::findOrFail($id);
             $user->delete();
-            
+
         } catch (\Exception $e) {
-            
+
         }
     }
 

@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\NotificationsController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RecursosEducativosController;
@@ -49,6 +50,8 @@ Route::middleware('auth')->group(function () {
         Route::get('/{id}/editar', [UserController::class, 'edit'])->name('edit');
         Route::match(['post', 'put'], '/{id}', [UserController::class, 'update'])->name('update');
     });
+
+    Route::post('guardar', [UserController::class, 'storeNewUser'])->name('storeNewUser');
 
     // Rutas para Recursos Educativos
     // Rutas protegidas para la gestión de Recursos Educativos

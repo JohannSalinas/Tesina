@@ -9,6 +9,11 @@ use Illuminate\Support\Facades\Password;
 use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Inertia\Response;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
+use App\Models\User;
+use App\Mail\NotificacionCambioContraseña;
+use Illuminate\Support\Facades\Mail;
 
 class PasswordResetLinkController extends Controller
 {
@@ -33,19 +38,33 @@ class PasswordResetLinkController extends Controller
             'email' => 'required|email',
         ]);
 
-        // We will send the password reset link to this user. Once we have attempted
-        // to send the link, we will examine the response then see the message we
-        // need to show to the user. Finally, we'll send out a proper response.
-        $status = Password::sendResetLink(
-            $request->only('email')
-        );
+        // Buscar al usuario por su correo electrónico
+        $user = User::where('email', $request->email)->first();
 
-        if ($status == Password::RESET_LINK_SENT) {
-            return back()->with('status', __($status));
+        if (!$user) {
+            throw ValidationException::withMessages([
+                'email' => [trans(Password::INVALID_USER)],
+            ]);
         }
 
-        throw ValidationException::withMessages([
-            'email' => [trans($status)],
-        ]);
+        // Generar un token de restablecimiento de contraseña
+        $token = Str::random(60);
+
+        // Guardar el token en la tabla `password_resets`
+        DB::table('password_reset_tokens')->updateOrInsert(
+            ['email' => $user->email],
+            ['token' => bcrypt($token), 'created_at' => now()]
+        );
+
+        // Construir la URL de restablecimiento de contraseña
+        $resetUrl = url(route('password.reset', [
+            'token' => $token,
+            'email' => $user->email,
+        ], false));
+
+        // Enviar el correo electrónico personalizado
+        Mail::to($user->email)->send(new NotificacionCambioContraseña($resetUrl));
+
+        return back()->with('status', 'Hemos enviado un enlace de restablecimiento de contraseña a tu correo electrónico.');
     }
 }
