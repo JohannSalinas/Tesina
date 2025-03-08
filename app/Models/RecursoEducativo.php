@@ -19,7 +19,8 @@ class RecursoEducativo extends Model
         'tipo',
         'archivo_path',
         'grupo_colaborador_id',
-        'user_id'
+        'user_id',
+        'url',
     ];
 
     // Relación con el usuario

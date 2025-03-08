@@ -2,11 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\NotificacionEstatusMail;
 use App\Models\NotificacionUnirseGrupo;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\GrupoColaborador;
 use App\Models\GrupoUsuario;
+use Illuminate\Support\Facades\Mail;
 
 class NotificationsController extends Controller
 {
@@ -63,7 +66,6 @@ class NotificationsController extends Controller
                 'usuario_id' => $notificacion->id_usuario_solicitante, // O el dato correcto
             ]);
 
-            // Llamar al método store con la nueva solicitud
             $grupoUsuarioController = new GrupoUsuarioController();
             $grupoUsuarioController->store($nuevoRequest, $notificacion->id_grupo);
         }
@@ -78,7 +80,11 @@ class NotificationsController extends Controller
 
         $notificacion->save();
 
-        // Retornar una respuesta de éxito
-        
+        // Obtener el usuario solicitante y el nombre del grupo
+        $usuarioSolicitante = User::findOrFail($notificacion->id_usuario_solicitante);
+        $grupo = GrupoColaborador::findOrFail($notificacion->id_grupo);
+
+        // Enviar el correo al usuario solicitante
+        Mail::to($usuarioSolicitante->email)->send(new NotificacionEstatusMail($request->estatus, $grupo->nombre, $usuarioSolicitante->nombre));
     }
 }

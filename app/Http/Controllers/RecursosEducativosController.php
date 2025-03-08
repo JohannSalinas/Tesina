@@ -56,16 +56,20 @@ class RecursosEducativosController extends Controller
         $validatedData = $request->validate([
             'titulo' => 'required|string|max:255',
             'descripcion' => 'required|string',
-            'tipo' => 'required|string|in:PDF,DOCX,PPTX',
-            'archivo' => 'required|file|mimes:pdf,docx,pptx|max:10240', // Máx 10MB
+            'tipo' => 'required|string|in:PDF,DOCX,PPTX,Enlace Web',
+            'archivo' => $request->tipo === 'Enlace Web' ? 'nullable|file' : 'required|file|mimes:pdf,docx,pptx|max:10240', // Máx 10MB
+            'url' => $request->tipo === 'Enlace Web' ? 'required|url' : 'nullable|url',
             'grupo_id' => 'required|exists:grupos_colaboradores,id',
         ]);
 
         // Guardar el archivo en 'public/recursos' y obtener la ruta
-        $archivoPath = $request->file('archivo')->store('recursos', 'public');
+        $archivoPath = null;
+        if ($request->hasFile('archivo')) {
+            $archivoPath = $request->file('archivo')->store('recursos', 'public');
+        }
 
         // Si el archivo es PPTX, convertirlo a PDF
-        if ($validatedData['tipo'] === 'PPTX') {
+        if ($validatedData['tipo'] === 'PPTX' && $archivoPath) {
             $archivoPath = $this->convertPptxToPdf($archivoPath);
         }
 
@@ -75,6 +79,7 @@ class RecursosEducativosController extends Controller
             'descripcion' => $validatedData['descripcion'],
             'tipo' => $validatedData['tipo'],
             'archivo_path' => $archivoPath, // Guardamos la ruta del archivo
+            'url' => $validatedData['url'], // Guardamos la URL
             'grupo_colaborador_id' => $validatedData['grupo_id'],
             'user_id' => $userId,
         ]);
@@ -143,7 +148,8 @@ class RecursosEducativosController extends Controller
             'titulo' => 'required|max:255',
             'descripcion' => 'required|max:1000',
             'tipo' => 'required|in:PDF,DOCX,PPTX,Enlace Web',  // Validación correcta
-            'archivo' => 'nullable|file|max:10240',
+            'archivo' => $request->tipo === 'Enlace Web' ? 'nullable|file' : 'required|file|mimes:pdf,docx,pptx|max:10240', // Máx 10MB
+            'url' => $request->tipo === 'Enlace Web' ? 'required|url' : 'nullable|url',
         ]);
 
         if ($validator->fails()) {
@@ -171,6 +177,7 @@ class RecursosEducativosController extends Controller
             'descripcion' => $request->descripcion,
             'tipo' => $request->tipo,
             'archivo_path' => $archivoPath,  // Se usa la nueva URL del archivo si fue cargado
+            'url' => $request->url,
         ]);
 
         return redirect()->route('recursos.index')->with('message', 'Recurso educativo actualizado exitosamente.');

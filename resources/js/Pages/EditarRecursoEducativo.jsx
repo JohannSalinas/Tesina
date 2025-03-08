@@ -10,6 +10,7 @@ export default function EditarRecursoEducativo() {
         descripcion: recurso.descripcion,
         tipo: recurso.tipo,
         archivo: null,
+        url: recurso.url,
     });
 
     useEffect(() => {
@@ -17,7 +18,8 @@ export default function EditarRecursoEducativo() {
             titulo: recurso.titulo,
             descripcion: recurso.descripcion,
             tipo: recurso.tipo,
-            archivo: null, // El archivo es opcional y solo se selecciona si el usuario lo modifica
+            archivo: recurso.tipo !== 'Enlace Web' ? null : undefined, // El archivo es opcional y solo se selecciona si el usuario lo modifica
+            url: recurso.tipo === 'Enlace Web' ? recurso.url : undefined,
         });
     }, [recurso]);
 
@@ -38,8 +40,10 @@ export default function EditarRecursoEducativo() {
         form.append('descripcion', formData.descripcion);
         form.append('tipo', formData.tipo);
 
-        if (formData.archivo) {
+        if (formData.archivo && formData.tipo !== 'Enlace Web') {
             form.append('archivo', formData.archivo);
+        }else{
+            form.append('url', formData.url);
         }
 
         form.append('_method', 'PUT');
@@ -117,18 +121,34 @@ export default function EditarRecursoEducativo() {
                                     <option value="Enlace Web">Enlace Web</option>
                                 </select>
                             </div>
-                            <div>
-                                <label htmlFor="archivo" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                                    Archivo (opcional)
-                                </label>
-                                <input
-                                    type="file"
-                                    id="archivo"
-                                    name="archivo"
-                                    onChange={handleInputChange}
-                                    className="mt-1 block w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-200"
-                                />
-                            </div>
+                            {formData.tipo === 'Enlace Web' ? (
+                                <div>
+                                    <label htmlFor="url" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                                        URL
+                                    </label>
+                                    <input
+                                        type="url"
+                                        id="url"
+                                        name="url"
+                                        value={formData.url || ''}
+                                        onChange={handleInputChange}
+                                        className="mt-1 block w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-200"
+                                    />
+                                </div>
+                            ) : (
+                                <div>
+                                    <label htmlFor="archivo" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                                        Archivo (opcional)
+                                    </label>
+                                    <input
+                                        type="file"
+                                        id="archivo"
+                                        name="archivo"
+                                        onChange={handleInputChange}
+                                        className="mt-1 block w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-200"
+                                    />
+                                </div>
+                            )}
                             <button
                                 type="submit"
                                 className="w-full bg-blue-600 text-white p-3 rounded-lg shadow-md hover:bg-blue-700 transition duration-300"
