@@ -21,11 +21,16 @@ class UserController extends Controller
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
             'user_type' => 'required|in:admin,profesor,coordinador',
             'genero' => 'required|in:masculino,femenino,otro',
-            'apellidos' => 'nullable|string|max:255',
+            'apellidos' => 'required|string|max:255',
             'gradoAcademico' => 'required|in:licenciatura,maestria,doctorado',
-            'fechaNacimiento' => 'nullable|date',
-            'foto' => 'nullable|image|max:10240',
+            'fechaNacimiento' => 'required|date',
+            'foto' => 'required|image|max:10240',
         ]);
+
+        $fechaNacimiento = \Carbon\Carbon::parse($request->fechaNacimiento);
+        if ($fechaNacimiento->diffInYears(\Carbon\Carbon::now()) < 18) {
+            return redirect()->back()->withErrors(['fechaNacimiento' => 'Debes tener al menos 18 años.']);
+        }
 
         // Handle the image upload
         $fotoPath = null;
@@ -62,12 +67,17 @@ class UserController extends Controller
         'email' => 'required|email|max:255|unique:users,email,' . $id,
         'user_type' => 'required|string',
         'password' => 'nullable|string|min:8|confirmed',  // Validación de la contraseña
-        'apellidos' => 'nullable|string|max:255',
+        'apellidos' => 'required|string|max:255',
         'genero' => 'required|in:masculino,femenino,otro',
         'gradoAcademico' => 'required|in:licenciatura,maestria,doctorado',
-        'fechaNacimiento' => 'nullable|date',
+        'fechaNacimiento' => 'required|date',
         'foto' => 'nullable|image|max:10240'
     ]);
+
+    $fechaNacimiento = \Carbon\Carbon::parse($request->fechaNacimiento);
+        if ($fechaNacimiento->diffInYears(\Carbon\Carbon::now()) < 18) {
+            return redirect()->back()->withErrors(['fechaNacimiento' => 'Debes tener al menos 18 años.']);
+        }
 
     $user = User::findOrFail($id);
 
