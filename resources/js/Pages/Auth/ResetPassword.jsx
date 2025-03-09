@@ -34,9 +34,9 @@ export default function RestablecerContraseña({ token, email }) {
                         type="email"
                         name="email"
                         value={data.email}
-                        className="mt-1 block w-full"
+                        className="mt-1 block w-full bg-gray-300 border-gray-300"
                         autoComplete="username"
-                        onChange={(e) => setData('email', e.target.value)}
+                        readOnly
                     />
                     <InputError message={errors.email} className="mt-2" />
                 </div>
@@ -81,8 +81,8 @@ export default function RestablecerContraseña({ token, email }) {
                 </div>
 
                 {/* Botón de envío */}
-                <div className="flex items-center justify-end">
-                    <PrimaryButton className="ms-4" disabled={processing}>
+                <div className="flex items-center justify-center">
+                    <PrimaryButton className="w-full py-2 bg-indigo-600 text-white rounded-lg justify-center" disabled={processing}>
                         Restablecer Contraseña
                     </PrimaryButton>
                 </div>
