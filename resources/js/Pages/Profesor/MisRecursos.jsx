@@ -102,14 +102,8 @@ export default function RecursosEducativos() {
             <Head title="Administrar Recursos Educativos" />
 
             <div className="relative bg-gradient-to-r from-teal-400 to-blue-500 text-white min-h-screen flex flex-col items-center justify-center py-12">
-                {/* Imagen de fondo con un efecto de parallax */}
-                <div className="absolute inset-0 overflow-hidden">
-                    <img
-                        className="object-cover w-full h-full opacity-30"
-                        src="https://images.unsplash.com/photo-1533750342991-d26d54d839b7"
-                        alt="Background"
-                    />
-                </div>
+               
+                
 
                 {/* Contenedor principal */}
                 <div className="relative bg-white bg-opacity-60 text-gray-800 shadow-lg rounded-2xl p-8 max-w-7xl w-full space-y-6">

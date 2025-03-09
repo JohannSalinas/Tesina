@@ -112,6 +112,8 @@ Route::get('/profesor/mis-recursos', [RecursosEducativosController::class, 'recu
 Route::post('recursos/{recurso}/calificar', [RecursosEducativosController::class, 'calificar'])->name('recursos.calificar');
 Route::get('/recursos/calificaciones-usuario', [RecursosEducativosController::class, 'calificacionesUsuario'])->name('recursos.calificacionesUsuario');
 
+Route::get('/profesor/mis-calificados', [RecursosEducativosController::class, 'misCalificados'])->name('profesor.mis-calificados');
+
 // Rutas para las preguntas del foro
 Route::get('/preguntas', [PreguntaForoController::class, 'index'])->name('preguntas.index');
 Route::post('/preguntas', [PreguntaForoController::class, 'store'])->name('preguntas.store');

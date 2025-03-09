@@ -262,5 +262,40 @@ class RecursosEducativosController extends Controller
     return response()->json($calificaciones);
 }
 
+public function misCalificados()
+{
+    // Obtener el ID del usuario autenticado
+    $userId = Auth::id();
+
+    // Obtener los recursos que el usuario ha calificado
+    $recursosCalificados = RecursoEducativo::whereHas('calificaciones', function ($query) use ($userId) {
+        $query->where('user_id', $userId);
+    })
+    ->with(['calificaciones' => function ($query) use ($userId) {
+        $query->where('user_id', $userId);
+    }])
+    ->get();
+
+    // Formatear los datos para la vista
+    $recursosFormateados = $recursosCalificados->map(function ($recurso) {
+        return [
+            'id' => $recurso->id,
+            'titulo' => $recurso->titulo,
+            'descripcion' => $recurso->descripcion,
+            'calificaciones' => $recurso->calificaciones->map(function ($calificacion) {
+                return [
+                    'calificacion' => $calificacion->calificacion,
+                ];
+            }),
+            'calificacion' => $recurso->calificacion, // Calificación promedio
+        ];
+    });
+
+    // Renderizar la vista de Inertia
+    return Inertia::render('Profesor/MisCalificados', [
+        'recursosCalificados' => $recursosFormateados,
+    ]);
+}
+
 
 }

@@ -274,6 +274,15 @@ export default function AuthenticatedLayout({ header, children }) {
                                         >
                                             Gestion Recursos Educativos
                                         </NavLink>
+                                        <NavLink
+                                            href={route('profesor.mis-calificados')} // Nueva ruta para "Mis Calificados"
+                                            active={route().current('profesor.mis-calificados')} // Activar si la ruta coincide
+                                            className="px-4 py-2 text-sm font-semibold transition duration-300 ease-in-out transform hover:scale-105 rounded-lg"
+                                            //activeClassName="bg-green-600 text-white shadow-lg" // Esto ya no es necesario en versiones recientes de Inertia
+                                            //inactiveClassName="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-green-50 dark:hover:bg-green-100"
+                                        >
+                                            Mis calificados
+                                        </NavLink>
                                     </>
                                 )}
 
@@ -472,6 +481,12 @@ export default function AuthenticatedLayout({ header, children }) {
                                     active={route().current('encuestas.profesor')}
                                 >
                                     Lista de Encuestas
+                                </ResponsiveNavLink>
+                                <ResponsiveNavLink
+                                    href={route('profesor.mis-calificados')} // Nueva ruta para "Mis Calificados"
+                                    active={route().current('profesor.mis-calificados')} // Activar si la ruta coincide
+                                >
+                                    Mis Calificados
                                 </ResponsiveNavLink>
                             </>
                         )}
