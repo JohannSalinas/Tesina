@@ -107,8 +107,10 @@ Route::post('/backup-restore/restore', [BackupController::class, 'restore'])->na
 Route::get('/backup-restore/download-latest', [BackupController::class, 'downloadLatestBackup'])->name('backup-restore.download-latest'); // Descargar respaldo
 
 Route::get('/profesor/grupos', [GrupoColaboradorController::class, 'indexProfesor'])->name('grupos-colaboradores.profesor');
+
 Route::get('/profesor/mis-recursos', [RecursosEducativosController::class, 'recursosProfesor'])->name('recursos.profesor');
 Route::post('recursos/{recurso}/calificar', [RecursosEducativosController::class, 'calificar'])->name('recursos.calificar');
+Route::get('/recursos/calificaciones-usuario', [RecursosEducativosController::class, 'calificacionesUsuario'])->name('recursos.calificacionesUsuario');
 
 // Rutas para las preguntas del foro
 Route::get('/preguntas', [PreguntaForoController::class, 'index'])->name('preguntas.index');

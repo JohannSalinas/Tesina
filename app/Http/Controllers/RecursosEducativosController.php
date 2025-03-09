@@ -14,6 +14,7 @@ use App\Models\GrupoColaborador; // Si se necesita el grupo completo
 use Illuminate\Support\Facades\Auth;
 use PhpOffice\PhpPresentation\IOFactory;
 use App\Models\User;
+use App\Models\CalificacionRecurso;
 
 class RecursosEducativosController extends Controller
 {
@@ -216,17 +217,50 @@ class RecursosEducativosController extends Controller
         ]);
     }
 
-    public function calificar(Request $request, RecursoEducativo $recurso)
+    // Método para calificar un recurso
+    public function calificar(Request $request, $recursoId)
 {
     $request->validate([
-        'calificacion' => 'required|numeric|min:0|max:5',
+        'calificacion' => 'required|integer|min:1|max:5',
     ]);
 
-    // Actualizar la calificación del recurso
-    $recurso->calificacion = $request->calificacion;
-    $recurso->save();
+    $user = Auth::user();
 
-    return response()->json(['message' => 'Calificación actualizada con éxito']);
+    // Buscar o crear la calificación del usuario para el recurso
+    $calificacion = CalificacionRecurso::updateOrCreate(
+        [
+            'recurso_id' => $recursoId,
+            'user_id' => $user->id,
+        ],
+        [
+            'calificacion' => $request->calificacion,
+        ]
+    );
+
+    // Calcular el promedio de calificaciones para el recurso
+    $promedio = CalificacionRecurso::where('recurso_id', $recursoId)->avg('calificacion');
+
+    // Actualizar el campo "calificacion" en la tabla "recursos_educativos"
+    RecursoEducativo::where('id', $recursoId)->update(['calificacion' => $promedio]);
+
+    // Devolver la calificación promedio actualizada
+    return response()->json([
+        'success' => true,
+        'calificacion_promedio' => $promedio,
+    ]);
 }
+
+    // Método para obtener las calificaciones del usuario
+    public function calificacionesUsuario()
+{
+    $user = Auth::user();
+
+    // Obtener las calificaciones del usuario
+    $calificaciones = CalificacionRecurso::where('user_id', $user->id)
+        ->pluck('calificacion', 'recurso_id');
+
+    return response()->json($calificaciones);
+}
+
 
 }

@@ -21,6 +21,7 @@ class RecursoEducativo extends Model
         'grupo_colaborador_id',
         'user_id',
         'url',
+        'calificacion',
     ];
 
     // Relación con el usuario
@@ -47,5 +48,10 @@ class RecursoEducativo extends Model
     public function scopeActivos($query)
     {
         return $query->whereNotNull('url');
+    }
+
+    public function calificaciones()
+    {
+        return $this->hasMany(CalificacionRecurso::class, 'recurso_id');
     }
 }
