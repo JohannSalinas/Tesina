@@ -107,34 +107,29 @@ public function update(Request $request, $id)
 
 public function indexProfesor()
 {
-    // Obtener el usuario autenticado
-    $usuario = Auth::user();
+     // Obtener el usuario autenticado
+     $usuario = Auth::user();
 
-    // Obtener los IDs de los grupos a los que el usuario ya está unido
-    $gruposUnidos = GrupoUsuario::where('usuario_id', $usuario->id)->pluck('grupo_id')->toArray();
-
-    // Filtrar los grupos para excluir aquellos a los que el usuario ya está unido
-    $grupos = GrupoColaborador::whereNotIn('id', $gruposUnidos)->get();
-
-    return Inertia::render('Profesor/ListaGrupos', [
-        'grupos' => $grupos
-    ]);
+     // Obtener los IDs de los grupos a los que el usuario ya está unido
+     $gruposUnidos = GrupoUsuario::where('usuario_id', $usuario->id)->pluck('grupo_id')->toArray();
+ 
+     // Obtener los IDs de los grupos en los que el usuario ha solicitado unirse y están en "pendiente" o "aceptado"
+     $gruposSolicitados = \DB::table('notificaciones_unirse_grupo')
+         ->where('id_usuario_solicitante', $usuario->id)
+         ->whereIn('estatus', ['pendiente', 'aceptado'])
+         ->pluck('id_grupo')
+         ->toArray();
+ 
+     // Combinar ambos arrays de grupos a excluir
+     $gruposExcluidos = array_merge($gruposUnidos, $gruposSolicitados);
+ 
+     // Filtrar los grupos excluyendo los que el usuario ya está unido o ha solicitado unirse
+     $grupos = GrupoColaborador::whereNotIn('id', $gruposExcluidos)->get();
+ 
+     return Inertia::render('Profesor/ListaGrupos', [
+         'grupos' => $grupos
+     ]);
 }
-/*
-public function solicitarUnirse($grupoId)
-{
-    // Obtener el grupo y el primer usuario
-    $grupo = GrupoColaborador::findOrFail($grupoId);
-    $primerUsuario = GrupoUsuario::where('grupo_id', $grupo->id)->first()->usuario;
-
-    // Obtener el usuario autenticado (el que solicita unirse)
-    $usuarioSolicitante = auth()->user();
-
-    // Enviar la notificación al primer usuario del grupo
-    Notification::send($primerUsuario, new SolicitudUnirseGrupo($grupo, $usuarioSolicitante));
-
-    return back()->with('success', 'Solicitud enviada correctamente.');
-}*/
 
 
 }
