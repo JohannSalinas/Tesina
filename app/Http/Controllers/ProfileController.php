@@ -18,11 +18,15 @@ class ProfileController extends Controller
      */
     public function edit(Request $request): Response
     {
+        $user = $request->user();
+        $user->name = $user->nombre; // Agregar la propiedad name
         return Inertia::render('Profile/Edit', [
-            'mustVerifyEmail' => $request->user() instanceof MustVerifyEmail,
+            'mustVerifyEmail' => $user instanceof MustVerifyEmail,
             'status' => session('status'),
+            'user' => $user, // Pasar el usuario con la propiedad name
         ]);
     }
+
 
     /**
      * Update the user's profile information.
