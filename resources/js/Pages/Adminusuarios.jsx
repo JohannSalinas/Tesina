@@ -95,7 +95,7 @@ export default function AdminUsuarios() {
                     <h1 className="text-4xl font-extrabold mb-4 text-gray-800">Administrar Usuarios</h1>
 
                     {/* Formulario para crear un nuevo usuario */}
-                    <form onSubmit={handleSubmit} className="bg-white p-6 rounded-lg shadow-md space-y-4">
+                    <form onSubmit={handleSubmit} className="bg-white p-6 rounded-lg shadow-xl space-y-4 bg-opacity-30">
                         <h2 className="text-2xl font-bold text-gray-800">Crear Nuevo Usuario</h2>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -106,7 +106,7 @@ export default function AdminUsuarios() {
                                     name="nombre"
                                     value={formData.nombre}
                                     onChange={handleChange}
-                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500"
+                                    className="mt-1 block w-full rounded-xl border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500"
                                     required
                                 />
                             </div>
@@ -118,7 +118,7 @@ export default function AdminUsuarios() {
                                     name="apellidos"
                                     value={formData.apellidos}
                                     onChange={handleChange}
-                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500"
+                                    className="mt-1 block w-full rounded-xl border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500"
                                     required
                                 />
                             </div>
@@ -130,7 +130,7 @@ export default function AdminUsuarios() {
                                     name="email"
                                     value={formData.email}
                                     onChange={handleChange}
-                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500"
+                                    className="mt-1 block w-full rounded-xl border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500"
                                     required
                                 />
                             </div>
@@ -142,7 +142,7 @@ export default function AdminUsuarios() {
                                     name="password"
                                     value={formData.password}
                                     onChange={handleChange}
-                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500"
+                                    className="mt-1 block w-full rounded-xl border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500"
                                     required
                                 />
                             </div>
@@ -153,7 +153,7 @@ export default function AdminUsuarios() {
                                     name="password_confirmation"
                                     value={formData.password_confirmation}
                                     onChange={handleChange}
-                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500"
+                                    className="mt-1 block w-full rounded-xl border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500"
                                     required
                                 />
                             </div>
@@ -163,7 +163,7 @@ export default function AdminUsuarios() {
                                     name="user_type"
                                     value={formData.user_type}
                                     onChange={handleChange}
-                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500"
+                                    className="mt-1 block w-full rounded-xl border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500"
                                     required
                                 >
                                     <option value="">Seleccione un tipo</option>
@@ -179,7 +179,7 @@ export default function AdminUsuarios() {
                                     name="genero"
                                     value={formData.genero}
                                     onChange={handleChange}
-                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500"
+                                    className="mt-1 block w-full rounded-xl border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500"
                                     required
                                 >
                                     <option value="">Seleccione un género</option>
@@ -195,7 +195,7 @@ export default function AdminUsuarios() {
                                     name="gradoAcademico"
                                     value={formData.gradoAcademico}
                                     onChange={handleChange}
-                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500"
+                                    className="mt-1 block w-full rounded-xl border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500"
                                     required
                                 >
                                     <option value="">Seleccione un grado academico</option>
@@ -212,7 +212,7 @@ export default function AdminUsuarios() {
                                     name="fechaNacimiento"
                                     value={formData.fechaNacimiento}
                                     onChange={handleChange}
-                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500"
+                                    className="mt-1 block w-full rounded-xl border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500"
                                 />
                             </div>
 
@@ -222,14 +222,14 @@ export default function AdminUsuarios() {
                                     type="file"
                                     name="foto"
                                     onChange={handleChange}
-                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500"
+                                    className="mt-1 block w-full rounded-bg border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500"
                                 />
                             </div>
                         </div>
 
                         <button
                             type="submit"
-                            className="w-full bg-teal-500 text-white py-2 px-4 rounded-md hover:bg-teal-600 transition duration-300"
+                            className="w-full bg-teal-600 text-white py-3 px-6 rounded-xl hover:bg-teal-700 transition duration-300 transform hover:scale-105"
                         >
                             Crear Usuario
                         </button>

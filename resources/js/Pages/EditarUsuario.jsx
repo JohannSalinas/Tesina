@@ -47,20 +47,21 @@ export default function EditarUsuario({ user }) {
         post(route("usuarios.update", user.id), formData, {
             forceFormData: true,
             preserveState: true,
-            onFinish: () => reset("password", "password_confirmation"),
             onSuccess: () => {
                 Swal.fire({
+                    title: "¡Éxito!",
+                    text: "El usuario ha sido actualizado correctamente.",
                     icon: "success",
-                    title: "Usuario actualizado correctamente",
-                    showConfirmButton: false,
-                    timer: 1500,
+                    confirmButtonColor: "#2563eb",
                 });
+                reset("password", "password_confirmation");
             },
             onError: () => {
                 Swal.fire({
+                    title: "Error",
+                    text: "Hubo un problema al actualizar el usuario. Revisa los campos e intenta nuevamente.",
                     icon: "error",
-                    title: "Error al actualizar el usuario",
-                    text: "Revisa los campos e intenta nuevamente.",
+                    confirmButtonColor: "#dc2626",
                 });
             },
         });
@@ -226,7 +227,7 @@ export default function EditarUsuario({ user }) {
                         </div>
 
                         <div className="mt-6 flex justify-center">
-                            <PrimaryButton className="px-6 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700" disabled={processing}>
+                            <PrimaryButton className="justify-center w-full bg-teal-600 text-white py-3 px-6 rounded-xl hover:bg-teal-700 transition duration-300 transform hover:scale-105" disabled={processing}>
                                 Actualizar Usuario
                             </PrimaryButton>
                         </div>
