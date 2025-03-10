@@ -52,36 +52,37 @@ class NoticiasController extends Controller
         return Inertia::render('EditarNoticia', ['noticia' => $noticia]);
     }
 
- // Actualizar una noticia
-public function update(Request $request, $id)
-{
-    // Validación de datos con la fecha que no puede ser anterior a la fecha actual
-    $validatedData = $request->validate([
-        'titulo' => 'required|string|max:255',
-        'descripcion' => 'nullable|string',
-        'lugar' => 'required|string|max:255',
-        'fecha_evento' => 'required|date|after_or_equal:today', // Validación para la fecha
-        'imagen' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-    ]);
+    // Actualizar una noticia
+    public function update(Request $request, $id)
+    {
+        // Validación de datos con la fecha que no puede ser anterior a la fecha actual
+        $validatedData = $request->validate([
+            'titulo' => 'required|string|max:255',
+            'descripcion' => 'nullable|string',
+            'lugar' => 'required|string|max:255',
+            'fecha_evento' => 'required|date|after_or_equal:today', // Validación para la fecha
+            'imagen' => 'nullable', // Permitir tanto archivos como paths
+        ]);
 
-    // Buscar la noticia por ID
-    $noticia = Noticia::findOrFail($id);
 
-    // Si se sube una nueva imagen, eliminar la antigua y guardarla
-    if ($request->hasFile('imagen')) {
-        // Eliminar la imagen anterior
-        if ($noticia->imagen) {
-            Storage::disk('public')->delete($noticia->imagen);
+        // Buscar la noticia por ID
+        $noticia = Noticia::findOrFail($id);
+
+        // Si se sube una nueva imagen, eliminar la antigua y guardarla
+        if ($request->hasFile('imagen')) {
+            // Eliminar la imagen anterior
+            if ($noticia->imagen) {
+                Storage::disk('public')->delete($noticia->imagen);
+            }
+            $validatedData['imagen'] = $request->file('imagen')->store('noticias', 'public');
         }
-        $validatedData['imagen'] = $request->file('imagen')->store('noticias', 'public');
+
+        // Actualizar los datos de la noticia
+        $noticia->update($validatedData);
+
+        // Redirigir o responder con un mensaje de éxito
+        return redirect(route('noticias.index'))->with('success', 'Noticia actualizada exitosamente.');
     }
-
-    // Actualizar los datos de la noticia
-    $noticia->update($validatedData);
-
-    // Redirigir o responder con un mensaje de éxito
-    return redirect(route('noticias.index'))->with('success', 'Noticia actualizada exitosamente.');
-}
 
 
     // Eliminar una noticia

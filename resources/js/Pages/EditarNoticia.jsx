@@ -14,13 +14,17 @@ export default function EditarNoticias({ noticia }) {
     const handleInputChange = (e) => {
         const { name, value, files } = e.target;
 
-        // Si es el campo de la imagen y se selecciona un archivo, actualiza el valor
-        if (name === 'imagen' && files && files.length > 0) {
-            setData(name, files[0]); // Guarda el archivo seleccionado
-        } else if (name !== 'imagen') {
+        if (name === 'imagen') {
+            if (files && files.length > 0) {
+                setData(name, files[0]); // Guarda la nueva imagen si el usuario selecciona una
+            } else {
+                setData(name, noticia.imagen); // Mantiene la imagen original si no se selecciona una nueva
+            }
+        } else {
             setData(name, value); // Para otros campos, actualiza el valor normalmente
         }
     };
+
 
     const handleSubmit = (e) => {
         e.preventDefault();
