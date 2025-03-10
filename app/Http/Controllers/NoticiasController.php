@@ -26,7 +26,6 @@ class NoticiasController extends Controller
     // Almacenar una nueva noticia
     public function store(Request $request)
     {
-        dd($request);
         $validatedData = $request->validate([
             'titulo' => 'required|string|max:255',
             'descripcion' => 'nullable|string',

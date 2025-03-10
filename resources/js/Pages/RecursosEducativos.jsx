@@ -65,6 +65,40 @@ export default function RecursosEducativos() {
         });
     };
 
+    const handleDelete = (recursoId) => {
+        Swal.fire({
+            title: '¿Estás seguro?',
+            text: `¿Deseas eliminar el recurso con ID: ${recursoId}?`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Sí, eliminar',
+            cancelButtonText: 'Cancelar',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                router.delete(`/recursos/${recursoId}`, {
+                    onSuccess: () => {
+                        Swal.fire({
+                            icon: 'success',
+                            title: '¡Eliminado!',
+                            text: 'El recurso ha sido eliminado correctamente.',
+                            confirmButtonColor: '#1E88E5',
+                        });
+                    },
+                    onError: () => {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: 'Ocurrió un problema al eliminar el recurso.',
+                            confirmButtonColor: '#d33',
+                        });
+                    },
+                });
+            }
+        });
+    };
+
     return (
         <AuthenticatedLayout>
             <Head title="Administrar Recursos Educativos" />
