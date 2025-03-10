@@ -80,7 +80,7 @@ class RecursosEducativosController extends Controller
             'descripcion' => $validatedData['descripcion'],
             'tipo' => $validatedData['tipo'],
             'archivo_path' => $archivoPath, // Guardamos la ruta del archivo
-            'url' => $validatedData['url'], // Guardamos la URL
+            'url' => isset($validatedData['url']) ? $validatedData['url'] : null, // Verificamos si la clave 'url' existe
             'grupo_colaborador_id' => $validatedData['grupo_id'],
             'user_id' => $userId,
         ]);
@@ -142,14 +142,10 @@ class RecursosEducativosController extends Controller
     {
         $recurso = RecursoEducativo::findOrFail($id);
 
-        // Agregar la línea de log para ver los datos recibidos
-        Log::info('Datos recibidos para actualización:', $request->all());
-
         $validator = Validator::make($request->all(), [
             'titulo' => 'required|max:255',
             'descripcion' => 'required|max:1000',
             'tipo' => 'required|in:PDF,DOCX,PPTX,Enlace Web',  // Validación correcta
-            'archivo' => $request->tipo === 'Enlace Web' ? 'nullable|file' : 'required|file|mimes:pdf,docx,pptx|max:10240', // Máx 10MB
             'url' => $request->tipo === 'Enlace Web' ? 'required|url' : 'nullable|url',
         ]);
 

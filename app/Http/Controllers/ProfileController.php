@@ -8,6 +8,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -33,16 +34,28 @@ class ProfileController extends Controller
      */
     public function update(ProfileUpdateRequest $request): RedirectResponse
     {
-        $request->user()->fill($request->validated());
+        $user = $request->user();
 
-        if ($request->user()->isDirty('email')) {
-            $request->user()->email_verified_at = null;
+        // Actualiza los campos de texto
+        $user->fill($request->safe()->except(['foto']));
+
+        // Si se proporcionó una foto, procésala
+        if ($request->hasFile('foto')) {
+            // Almacena la nueva imagen y guarda la ruta
+            $path = $request->file('foto')->store('fotos', 'public');
+            $user->foto = $path; // Asegúrate de que el nombre de la columna coincida con tu BD
         }
 
-        $request->user()->save();
+        if ($user->isDirty('email')) {
+            $user->email_verified_at = null;
+        }
 
-        return Redirect::route('profile.edit');
+        $user->save();
+
+        // Redirecciona con un mensaje de éxito
+        return Redirect::route('profile.edit')->with('success', 'Perfil actualizado correctamente.');
     }
+
 
     /**
      * Delete the user's account.

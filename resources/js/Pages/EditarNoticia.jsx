@@ -3,21 +3,29 @@ import { Head, useForm } from '@inertiajs/react';
 import Swal from 'sweetalert2';
 
 export default function EditarNoticias({ noticia }) {
-    const { data, setData, put, errors } = useForm({
+    const { data, setData, post, errors } = useForm({
         titulo: noticia.titulo,
         descripcion: noticia.descripcion,
         lugar: noticia.lugar,
         fecha_evento: noticia.fecha_evento,
+        imagen: noticia.imagen, // Imagen existente
     });
 
     const handleInputChange = (e) => {
-        const { name, value } = e.target;
-        setData(name, value);
+        const { name, value, files } = e.target;
+
+        // Si es el campo de la imagen y se selecciona un archivo, actualiza el valor
+        if (name === 'imagen' && files && files.length > 0) {
+            setData(name, files[0]); // Guarda el archivo seleccionado
+        } else if (name !== 'imagen') {
+            setData(name, value); // Para otros campos, actualiza el valor normalmente
+        }
     };
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        put(`/noticias/${noticia.id}`, {
+
+        post(`/noticias/${noticia.id}`, {
             onSuccess: () => {
                 Swal.fire({
                     title: '¡Éxito!',
@@ -104,6 +112,20 @@ export default function EditarNoticias({ noticia }) {
                                     className="mt-1 block w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-200"
                                 />
                                 {errors.fecha_evento && <p className="text-red-500 text-sm mt-2">{errors.fecha_evento}</p>}
+                            </div>
+                            <div>
+                                <label htmlFor="imagen" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                                    Imagen
+                                </label>
+                                <input
+                                    id="imagen"
+                                    name="imagen"
+                                    type="file"
+                                    className="mt-2 block w-full p-4 border border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-teal-500 focus:border-teal-500 dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600"
+                                    onChange={handleInputChange}
+                                    accept="image/*"
+                                />
+                                {errors.imagen && <p className="text-red-500 text-sm mt-2">{errors.imagen}</p>}
                             </div>
                             <button
                                 type="submit"

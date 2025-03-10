@@ -19,7 +19,6 @@ export default function AuthenticatedLayout({ header, children }) {
 
     useEffect(() => {
         const resetTimer = () => {
-            console.log('Actividad detectada, reiniciando temporizador');
             clearTimeout(inactivityTimerRef.current);
             clearInterval(countdownTimerRef.current);
             setTimeLeft(5 * 60); // Reiniciar el contador
@@ -29,7 +28,6 @@ export default function AuthenticatedLayout({ header, children }) {
         };
 
         const startCountdown = () => {
-            console.log('Iniciando el contador de inactividad');
             setShowTimer(true); // Mostrar el contador
 
             countdownTimerRef.current = setInterval(() => {
@@ -39,14 +37,12 @@ export default function AuthenticatedLayout({ header, children }) {
                         logoutUser();
                         return 0;
                     }
-                    console.log('Contador:', prevTime - 1);
                     return prevTime - 1;
                 });
             }, 1000);
         };
 
         const logoutUser = () => {
-            console.log('Cerrando sesión por inactividad');
             router.post(route('logout'));
         };
 

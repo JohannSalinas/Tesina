@@ -26,12 +26,13 @@ class NoticiasController extends Controller
     // Almacenar una nueva noticia
     public function store(Request $request)
     {
+        dd($request);
         $validatedData = $request->validate([
             'titulo' => 'required|string|max:255',
             'descripcion' => 'nullable|string',
             'lugar' => 'required|string|max:255',
             'fecha_evento' => 'required|date',
-            'imagen' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'imagen' => 'nullable|image|mimes:jpeg,png,jpg,gif',
         ]);
 
         // Si se sube una imagen, guardarla en el almacenamiento

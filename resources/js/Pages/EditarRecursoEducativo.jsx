@@ -5,11 +5,12 @@ import Swal from 'sweetalert2';
 
 export default function EditarRecursoEducativo() {
     const { recurso } = usePage().props; // Recibe el recurso desde el backend
+
     const [formData, setFormData] = useState({
         titulo: recurso.titulo,
         descripcion: recurso.descripcion,
         tipo: recurso.tipo,
-        archivo: null,
+        archivo: null, // Inicialmente no hay archivo seleccionado
         url: recurso.url,
     });
 
@@ -18,7 +19,7 @@ export default function EditarRecursoEducativo() {
             titulo: recurso.titulo,
             descripcion: recurso.descripcion,
             tipo: recurso.tipo,
-            archivo: recurso.tipo !== 'Enlace Web' ? null : undefined, // El archivo es opcional y solo se selecciona si el usuario lo modifica
+            archivo: recurso.tipo !== 'Enlace Web' ? null : undefined, // Archivo es null si no es un enlace web
             url: recurso.tipo === 'Enlace Web' ? recurso.url : undefined,
         });
     }, [recurso]);
@@ -26,7 +27,7 @@ export default function EditarRecursoEducativo() {
     const handleInputChange = (e) => {
         const { name, value, type, files } = e.target;
         if (type === 'file') {
-            setFormData({ ...formData, [name]: files[0] });
+            setFormData({ ...formData, [name]: files[0] }); // Actualiza el archivo seleccionado
         } else {
             setFormData({ ...formData, [name]: value });
         }
@@ -40,10 +41,18 @@ export default function EditarRecursoEducativo() {
         form.append('descripcion', formData.descripcion);
         form.append('tipo', formData.tipo);
 
-        if (formData.archivo && formData.tipo !== 'Enlace Web') {
-            form.append('archivo', formData.archivo);
-        }else{
-            form.append('url', formData.url);
+        // Si el tipo no es 'Enlace Web', manejar el archivo
+        if (formData.tipo !== 'Enlace Web') {
+            if (formData.archivo) {
+                // Si se seleccionó un nuevo archivo, agregarlo al FormData
+                form.append('archivo', formData.archivo);
+            } else if (recurso.archivo_path) {
+                // Si no se seleccionó un nuevo archivo, mantener el archivo existente
+                form.append('archivo', recurso.archivo_path);
+            }
+        } else {
+            // Si el tipo es 'Enlace Web', agregar la URL
+            form.append('url', formData.url || '');
         }
 
         form.append('_method', 'PUT');
@@ -57,10 +66,20 @@ export default function EditarRecursoEducativo() {
                     confirmButtonColor: '#2563eb',
                 });
             },
-            onError: () => {
+            onError: (errors) => {
+                // Mostrar los errores específicos
+                let errorMessage = 'Ocurrió un error al actualizar el recurso.';
+                if (errors && typeof errors === 'object') {
+                    // Si hay errores de validación, mostrarlos
+                    errorMessage = Object.values(errors).join('<br>'); // Unir los errores en un solo mensaje
+                } else if (typeof errors === 'string') {
+                    // Si el error es un mensaje de texto
+                    errorMessage = errors;
+                }
+
                 Swal.fire({
                     title: 'Error',
-                    text: 'Ocurrió un error al actualizar el recurso.',
+                    html: errorMessage, // Usar `html` para mostrar saltos de línea
                     icon: 'error',
                     confirmButtonColor: '#dc2626',
                 });
@@ -70,10 +89,8 @@ export default function EditarRecursoEducativo() {
 
     return (
         <AuthenticatedLayout>
-            {/* Fondo degradado de azul a verde */}
             <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-500 to-green-500 px-4">
                 <div className="max-w-3xl w-full">
-                    {/* Formulario con opacidad y desenfoque */}
                     <div className="bg-white dark:bg-gray-800 bg-opacity-75 dark:bg-opacity-75 backdrop-blur-lg shadow-xl rounded-xl p-8">
                         <h3 className="text-2xl font-semibold text-gray-900 dark:text-gray-100 text-center mb-6">
                             Editar Recurso Educativo
